@@ -1,6 +1,6 @@
 Histogram <-
 function(x=NULL, data=d, filter=NULL,
-    stat_x=c("count", "proportion"),
+    stat=c("count", "proportion", "density"),
 
     facet1=NULL, facet2=NULL,
     n_row=NULL, n_col=NULL, aspect="fill",
@@ -16,11 +16,11 @@ function(x=NULL, data=d, filter=NULL,
 
     cumulate=c("off", "on", "both"), reg="snow2",
 
-    density=FALSE, show_histogram=TRUE,
+    show_histogram=TRUE,
     bandwidth=NULL, type=c("general", "normal", "both"),
     fill_general=NULL, fill_normal=NULL, fill_hist=getOption("se_fill"),
-    color_general="gray20", color_normal="gray20",
-    x.pt=NULL, y_axis=FALSE,
+    color_general="gray20", color_normal="gray20", line_width=NULL,
+    x_pt=NULL, y_axis=FALSE,
     rug=FALSE, color_rug="black", size_rug=0.5,
 
     xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
@@ -47,11 +47,12 @@ function(x=NULL, data=d, filter=NULL,
   # limit actual argument to alternatives, perhaps abbreviated
   cumulate <- match.arg(cumulate)
   type <- match.arg(type)
-  stat_x <- match.arg(stat_x)
+  stat <- match.arg(stat)
   if (is.null(fun_call)) fun_call <- match.call()
   if (nzchar(axis_fmt[1])) axis_fmt <- match.arg(axis_fmt)
 
-  proportion <- ifelse (stat_x == "proportion", TRUE, FALSE)   # old signal
+  proportion <- ifelse (stat == "proportion", TRUE, FALSE)   # old signal
+  density <- ifelse (stat == "density", TRUE, FALSE)
   histogram <- ifelse (density, FALSE, TRUE)
   trans <- transparency
 
@@ -83,6 +84,10 @@ function(x=NULL, data=d, filter=NULL,
       if (names(dots)[i] == "color_gen") color_general <- dots[[i]]
       if (names(dots)[i] == "color_nrm") color_normal <- dots[[i]]
       if (names(dots)[i] == "bw") bandwidth <- dots[[i]]
+      if (names(dots)[i] == "density") {
+        cat("\n"); stop(call.=FALSE, "\n------\n",
+          "Now enter:  stat=\"density\"\n\n")
+      } 
       if (length(grep(".", names(dots)[i], fixed=TRUE)) > 0) {
         nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
         assign(nm, dots[[i]])
@@ -476,7 +481,8 @@ function(x=NULL, data=d, filter=NULL,
             if (clr == "gray" ||
                (getOption("theme") == "gray"  &&
                 getOption("sub_theme") == "black")) {
-              fill_normal <- "transparent"
+              fill_normal <- ifelse (type=="normal",
+                                     rgb(.75,.75,.75, .5), "transparent")
             }
           }
           else {  # add some transparency to a named color
@@ -497,10 +503,10 @@ function(x=NULL, data=d, filter=NULL,
           stuff <- .dn.main(data[,i], bandwidth, type, show_histogram,
                 bin_start, bin_width,
                 fill_hist, color_normal, color_general,
-                fill_normal, fill_general,
+                fill_normal, fill_general, line_width,
                 rotate_x, rotate_y, offset,
                 axis_fmt, axis_x_pre, axis_y_pre,
-                x.pt, xlab, main, sub, y_axis, x.min, x.max,
+                x_pt, xlab, main, sub, y_axis, x.min, x.max,
                 rug, color_rug, size_rug, quiet, fncl=fun_call, ...)
 
 

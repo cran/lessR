@@ -1,9 +1,8 @@
 .plt.contour <-
-function(x, y, contour_n, contour_nbins,
+function(x, y, contour_n, contour_nbins, contour_points, size.pt,
          theme, scale_x, scale_y, pad_x, pad_y, x.lab, y.lab,
          ellipse, ellipse_color, ellipse_lwd, fit.line, fit_color, fit_lwd,
          axis_x_pre, axis_y_pre, axis_fmt, xlab.adj, ylab.adj) {
-
 
   if (theme %in% c("white", "gray", "light"))
     clrs <- colorRampPalette(c("white", gray.colors(contour_n,
@@ -98,9 +97,22 @@ function(x, y, contour_n, contour_nbins,
   }
   lbl.y <- .axis.format(ayT2, axis_fmt, axis_x_pre="no", axis_y_pre)
 
-  # Plot
+
+# Plot --------------------------------------------------------------------
   ax <- .axes_dim()
-  filled.contour(
+
+  # buffer to y.lab vertical extra room, preview actual axis text
+  ticks <- ayT2[ayT2 >= y.lim[1] & ayT2 <= y.lim[2]]
+  ticks <- .axis.format(ticks, axis_fmt, axis_x_pre="no", axis_y_pre)
+  mnv <- max(nchar(ticks))
+  buf.y <- -0.8 + 0.32*mnv
+
+  if (contour_points) {  # extend axes to accommodate maximum points
+    x.lim[2] <- x.lim[2] + .015*diff(x.lim)
+    y.lim[2] <- y.lim[2] + .015*diff(y.lim)
+  }
+
+  filled.contour(  # with legend, implicitly uses layout()
     dens$x, dens$y, dens$z,
     xlim=x.lim, ylim=y.lim,
     nlevels=contour_n,
@@ -108,22 +120,21 @@ function(x, y, contour_n, contour_nbins,
 
     plot.axes={
 
-      # buffer to y.lab vertical extra room, preview actual axis text
-      ticks <- ayT2[ayT2 >= y.lim[1] & ayT2 <= y.lim[2]]
-      ticks <- .axis.format(ticks, axis_fmt, axis_x_pre="no", axis_y_pre)
-      mnv <- max(nchar(ticks))
-      buf.y <- -0.8 + 0.32* mnv
-
       old.par <- par()
-#     par(mgp=c(8, 2.25, 0), tcl=-1)
-      par(mgp=c(3, .5, 0), tcl=-.28)  # axes text closer to the axes
+      par(mgp=c(3.5, .5, 0), tcl=-.28)  # axes text closer to the axes
       axis(1, at=axT1, labels=lbl.x,
            cex.axis=ax$axis_x_cex*1.1, col.axis=ax$axis_x_text_color)
       axis(2, at=ayT2, labels=lbl.y,
            cex.axis=ax$axis_y_cex*1.1, col.axis=ax$axis_y_text_color)
       lab.cex <- getOption("lab_cex")*1.2
-      title(xlab=x.lab, line=2.25+xlab.adj, cex.lab=lab.cex)
-      title(ylab=y.lab, line=3+ylab.adj+buf.y, cex.lab=lab.cex)
+      title(xlab=x.lab, line=2.3+xlab.adj, cex.lab=lab.cex)
+      title(ylab=y.lab, line=3.5+ylab.adj+buf.y, cex.lab=lab.cex)
+
+      if (contour_points) {
+        point.args = list(pch=21, cex=size.pt,
+                          bg="#00000044", col="white", lwd=.2)
+        do.call(points, c(list(x = x, y = y), point.args))
+      }
 
       if (ellipse[1] > 0) {
         for (j in seq_along(ellipse)) {
@@ -133,7 +144,6 @@ function(x, y, contour_n, contour_nbins,
         }
         ellipse <- 0
       }  # end do.ellipse
-#     lines(ellipse.trunc, col=ellipse_color, lwd=2)
 
       if (fit.line != "off") {
         pf <- .plt.fit(x, y, fit.line=fit.line, fit_power=0, fit_new=NULL)

@@ -513,9 +513,16 @@ function(data, compute, variable, by=NULL, by_cols=NULL, filter=NULL,
 
       k <- n.by
       for (i in 1:n.var) {  # for each variable, cover n, na, aggregated stat
-        names(a)[k+1] <- paste(nm.var.d[i], "_n", sep="")
-        names(a)[k+2] <- paste(nm.var.d[i], "_na", sep="")
-        names(a)[k+3] <- nm.var.d[i]
+
+        if (n.var==1) { 
+          names(a)[k+1] <- "n"
+          names(a)[k+2] <- "na"
+        }
+        else {
+          names(a)[k+1] <- paste(nm.var.d[i], "_n", sep="")
+          names(a)[k+2] <- paste(nm.var.d[i], "_na", sep="")
+        }
+          names(a)[k+3] <- nm.var.d[i]
         k <- k + 3
       }
     }  # end n.cmp==1
@@ -526,8 +533,8 @@ function(data, compute, variable, by=NULL, by_cols=NULL, filter=NULL,
       a <- a2
 
       k <- n.by
-      names(a)[k+1] <- paste(nm.var.d[1], "_n", sep="")
-      names(a)[k+2] <- paste(nm.var.d[1], "_na", sep="")
+      names(a)[k+1] <- "n"
+      names(a)[k+2] <- "na"
       for (i in 1:n.cmp) {
         names(a)[k+2+i] <- nm.var.d[1]  # all agg vars get the var name
       }
@@ -654,8 +661,9 @@ function(data, compute, variable, by=NULL, by_cols=NULL, filter=NULL,
     }
   }  # end 1:nrow(a)
   for (i in 1:nrow(a)) {
+
     for (j in 1:length(na_ind)) {
-      if (is.na(a[i,na_ind[j]])) {
+      if (length(na_ind) > 0 && is.na(a[i, na_ind[j]])) {
         a[i,na_ind[j]] <- 0
         ind0[i] <- TRUE
       }
@@ -706,8 +714,14 @@ function(data, compute, variable, by=NULL, by_cols=NULL, filter=NULL,
     nm.var.a <- names(a)[ind.var]  # preserve original names
 
     # delete variables _n and _na
-    n.ind <- which(grepl("_n", names(a), fixed=TRUE))
-    miss.ind <- which(grepl("_na", names(a), fixed=TRUE))
+    if ("n" %in% names(a))
+      n.ind <- which(names(a) == "n")
+    else
+      n.ind <- which(grepl("_n", names(a), fixed=TRUE))
+    if ("na"  %in% names(a))
+      miss.ind <- which(names(a) == "na")
+    else
+      miss.ind <- which(grepl("_na", names(a), fixed=TRUE))
     a <- a[, -c(n.ind, miss.ind)]
 
     # re-reference pivot variables in aggregated data frame a

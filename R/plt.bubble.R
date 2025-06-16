@@ -2,7 +2,7 @@
 function(x, y, size, radius, power, fill, color,
          size_cut, prop, bubble_text, object) {
 
-  cords <- data.frame(x, y, size, stringsAsFactors=TRUE)
+  cords <- data.frame(x, y, size)
   cords <- na.omit(cords)
 
   # scale for regular R or RStudio
@@ -15,7 +15,9 @@ function(x, y, size, radius, power, fill, color,
   mxru <- max(sz)
   sz <- 2 * (sz/mxru) * radius  # scaled diameter
 
-  # text on the bubbles
+
+# text on the bubbles -----------------------------------------------------
+
   if (size_cut  &&  object == "bubble") {  
 
     # get q.ind before setting too small bubbles for text at NA
@@ -65,5 +67,4 @@ function(x, y, size, radius, power, fill, color,
         text(cords[,1], cords[,2], crd, cex=sz.cex, col=bubble_text)
     }
   }  # end (size_cut  &&  object == "bubble")
-
 }

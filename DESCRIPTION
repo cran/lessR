@@ -1,6 +1,6 @@
 Package: lessR
-Version: 4.4.3
-Date: 2025-05-08
+Version: 4.4.4
+Date: 2025-06-16
 Title: Less Code, More Results
 Authors@R: c(
     person(given = "David W.", 
@@ -11,18 +11,18 @@ Authors@R: c(
 Depends: R (>= 3.6.0)
 Imports: graphics, grDevices, stats, utils, methods, lattice,
         latticeExtra, robustbase, ellipse, leaps, openxlsx, colorspace,
-        shiny, knitr, kableExtra, xts, zoo, MASS,
+        shiny, knitr, kableExtra, xts, zoo, MASS
 Suggests: KernSmooth, haven, readODS, triangle, arrow, rmarkdown,
         wesanderson
 VignetteBuilder: knitr
 Description: Each function replaces multiple standard R functions. For example, two function calls, Read() and CountAll(), generate summary statistics for all variables in the data frame, plus histograms and bar charts as appropriate. Other functions provide for summary statistics via pivot tables, a comprehensive regression analysis, ANOVA and t-test, visualizations including the Violin/Box/Scatter plot for a numerical variable, bar chart, histogram, box plot, density curves, calibrated power curve, reading multiple data formats with the same function call, variable labels, time series with aggregation and forecasting, color themes, and Trellis (facet) graphics. Also includes a confirmatory factor analysis of multiple indicator measurement models, pedagogical routines for data simulation such as for the Central Limit Theorem, generation and rendering of regression instructions for interpretative output, and interactive visualizations.
 License: GPL (>= 2)
 LazyLoad: yes
-Packaged: 2025-05-09 00:27:47 UTC; davidgerbing
+Packaged: 2025-06-16 14:21:32 UTC; davidgerbing
 NeedsCompilation: no
 Author: David W. Gerbing [aut, cre] (ORCID:
     https://orcid.org/0000-0001-6998-8350; Affiliation: School of
     Business, Portland State University)
 Maintainer: David W. Gerbing <gerbing@pdx.edu>
 Repository: CRAN
-Date/Publication: 2025-05-09 03:30:02 UTC
+Date/Publication: 2025-06-16 15:00:02 UTC

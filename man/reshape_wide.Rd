@@ -14,10 +14,9 @@ reshape_wide(data, widen, response, ID, prefix=NULL, sep="_", ...)
 \arguments{
   \item{data}{Data frame that contains the variables to analyze as a
         wide-form single column.}
-  \item{widen}{Name of the (single) grouping variable in the input long-form column.}
-  \item{response}{Name of the variable of the response values in the input
-        long-form column.}
-  \item{ID}{Name of the ID field in the long-form column.}
+  \item{widen}{Name of the (single) grouping variable in the input long-form column to have its individual values listed as columns in the corresponding wide form version.}
+  \item{response}{Name of the variable of the response values in the input long-form column that becomes the data values in the wide-form version.}
+  \item{ID}{Name of the ID field in the long-form column used to identify each row in the wide-form version.}
   \item{prefix}{If \code{TRUE}, prefix the column names in the wide form
         of each corresponding level of the  
         \code{widen} variable with the name of the \code{response}. Unless

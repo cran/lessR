@@ -18,10 +18,10 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
          segments=FALSE, segments_y=FALSE, segments_x=FALSE,
 
          type="regular", smooth_points=100, smooth_size=1,
-         smooth_exp=0.25, smooth_bins=128,
-         contour_n=8, contour_nbins=50,
+         smooth_power=0.25, smooth_bins=128,
+         contour_n=8, contour_nbins=50, contour_points=FALSE,
 
-         radius=0.15, power=0.6, size_cut=TRUE,
+         radius=0.15, power=0.5, size_cut=TRUE,
          bbl.txt.col=getOption("bubble_text_color"),
          col.low=NULL, col.hi=NULL,
 
@@ -79,7 +79,7 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
   # a time series has dates for x and numeric for y, factors are factors, etc
 
   # want labels set just for ttestPower, which provides its own labels
-  # both x and y are plotted, even if only a single variable
+  # both x# and y are plotted, even if only a single variable
   # for a 1-D bubble plot of a single factor var, y was set to 0's
   bubble1 <- ifelse (length(unique(y[,1])) == 1, TRUE, FALSE)
 
@@ -101,12 +101,12 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
   # size is a variable, these values passed to .plt.main
   # bubble.title=FALSE passed from .plt.bins to suppress title
   # bubble plot can be directly from object="point"
-  if (length(size) > 1  &&  bubble.title) {
-    sz.nm <- getOption("sizename")
-    main.lab <- bquote(paste(italic(.(sz.nm)), ": Bubble size from ",
-      .(min(size)), " to ", .(max(size)), sep=""))
-  }
-  else
+# if (length(size) > 1  &&  bubble.title) {
+#   sz.nm <- getOption("sizename")
+#   main.lab <- bquote(paste(italic(.(sz.nm)), ": Bubble size from ",
+#     .(min(size)), " to ", .(max(size)), sep=""))
+# }
+# else
     main.lab <- NULL
 
   # get lab_x_cex  lab_y_cex    Synchronize with Plot() code, put in own sub
@@ -277,10 +277,15 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
 
   # room in right margin for the vertical legend
   if (n.xcol > 1  ||  n.ycol > 1  ||  !is.null(by)) {
+    rm <- rm - .025  # hack to reduce rm a bit
     if (n.xcol > 1) nm.v <- nm.x
     if (n.ycol > 1) nm.v <- nm.y
     if (!is.null(by)) nm.v <- by.name
-    big.nm <- max(nchar(nm.v))
+    big.nm <- max(nchar(nm.v))  # nm.v could be a vector
+    if (!is.null(legend_title)) {
+      nm.lt <- nchar(legend_title)
+      big.nm <- max(nm.lt, big.nm)
+    }
     if (big.nm > 6) rm <- rm + (.05 * (big.nm - 6))
     if (n.ycol == 1) rm <- rm + .30  + (.65 * axis_y_cex)
     if (axis_y_cex > 1) if (!is.null(by)) rm <- rm + .1  # kludge
@@ -289,7 +294,7 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
   if (ts_ahead > 0) rm <- rm + 0.75  # make room for vertical legend
 
   if (center_line != "off") rm <- rm + .4  # room for center_line label
-  rm <- rm + 0.10  # make room when the last axis date > last data value
+  if (date.var) rm <- rm + 0.10  # make room: last axis date > last data value
   if ((options("device") != "RStudioGD")  &&  !is.null(by)) rm <- rm + .3
 
   if (date.var && n.by>1) rm <- rm - 0.05
@@ -298,14 +303,21 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
     mm <- mm + 0.25  # reduce size of plot in the left to make room for label
     ylab.adj <- ylab.adj + 0.2  # move label right when calling .axlabs()
   }
-  if (n.ycol > 1)
+
+  if (n.ycol > 1) {
     rm <- rm + 0.80  # add right margin for legend
+    mxch <- max(nchar(colnames(y)))
+    if (mxch > 6) rm <- rm + 0.20
+  }
+
+  if (length(size) > 1)
+    rm <- rm + 0.92  # add right margin for legend
 
   if (offset > 0.5) bm <- bm + (-0.05 + 0.2 * offset)  # offset kludge
 
-  if (n.xcol>1  && !date.var) {
+  if (n.xcol>1  && !date.var  && !cleveland) {
     bm <- bm + 0.20  # allow for the bottom legend
-    rm <- rm - 0.60  # remove superfluous right margin
+    rm <- rm - 0.80  # remove superfluous right margin
   }
 
   if (type == "contour") {
@@ -437,7 +449,7 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
   usr <- par("usr")
 
   
-# axes ticks and labels axT1 and axT2--------------------------------------
+# axes ticks and labels axT1 and axT2 -------------------------------------
 
   # set axT1: x-axis tics and values, Date var uses x.zoo.dates, defined later
   if (cat.x)
@@ -646,7 +658,7 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
             lines(x[,1], y[,1], col=color[1], lwd=ln.width, ...)
         if (area_fill[1] != "transparent") # fill area
           polygon(c(x[1],x,x[length(x)]), c(mn.y,y[,1],mn.y),
-              col=area_fill, border="transparent")
+                  col=area_fill, border="transparent")
 
         if (ts_ahead > 0) {  # forecast
           trns.red <- .maketrans("darkred", 0.25*256)
@@ -742,25 +754,26 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
 
       if (type == "smooth") {  # 2-D kernel density plot
         # grid lines only plot after the sp
+        hue <- .get.h(getOption("theme"))  # get hue number from theme
+        satur <- ifelse (getOption("theme") %in% c("gray", "white"), 0, 80)
         clr.den <- colorRampPalette(c(getOption("window_fill"),
-                                       getOption("bar_fill_cont")))
+                     hcl(hue, satur, 16)))
         if (!requireNamespace("KernSmooth", quietly=TRUE)) {
           stop("Package \"KernSmooth\" needed for this visualization\n",
                "Please install it:  install.packages(\"KernSmooth\")\n\n",
                call. = FALSE)
         }
         smoothScatter(x, y, nrpoints=smooth_points, nbin=smooth_bins,
-                      transformation=function(x) x^(smooth_exp),
+                      transformation=function(x) x^(smooth_power),
                       colramp=clr.den, cex=smooth_size, add=TRUE)
       }
  
       else if (type == "contour")
-        .plt.contour(x, y, contour_n, contour_nbins,
+        .plt.contour(x, y, 
+           contour_n, contour_nbins, contour_points, size.pt[1],
            theme, scale_x, scale_y, pad_x, pad_y, x.lab, y.lab, 
            ellipse, ellipse_color, ellipse_lwd, fit.line, fit_color, fit_lwd,
            axis_x_pre, axis_y_pre, axis_fmt, xlab.adj, ylab.adj) 
-
-
 
 # plot points, segments, means with no by --------------------------------- 
 
@@ -783,8 +796,6 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
 
         else if (n.ycol == 1) {  # one y
           for (i in 1:n.xcol) {  # one to many x's
-              if (theme %in% c("gray", "white"))
-                if (n.clrs == 2  &&  i == 2) fill[i] <- "transparent"
               points(x[,i], y[,1], pch=shape, col=color[i], bg=fill[i],
                      cex=size.pt, ...)
           }
@@ -792,8 +803,6 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
 
         else  if (n.xcol == 1) {  # one x
           for (i in 1:n.ycol) {  # one to many y's
-              if (theme %in% c("gray", "white"))
-                if (n.clrs == 2  &&  i == 2) fill[i] <- "transparent"
               points(x[,1],y[,i], pch=shape, col=color[i], bg=fill[i],
                      cex=size.pt, ...)  # one x
           }
@@ -972,16 +981,25 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
                          fill_bg, usr, legend_title=legend_title)
       }
     }  # end by
-
     
+
 # legend (more than 1 x or y) ---------------------------------------------
 
     if (fill[1] == "transparent") fill <- color
 
-    if (n.xcol > 1)  # horizontal legend, on x-axis
-      .plt.legend(colnms=colnames(x), horiz=TRUE,
-                  color, fill, shape, fill_bg, usr,
-                  lab_cex=lab_x_cex, pt.size=1.25, legend_title)
+    if (n.xcol > 1) {
+      if (!cleveland) {  # horizontal legend, on x-axis
+        .plt.legend(colnms=colnames(x), horiz=TRUE,
+                    color, fill, shape, fill_bg, usr,
+                    lab_cex=lab_x_cex, pt.size=1.25, legend_title)
+      }
+      else {  # vertical legend
+        point.size <- 1.25 * size.pt
+        .plt.by.legend(colnames(x), color, fill, shp=shape[1], pts_trans,
+                       fill_bg, usr, pt.size=point.size,  # 22 is a rectangle
+                       legend_title=legend_title)
+      }
+    }
 
     if (n.ycol > 1) {  # vertical legend, on y-axis
       if (stack)  # ifelse form only returns the first value of the vector
@@ -1004,6 +1022,9 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
         "Parameter  by  not valid for bubble plot\n\n")
     }
 
+    if (length(size) > 1)  # custom legend for the bubble sizes
+      .plt.sym.legend(size, color, fill, shape, fill_bg, usr, radius, power)
+
     n.clrs <- 1  # for fit.line
 
     # colors
@@ -1021,7 +1042,6 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
     }
 
     # no value for size specified, do counts
-
     if (length(size) == 1) {
       mytbl <- table(x, y)  # get the counts, all x-y combinations
       n.count <- nrow(mytbl) * ncol(mytbl)

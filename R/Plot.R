@@ -33,19 +33,19 @@ function(x, y=NULL, data=d, filter=NULL,
     stat=c("mean", "sum", "sd", "deviation", "min", "median", "max"),
     stat_x=c("count", "proportion", "%"),
 
-    vbs_plot="vbs", vbs_size=0.9, bw=NULL, bw_iter=10,
+    vbs_plot="vbs", vbs_ratio=0.9, bw=NULL, bw_iter=10,
     violin_fill=getOption("violin_fill"),
     box_fill=getOption("box_fill"),
     vbs_pt_fill="black",
-    vbs_mean=FALSE, fences=FALSE,
+    vbs_mean=FALSE, fences=FALSE, n_min_pivot=1,
     k=1.5, box_adj=FALSE, a=-4, b=3,
 
-    radius=NULL, power=0.55, low_fill=NULL, hi_fill=NULL,
+    radius=NULL, power=0.5, low_fill=NULL, hi_fill=NULL,
 
     type=c("regular", "smooth", "contour"),
     smooth_points=100, smooth_size=1,
-    smooth_exp=0.25, smooth_bins=128, n_bins=1,
-    contour_n=10, contour_nbins=50,
+    smooth_power=0.25, smooth_bins=128, n_bins=1,
+    contour_n=10, contour_nbins=50, contour_points=FALSE,
 
     bin=FALSE, bin_start=NULL, bin_width=NULL, bin_end=NULL,
     breaks="Sturges", cumulate=FALSE,
@@ -59,7 +59,7 @@ function(x, y=NULL, data=d, filter=NULL,
     rotate_x=getOption("rotate_x"), rotate_y=getOption("rotate_y"),
     offset=getOption("offset"),
     axis_fmt=c("K", ",", ".", ""), axis_x_prefix="", axis_y_prefix="",
-    xy_ticks=TRUE, 
+    xy_ticks=TRUE, n_axis_x_skip=0, n_axis_y_skip=0, 
 
     legend_title=NULL,
 
@@ -103,6 +103,11 @@ function(x, y=NULL, data=d, filter=NULL,
   }
   if (stat.miss) stat <- "data"  # no aggregation
   if (stat.miss  &&  !stat_x.miss) stat <- stat_x
+
+  if (!missing(contour_n) || !missing(contour_nbins) || 
+      !missing(contour_points))
+    type <- "contour"
+
 
   if (type == "contour"  &&  !is.null(add)) {
     cat("\n"); stop(call.=FALSE, "\n------\n",
@@ -174,7 +179,9 @@ function(x, y=NULL, data=d, filter=NULL,
       }
       if (names(dots)[i] == "type") ts_type <- dots[[i]]
       if (names(dots)[i] == "stat_yx") stat <- dots[[i]]
+      if (names(dots)[i] == "smooth_exp") smooth_power <- dots[[i]]
       if (names(dots)[i] == "area_origin") area_split <- dots[[i]]
+      if (names(dots)[i] == "vbs_size") vbs_ratio <- dots[[i]]
       if (names(dots)[i] == "run") {
         cat("\n"); stop(call.=FALSE, "\n------\n",
           "Parameter  run  dropped. Now, specify the first variable, the\n",
@@ -311,6 +318,7 @@ function(x, y=NULL, data=d, filter=NULL,
   facet1.miss <- ifelse (is.null(facet1), TRUE, FALSE)
   facet2.miss <- ifelse (is.null(facet2), TRUE, FALSE)
   size.miss <- ifelse (missing(size), TRUE, FALSE)
+  shape.miss <- ifelse (missing(shape), TRUE, FALSE)
   radius.miss <- ifelse (missing(radius), TRUE, FALSE)
   fill.miss <- ifelse (missing(fill), TRUE, FALSE)
   if (is.null(fill)) fill.miss <- TRUE  # shiny sets fill at NULL if by var
@@ -336,8 +344,8 @@ function(x, y=NULL, data=d, filter=NULL,
 
   if (!missing(a) || !missing(b)) box_adj <- TRUE
 
-  if (missing(vbs_size)) if (!violin)  # wider box if no violin
-    vbs_size <- ifelse (y.miss || facet1.miss, vbs_size*3.75, vbs_size*5)
+  if (missing(vbs_ratio)) if (!violin)  # wider box if no violin
+    vbs_ratio <- ifelse (y.miss || facet1.miss, vbs_ratio*3.75, vbs_ratio*5)
 
   # "off" substitutes for official value of "transparent"
   fill[which(fill == "off")] <- "transparent"
@@ -892,7 +900,7 @@ function(x, y=NULL, data=d, filter=NULL,
       data.vars <- as.list(seq_along(data))  # even if only a single var
       names(data.vars) <- names(data)  # all var names in data frame
       by.col <- eval(substitute(by), envir=data.vars)  # col num selected vars
-      by.call <- data[, by.col]
+      by.call <- data[, by.col]  # values are original labels here
     }
     else {  # vars that are function names get assigned to global
       by.call <- by
@@ -903,14 +911,16 @@ function(x, y=NULL, data=d, filter=NULL,
    # .plt.by.legend, plt.main #818, needs levels(by)
     if (!is.factor(by.call)) by.call <- factor(by.call)
     by.unq <- length(unique(by.call))
+    if (!shape.miss && !is.null(by.call) && shape[1]!="vary")
+      shape  <- align_vector(shape, by.call)  # convert named shape to unnamed
     shp <- .plt.shapes(shape, out_shape, n.by=by.unq)
     shape <- shp$shape
-  }
+  }  # end a by var
 
   else {   # process shapes (without a by var)
     if (shape[1] == "sunflower")
       object <- "sunflower"
-    else {  # get numeric code, check for bad shapes
+    else {  # get numeric code for shape, check for bad shapes
       shp <- .plt.shapes(shape, out_shape)
       shape <- shp$shape
       out_shape <- shp$out_shape
@@ -920,7 +930,12 @@ function(x, y=NULL, data=d, filter=NULL,
   }
 
   n.by <- ifelse (is.null(by.call), 0, nlevels(by.call))
-
+  if (!by.miss) {
+    if (all(is.na(by.call))) { # x a data frame
+        cat("\n"); stop(call.=FALSE, "\n------\n",
+          "All values of  by  are missing. You need some data.\n\n")
+    }
+  }
 
   # evaluate facet1
   #-------------
@@ -1036,8 +1051,7 @@ function(x, y=NULL, data=d, filter=NULL,
   #------------
   get.ID <- FALSE
   if (!is.null(add)) if (add[1] == "labels") get.ID <- TRUE
-  if (!y.miss) if (MD_cut>0 || out_cut>0)
-    get.ID <- TRUE
+  if (MD_cut>0 || out_cut>0) get.ID <- TRUE
 
   if (get.ID) {
     # ID.name is the actual var name if specified directly,
@@ -1063,7 +1077,7 @@ function(x, y=NULL, data=d, filter=NULL,
         ID.call <- row.names(data) 
     } # end x.in.global
 
-    else {
+    else {  # in global
       ID.call <- eval(substitute(ID), parent.frame())
     }
   }  # end get.ID
@@ -1089,6 +1103,7 @@ function(x, y=NULL, data=d, filter=NULL,
   if (is.null(width)) width <- 6
   if (!is.null(by.call)) width <- width + .85  # wider plot
 
+  sm.tbl <- NULL  # for pivot() output of Trellis plots
 
   # --------
   # adjust by, manage regular-R or PDF graphics
@@ -1366,10 +1381,20 @@ function(x, y=NULL, data=d, filter=NULL,
   nn.col <- max(n.xcol, n.ycol)  # n_col goes into lattice, do not change
 
   ord.by.call <- is.ordered(by.call)
+  if (!fill.miss && !is.null(by.call)) {
+    if (!.is.palette(fill[1]))
+      fill  <- align_vector(fill, by.call)  # named fill to legacy unnamed
+  }
+  if (!color.miss && !is.null(by.call)) {
+    if (!.is.palette(color[1]))
+      color  <- align_vector(color, by.call)  # convert named color to legacy
+  }
+
   fc <- .plt.colors(object, nn.col, n.by, segments, theme, fill, fill.miss,
           color, color.miss, area_fill, area_fill.miss, trans, stack,
           n.ycol, n.yvar, ord.by.call, run, pt.size)
 
+  # assign fills and colors
   pt.fill <- fc$pt_fill
   pt.color <- fc$pt_col
   area_fill <- fc$area_fill
@@ -1472,8 +1497,6 @@ function(x, y=NULL, data=d, filter=NULL,
           }
         }  # end n.by is 0 or 1
 
-
-
         # grayscale
         if (theme %in% c("gray", "white"))
           if (any(pt.size > 0.4)) if (out_shape.miss) out_shape <- 23
@@ -1505,10 +1528,11 @@ function(x, y=NULL, data=d, filter=NULL,
         jitter_x <- VBS$jitter_x
         bw <- VBS$bw
         adj.bx.ht <- VBS$adj.bx.ht
-        output <- VBS$output  # text output
-      }  # end VBS plot
+        output$out_stats <- VBS$output  # text output
+#       print(output)
+      }  # end single VBS plot
 
-      else {  # Trellis but not a VBS plot, such as when there is a y-variable
+      else {  # Trellis but not a VBS plot, such as when there is a by-variable
 
         # e.g., y.miss=FALSE,  Plot(Years, Salary, facet1=Gender)
         adj.bx.ht <- nrows  # just to adjust box height
@@ -1534,15 +1558,111 @@ function(x, y=NULL, data=d, filter=NULL,
                    fit.ln, fit_power, fit_color, fit_lwd, fit_se,
                    plot_errors, area_split, jitter_y,
                    violin, violin_fill, box, box_fill,
-                   bw, vbs_size, box_adj, a, b, k.iqr, fences, vbs_mean,
+                   bw, vbs_ratio, box_adj, a, b, k.iqr, fences, vbs_mean,
                    out_shape, pt.out_size,
                    out_fill, out_color, out2_fill, out2_color,
                    ID.call, out_cut, ID_color, ID_size,
                    axis_fmt, axis_x_prefix, axis_y_prefix,
-                   rotate_x, rotate_y, width, height, pdf_file,
-                   T.type, quiet, ...)
+                   rotate_x, rotate_y, n_axis_x_skip, n_axis_y_skip,
+                   width, height, pdf_file, T.type, quiet, ...)
 
-    }  # end T.type != "dot"
+# pivot tables ------------------------------------------------------------
+      if (!date.var && !run && y.miss) {  # no time vars, VBS only
+        out_by <- NULL
+        out_facet1 <- NULL
+        out_facet2 <- NULL
+
+        group.vars <- c()  # for main pivot table
+        if (!by.miss) {
+          group.vars <- c(group.vars, by.name)
+          pivot.call <- bquote(  # cannot do this in a sub-function
+            pivot(data = .(data),
+              compute = c(mean, median, sd, IQR, min, max), 
+              variable = .(as.name(x.name)), 
+              by = .(as.name(by.name)),
+              out_name = c("Mean", "Median", "SD", "IQR", "Min", "Max")
+            )
+          )
+          pt.tbl <- eval(pivot.call, envir=parent.frame())
+          txpiv <- .df_char(pt.tbl)  # convert df to char array
+          class(txpiv) <- "out"
+          out_by <- txpiv 
+        }
+        if (!facet1.miss)  { 
+          group.vars <- c(group.vars, facet1.name)
+          pivot.call <- bquote(  # cannot do this in a sub-function
+            pivot(data = .(data),
+              compute = c(mean, median, sd, IQR, min, max), 
+              variable = .(as.name(x.name)), 
+              by = .(as.name(facet1.name)),
+              out_name = c("Mean", "Median", "SD", "IQR", "Min", "Max")
+            )
+          )
+          pt.tbl <- eval(pivot.call, envir=parent.frame())
+          txpiv <- .df_char(pt.tbl)  # convert df to char array
+          class(txpiv) <- "out"
+          out_facet1 <- txpiv 
+        }
+        if (!facet2.miss) {
+          group.vars <- c(group.vars, facet2.name)
+          pivot.call <- bquote(  # cannot do this in a sub-function
+            pivot(data = .(data),
+              compute = c(mean, median, sd, IQR, min, max), 
+              variable = .(as.name(x.name)), 
+              by = .(as.name(facet2.name)),
+              out_name = c("Mean", "Median", "SD", "IQR", "Min", "Max")
+            )
+          )
+          pt.facet2 <- eval(pivot.call, envir=parent.frame())
+          pt.tbl <- eval(pivot.call, envir=parent.frame())
+          txpiv <- .df_char(pt.tbl)  # convert df to char array
+          class(txpiv) <- "out"
+          out_facet2 <- txpiv 
+        }
+
+        if (length(group.vars)>0) {
+          pivot.call <- bquote(  # cannot do this in a sub-function
+            pivot(data = .(data),
+              compute = c(mean, median, sd, IQR, min, max), 
+              variable = .(as.name(x.name)), 
+              by = .(as.name(paste0("c(",paste(group.vars, collapse=","),")"))),
+              out_name = c("Mean", "Median", "SD", "IQR", "Min", "Max")
+            )
+          )
+          pt.tbl <- eval(pivot.call, envir=parent.frame())
+          if (n_min_pivot > 0) pt.tbl <- pt.tbl[pt.tbl$n >= n_min_pivot, ]
+
+          txpiv <- .df_char(pt.tbl)  # convert df to char array
+          class(txpiv) <- "out"
+          output$out_pivot <- txpiv 
+
+          txt <- ifelse (length(group.vars) == 1, "table", "tables") 
+          title <- paste("\n---------- Pivot", txt, "for", x.name)
+          if (n_min_pivot > 1)
+            title <- paste(title, "for groups with minimum n of", n_min_pivot)
+          class(title) <- "out"
+
+          # names(output): out_grp out_rep out_parm out_pivot
+          # others are from VBS$output above, leaving their computation for now
+          output <- list(
+            out_title_pivot = title,
+            out_pivot = output$out_pivot
+          )
+          if (!is.null(out_by) && !facet1.miss) output$out_by <- out_by
+          if (!is.null(out_facet1) && !by.miss) output$out_facet1 <- out_facet1
+          if (!is.null(out_facet2)) output$out_facet2 <- out_facet2
+          if (!facet2.miss) output$out_rep <- VBS$output$out_rep
+          output$out_parm <- VBS$output$out_parm
+
+          if (!quiet) {  # if quiet, do the above calculations if results saved
+            class(output) <- "out_all"
+            print(output)
+            cat("\n")  # add a blank line after output
+          }  # end not quiet
+        }  # end group vars exist
+      }  # end pivot tables with no time vars
+
+    }  # end T.type != "dot
 
     else {  # bar plot
 
@@ -1888,7 +2008,7 @@ function(x, y=NULL, data=d, filter=NULL,
             if (min.x > 0) {  # all + or all - which were converted to +
               rng <- max.x - min.x
               prp <- rng / min.x
-              if (prp > 2.30) origin_x <- 0  # 2.30 cutoff is a heuristic
+              if (prp > 2.40) origin_x <- 0  # 2.40 cutoff is a heuristic
             }
           }
         }  # end numr
@@ -1913,8 +2033,8 @@ function(x, y=NULL, data=d, filter=NULL,
           rotate_x, rotate_y, offset, proportion, origin_x, origin_y,
           pt.size, line_width, shape, means,
           segments, segments_y, segments_x,
-          type, smooth_points, smooth_size, smooth_exp, smooth_bins,
-          contour_n, contour_nbins,
+          type, smooth_points, smooth_size, smooth_power, smooth_bins,
+          contour_n, contour_nbins, contour_points,
           radius, power, size_cut, bbl.txt.col, low_fill, hi_fill,
           ID.call, ID_color, ID_size, outlpts,
           out_fill, out_color, out_shape, out_shape.miss,
@@ -1939,7 +2059,6 @@ function(x, y=NULL, data=d, filter=NULL,
           by.cat <- m.out$by.cat
           y.new <- m.out$y.new
         }
-      }  # end do_plot
 
       if (outp && !quiet) {  # text output
 
@@ -1970,7 +2089,7 @@ function(x, y=NULL, data=d, filter=NULL,
           tx[length(tx)+1] <- paste("radius:", .fmt(radius,2),
               "   size of largest bubble")
           tx[length(tx)+1] <- paste("power:", .fmt(power,2),
-              "    relative bubble t's going onsizes")
+              "    relative bubble sizes")
           txbub <- tx
         }
 
@@ -2077,11 +2196,14 @@ function(x, y=NULL, data=d, filter=NULL,
 
   # display text output from Plot() unless turned off
   # T.type is the type of Trellis plot, otherwise is NULL
+
   if (!quiet && n_bins==1) {
     if (Trellis) {  # only VBS plots have output processed here
       if (!(T.type %in% c("cont", "cont_cat"))) outp <- FALSE
     }
+  }
     if (n.xvar > 1  &&  y.miss) outp <- FALSE  # scatterplot matrix
+
 
     if (outp) {
       if (!is.null(output)) print(output)

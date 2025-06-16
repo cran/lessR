@@ -22,8 +22,8 @@ reshape_wide <-
     
   data <- data[, c(ID, widen, response)]
   dw <- reshape(data, direction="wide",
-               idvar=ID, timevar=widen, v.names=response,
-               sep=sep)
+                idvar=ID, timevar=widen, v.names=response,
+                sep=sep)
 
   sep.nm <- sep
   pattern <- paste(response, sep.nm, sep="")

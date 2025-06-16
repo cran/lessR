@@ -9,7 +9,7 @@ if (getRversion() >= "3.6.0")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 4.4.3                         feedback: gerbing@pdx.edu \n",
+      "lessR 4.4.4                         feedback: gerbing@pdx.edu \n",
       "--------------------------------------------------------------\n",
       "> d <- Read(\"\")  Read data file, many formats available, e.g., Excel\n",
       "  d is default data frame, data= in analysis routines optional\n",
@@ -857,7 +857,7 @@ function(...) {
     marg.y <- par("mai")[1] + par("mai")[3]
     axis_y <- fig.ht - marg.y
     cut.x <- 0.94 * axis_x
-    cut.y <- 1.10 * axis_y  # multiplier empirically derived
+    cut.y <- 1.21 * axis_y  # multiplier empirically derived
   }
   else {  # do not open a graphics window if no plot
     cut.x <- 3.75
@@ -1066,6 +1066,54 @@ function(lab, labcex, cut, nm, var.nm, units) {
 }
 
 
+# convert a data frame to a character array preserving spacing for class output
+# currently used only in Plot() VBS Trellis plots
+.df_char <- function(df) {
+  # Format each column
+  formatted <- lapply(df, function(col) {
+    if (is.numeric(col)) {
+      # Determine max number of decimal places
+      decimals <- sapply(col, function(x) {
+        if (is.na(x)) return(0)
+        parts <- strsplit(format(x, scientific=FALSE), ".", fixed=TRUE)[[1]]
+        if (length(parts) == 2) nchar(parts[2]) else 0
+      })
+      max_dec <- max(decimals, na.rm=TRUE)
+      out <- formatC(col, format="f", digits=max_dec)
+    } else {
+      out <- as.character(col)
+    }
+    # Make NA values explicit
+    out[is.na(col)] <- "NA"
+    out
+  })
+
+  # Build character data frame
+  char_df <- as.data.frame(formatted, stringsAsFactors=FALSE)
+
+  # Compute column widths
+  widths <- mapply(function(col, name) {
+    vals <- c(name, col)
+    max(nchar(vals, type="width"), na.rm=TRUE)
+  }, char_df, names(char_df))
+
+  # Pad each column
+  padded <- mapply(function(col, w) {
+    format(col, width=w, justify="right")
+  }, char_df, widths, SIMPLIFY=FALSE)
+
+  # Format headers
+  headers <- mapply(function(name, w) format(name, width=w, justify="right"),
+                    names(df), widths, USE.NAMES=FALSE)
+
+  # Combine rows
+  rows <- do.call(paste, c(padded, sep="  "))
+  header_row <- paste(headers, collapse="  ")
+
+  return(c(header_row, rows))
+}
+
+
 # axis labels
 .axlabs <- function(x.lab, y.lab, main.lab, sub.lab,
                     x.val=NULL, xy_ticks=TRUE, offset=0.5,
@@ -1183,13 +1231,42 @@ function(lab, labcex, cut, nm, var.nm, units) {
 }
 
 
-# Format axis labels, such as using "K" notation
+# reduce "pretty" tick locations from a numeric vector for lattice
+# call the formatting function of the axis labels, .axis.format()
+.sparse.labels <- function(x, ax, n.axis.skip, axis_fmt = NULL,
+                                 axis_pre, label_fn = NULL) {
+  at <- pretty(x)
+
+  # define the default label function: identity if none supplied
+  if (is.null(label_fn)) {
+    if (ax=="x")
+      label_fn <- function(z) .axis.format(z, axis_fmt, axis_pre, "no")
+    if (ax=="y")
+      label_fn <- function(z) .axis.format(z, axis_fmt, "no", axis_pre)
+  }
+
+  if (length(at) <= n.axis.skip) {  # us all axis labels
+    labels <- label_fn(at)
+  } 
+  else {  # reduce
+    keep_idx <- seq(1, length(at), by=n.axis.skip+1)  # skip
+    # keep_idx <- round(seq(1, length(at), length.out=n.axis.lbl)) # keep num
+    labels <- rep("", length(at))
+    labels[keep_idx] <- label_fn(at[keep_idx])
+  }
+
+  list(at=at, labels=labels)
+}
+
+
+# format axis labels, such as using "K" notation
 .axis.format <- function(axT, axis_fmt, axis_x_pre, axis_y_pre) {
   lbls <- na.omit(axT)  # Remove NA values
 
   if ("K" %in% axis_fmt) {
-    if (all(axT %% 1000 == 0) && all(abs(axT)[abs(axT) > 0] > 1000))
-      lbls <- trimws(paste0(lbls %/% 1000, "K"))
+    if (all(axT %% 100 == 0) && all(abs(axT)[abs(axT) > 0] > 1000))
+#     lbls <- trimws(paste0(lbls %/% 1000, "K"))  # int division
+      lbls <- trimws(paste0(lbls / 1000, "K"))
     else
       lbls <- trimws(format(lbls, nsmall=0, big.mark=",", decimal.mark="."))
   }
@@ -1242,19 +1319,19 @@ function(lab, labcex, cut, nm, var.nm, units) {
       axT <- axT1[which(axT1 >= usr[1]  &  axT1 <= usr[2])]
       lbl <- .axis.format(axT, axis_fmt, axis_x_pre, axis_y_pre="no")
       if (rotate_x==0) {  # mgp[2] for tic marks and value label separation
-      axis(1, at=axT, labels=lbl,
-           col=ax$axis_x_color, col.axis=ax$axis_x_text_color,
-           lwd=ax$axis_x_lwd, lty=ax$axis_x_lty, cex.axis=ax$axis_x_cex)
-    }
-    else {
-      # text() for labels to achieve rotation with srt and offset
-      # so par$mgp[2] does not work, instead adjust text(... y= ...)
-      axis(1, at=axT, labels=FALSE,
-           col=ax$axis_x_color, col.axis=ax$axis_x_text_color,
-           lwd=ax$axis_x_lwd, lty=ax$axis_x_lty, cex.axis=ax$axis_x_cex)
-      text(x=axT, y=usr[3]- par("cxy")[2]/4.5, labels=lbl,
-           pos=1, xpd=TRUE, cex=ax$axis_x_cex, col=ax$axis_x_text_color,
-           srt=rotate_x, offset=offset, font=fnt, ...)
+        axis(1, at=axT, labels=lbl,
+             col=ax$axis_x_color, col.axis=ax$axis_x_text_color,
+             lwd=ax$axis_x_lwd, lty=ax$axis_x_lty, cex.axis=ax$axis_x_cex)
+      }
+      else {
+        # text() for labels to achieve rotation with srt and offset
+        # so par$mgp[2] does not work, instead adjust text(... y= ...)
+        axis(1, at=axT, labels=FALSE,
+             col=ax$axis_x_color, col.axis=ax$axis_x_text_color,
+             lwd=ax$axis_x_lwd, lty=ax$axis_x_lty, cex.axis=ax$axis_x_cex)
+        text(x=axT, y=usr[3]- par("cxy")[2]/4.5, labels=lbl,
+             pos=1, xpd=TRUE, cex=ax$axis_x_cex, col=ax$axis_x_text_color,
+             srt=rotate_x, offset=offset, font=fnt, ...)
       }  # end axis(), text()
     }
   }
@@ -1507,6 +1584,35 @@ function(lab, labcex, cut, nm, var.nm, units) {
 }
 
 
+# reorder fill, etc. to match the level order of the grouping factor by.call
+align_vector <- function(vec, by.call) {
+  vec_name <- deparse(substitute(vec))
+
+  if (!is.factor(by.call)) stop("by.call must be a factor")
+
+  by_levels <- levels(by.call)
+
+  # for named vec, reorder to match factor levels
+  if (!is.null(names(vec))) {
+    if (!all(by_levels %in% names(vec))) {
+      cat("\n"); stop(call.=FALSE, "\n------\n",
+        "All levels of  by  must be named in", sQuote(vec_name))
+    }
+    vec <- vec[by_levels]
+  }
+
+  # for unnamed vec, assume user provided it in level order
+  if (length(vec) != length(by_levels)) {
+    cat("\n"); stop(call.=FALSE, "\n------\n",
+      "Length of", sQuote(vec_name),
+      "must match number of levels in by.call")
+  }
+
+  unname(vec)
+}
+
+
+
 .corcolors <- function() {
 
   fill_low <- NULL
@@ -1650,11 +1756,9 @@ function(lab, labcex, cut, nm, var.nm, units) {
 }
 
 
-# from a pre-defined color palette name, generate the palette without scaling
-# if not a palette name, then return the name, i.e., do nothing
-# typically used to convert color name to a color, such as from from get_fill()
-.color_range <- function(fill, n.clr) {
-  if (fill[1] == "magma") fill[1] <- "plasma"
+# see if fill or color is a predefined palette
+.is.palette <- function(fillclr) {
+  if (fillclr == "magma") fillclr <- "plasma"
 
   # names of color palettes generated by getColors
   nmC <- c("reds", "rusts", "browns", "olives", "greens", "emeralds",
@@ -1672,6 +1776,15 @@ function(lab, labcex, cut, nm, var.nm, units) {
   nmT <- c("Tableau")
   nm <- c(nmC, nmR, nmV, nmO, nmD, nmW, nmT)
 
+  return(fillclr %in% nm)
+}
+
+
+# from a pre-defined color palette name, generate the palette without scaling
+# if not a palette name, then return the name, i.e., do nothing
+# typically used to convert color name to a color, such as from from get_fill()
+.color_range <- function(fill, n.clr) {
+
   # fill is a function such as hcl or is a named vector
   if (is.call(fill) || is.name(fill)) {
     clrs <- eval(fill)
@@ -1683,13 +1796,15 @@ function(lab, labcex, cut, nm, var.nm, units) {
       if (fill[1] == "colors") fill[1] <- "hues"   # new names
       if (fill[1] == "yellows")  fill[1] <- "browns"
 
-      if (fill[1] %in% nm)
+      if (.is.palette(fill[1]))
         clrs <- getColors(fill[1], n=n.clr, output=FALSE)  # sequential palette
       else
         clrs <- fill  # not an identified name of a color range
+      if (fill[1]=="grays" && n.clr==2) # Cleveland 2-var dot plot of difference
+        clrs <- c("gray40", "gray75")
 
-      if (length(fill == 2)) {  # divergent
-        if (fill[2] %in% nm)
+      if (length(fill) == 2) {  # divergent
+        if (.is.palette(fill[2]))
           clrs <- getColors(fill[1], fill[2], n=n.clr, output=FALSE)
       }
     }  # fill[1] not NULL

@@ -95,13 +95,17 @@ function (x, y, box.ratio=1, vbs_size=box.ratio/(1 + box.ratio),
               up30 <- blist.stats[, 4] + 2 * k.iqr * exp(-a*m.c) * iqr
             }
 
-        s.t <- getOption("sub_theme")
-        fence_color <- ifelse (s.t == "black", "gray85", box.umbrella$col)
+        s.th <- getOption("sub_theme")
+        th <- getOption("theme")
+        fence_color <- ifelse (th %in% c("gray", "white") || s.th=="black",
+                              "gray85", "darkred")
+#       fence_color <- ifelse (s.th == "black", "gray85", box.umbrella$col)
         panel.segments(
             c(lo15, up15), levels.fos - blist.height/2,
             c(lo15, up15), levels.fos + blist.height/2,
             col=fence_color, alpha=box.umbrella$alpha,
-            lwd=box.umbrella$lwd, lty="dotted",
+            lwd=1.5, lty="solid",
+#           lwd=box.umbrella$lwd, lty="dotted",
             identifier=paste(identifier, "cap", sep="."))
       }  # end fences
 

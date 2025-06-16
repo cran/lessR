@@ -3,6 +3,8 @@
 function(mylevels, color, fill, shp, trans_pts, col.bg, usr,
          pt.size=1.25, pt.lwd=0.5, legend_size=NULL,
          legend_abbrev=NULL, legend_adj=0, legend_title=NULL) {
+p("in legend")
+p(pt.size)
 
   par(xpd=NA)  # allow drawing outside of plot region
 
@@ -60,7 +62,12 @@ function(mylevels, color, fill, shp, trans_pts, col.bg, usr,
 
   # fill=length(legend_labels):1  puts the legend labels in the correct
   #   order, but only for inflexible boxes that cannot be resized with pt.cex
-  if (pt.size == 0) pt.size <- 1.2
+print(pt.size)
+p(length(pt.size))
+p(pt.size)
+p(class(pt.size))
+p(length(pt.size))
+  if (length(pt.size) == 1) if (pt.size == 0) pt.size <- 1.2
   if (shp[1] != "lines")
     legend(xleft+legend_adj, ytop, legend=legend_labels, title=legend_title,
            pch=shp, horiz=FALSE, cex=legend_size, pt.cex=pt.size, pt.lwd=pt.lwd,

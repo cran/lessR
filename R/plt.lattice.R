@@ -7,12 +7,13 @@ function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
          fit="off", fit_power=1, fit_color=NULL, fit_lwd=NULL, fit_se,
          plot_errors=FALSE, origin=NULL, jitter,
          violin, violin_fill, box, box_fill,
-         bw, vbs_size, box_adj, a, b, k.iqr, fences, vbs_mean,
+         bw, vbs_ratio, box_adj, a, b, k.iqr, fences, vbs_mean,
          out_shape, out_size,
          out_fill, out_color, out2_fill, out2_color,
          ID, out_cut, ID_color, ID_size,
          axis_fmt="K", axis_x_pre="", axis_y_pre="",
-         rotate_x, rotate_y, width, height, pdf_file, T.type, quiet, ...) {
+         rotate_x, rotate_y, n_axis_x_skip, n_axis_y_skip,
+         width, height, pdf_file, T.type, quiet, ...) {
 
 
   if (size.pt[1] == 0) object <- "line"
@@ -92,8 +93,9 @@ function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
   ltype <- character(length=n.groups)
   for (j in 1:n.groups) ltype[j] <- "solid"
 
-  legend_title <- abbreviate(getOption("byname"), 7)
-  leg.cex.title <- axis_x_cex * 1.1  # abbreviate only returns of type character
+  legend_title <- deparse(substitute(by, env=parent.frame()))
+  leg.text.cex <- axis_cex * 1.05
+  leg.title.cex <- leg.text.cex * 1.14  # abbreviate only returns of type character
 # BAD if (!is.null(by)) by <- factor(abbreviate(by, 5), levels(by))
 
   if (is.null(facet1) && is.null(facet2))
@@ -135,80 +137,80 @@ function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
 
   # ---------------------------------
   if (!date.var) {
+
+    # perhaps print fewer axis tick labels, perhaps re-format labels
+    if (!is.null(x)) 
+      x.out <- .sparse.labels(x, ax="x", n_axis_x_skip, axis_fmt, axis_x_pre)
+    if (!is.null(y)) 
+      y.out <- .sparse.labels(y, ax="y", n_axis_y_skip, axis_fmt, axis_y_pre)
+
     if (T.type == "cont_cont") {  # cont - cont
       # set 1 or 2 conditioning variables
       if (is.null(facet2)) {
         p <- lattice::xyplot(y ~ x | facet1, groups=by,
           scales=list(
-            x=list(labels=.axis.format(pretty(x), axis_fmt, axis_x_pre, "no"), 
-                   at=pretty(x), tck=.8),
-            y=list(labels=.axis.format(pretty(y), axis_fmt, "no", axis_y_pre),
-                   at=pretty(y), tck=.8)
+            x = list(at=x.out$at, labels=x.out$labels, tck=0.8),
+            y = list(at=y.out$at, labels=y.out$labels, tck=0.8)
           ), ...)
       }
       else {  # facet2 is present
         p <- lattice::xyplot(y ~ x | facet1 * facet2, groups=by,
+          xlim = range(x.out$at),
+          ylim = range(y.out$at),
           scales=list(
-            x=list(labels=.axis.format(pretty(x), axis_fmt, axis_x_pre, "no"), 
-                   at=pretty(x), tck=.8),
-            y=list(labels=.axis.format(pretty(y), axis_fmt, "no", axis_y_pre),
-                   at=pretty(y), tck=.8)
+            x = list(at=x.out$at, labels=x.out$labels, tck=0.8),
+            y = list(at=y.out$at, labels=y.out$labels, tck=0.8)
           ), ...)
-      }
+      }  # end facet2 is present
     }
-    else if (T.type == "con_cat") {  # cont - cat
-        jitter <- .4 * jitter
-        if (is.null(facet1)  &&  is.null(facet2)) {
-          p <- lattice::bwplot(y ~ x, groups=by,
-          scales=list(
-            x=list(labels=.axis.format(pretty(x), axis_fmt, axis_x_pre, "no"), 
-                   at=pretty(x), tck=.8),
-            y=list(labels=.axis.format(pretty(y), axis_fmt, "no", axis_y_pre),
-                   at=pretty(y), tck=.8)
-          ), ...)
-        }
-        else if (is.null(facet2)) {
-          p <- lattice::bwplot(y ~ x | facet1, groups=by,
-          scales=list(
-            x=list(labels=.axis.format(pretty(x), axis_fmt, axis_x_pre, "no"), 
-                   at=pretty(x), tck=.8),
-            y=list(labels=.axis.format(pretty(y), axis_fmt, "no", axis_y_pre),
-                   at=pretty(y), tck=.8)
-          ), ...)
-        }
-        else {  # facet2 is present
-          p <- lattice::bwplot(y ~ x | facet1 * facet2, groups=by,
-          scales=list(
-            x=list(labels=.axis.format(pretty(x), axis_fmt, axis_x_pre, "no"), 
-                   at=pretty(x), tck=.8),
-            y=list(labels=.axis.format(pretty(y), axis_fmt, "no", axis_y_pre),
-                   at=pretty(y), tck=.8)
-          ), ...)
-        }
-    }  # end con_cat
+
+# get boxplot with vbs_plot="b" instead
+# -------------------------------------
+#   else if (T.type == "con_cat") {  # cont - cat
+#       jitter <- .4 * jitter
+#       if (is.null(facet1)  &&  is.null(facet2)) {
+#         p <- lattice::bwplot(y ~ x, groups=by,
+#         scales=list(
+#           x = list(at=x.out$at, labels=x.out$labels, tck=0.8),
+#           y = list(at=y.out$at, labels=y.out$labels, tck=0.8)
+#         ), ...)
+#       }
+#       else if (is.null(facet2)) {
+#         p <- lattice::bwplot(y ~ x | facet1, groups=by,
+#         scales=list(
+#           x = list(at=x.out$at, labels=x.out$labels, tck=0.8),
+#           y = list(at=y.out$at, labels=y.out$labels, tck=0.8)
+#         ), ...)
+#       }
+#       else {  # facet2 is present
+#         p <- lattice::bwplot(y ~ x | facet1 * facet2, groups=by,
+#         scales=list(
+#           x = list(at=x.out$at, labels=x.out$labels, tck=0.8),
+#           y = list(at=y.out$at, labels=y.out$labels, tck=0.8)
+#         ), ...)
+#       }
+#   }  # end con_cat
+
     else if (T.type == "cont") {  # cont, VBS plots, possibly over facets
       # set 0, 1 or 2 conditioning variables
       if (is.null(facet1)  &&  is.null(facet2)) {  # 0 cond var
         p <- lattice::stripplot(~ x, groups=by, subscripts=TRUE,
           scales=list(
-            x=list(labels=.axis.format(pretty(x), axis_fmt, axis_x_pre, "no"), 
-                   at=pretty(x), tck=.8)
+            x = list(at=x.out$at, labels=x.out$labels, tck=0.8)
           ), ...)
         y.lab <- ""
       }
       else if (is.null(facet2)) {  # 1 cond var
         p <- lattice::stripplot(~ x | facet1, groups=by, subscripts=TRUE,
           scales=list(
-            x=list(labels=.axis.format(pretty(x), axis_fmt, axis_x_pre, "no"), 
-                   at=pretty(x), tck=.8)
+            x = list(at=x.out$at, labels=x.out$labels, tck=0.8)
           ), ...)
         y.lab <- ifelse (is.null(ylab), getOption("facet1name"), ylab)
       }
       else  {  # 2 cond var
         p <- lattice::stripplot(~ x | facet1*facet2, groups=by, subscripts=TRUE,
           scales=list(
-            x=list(labels=.axis.format(pretty(x), axis_fmt, axis_x_pre, "no"), 
-                   at=pretty(x), tck=.8)
+            x = list(at=x.out$at, labels=x.out$labels, tck=0.8)
           ), ...)
         y.lab <- ""
       }
@@ -383,12 +385,12 @@ function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
     if (n.groups > 1) {  # lattice groups is lessR by
       if (object %in% c("point", "both")) {
         p <- update(p,
-             key=list(
-               cex=axis_x_cex, space="right",
-               text=list(levels(by)),  # by is always a factor at this point
+             key=list(  # defines the properties of the legend
+               space="right",
+               text=list(levels(by), cex=leg.text.cex),  # by is a factor
+               points=list(pch=21, fill=fill, col=fill, cex=leg.title.cex),
                border="gray80", background=col.bg,
-               points=list(cex=axis_x_cex, pch=21, fill=fill, col=fill),
-               title=legend_title, cex.title=leg.cex.title))
+               title=legend_title, cex.title=leg.title.cex))
       }
       else {  # lines
         p <- update(p,
@@ -397,7 +399,7 @@ function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
                text=list(levels(by)),  # by is always a factor at this point
                border="gray80", background=col.bg,
                lines=list(lwd=size.ln, col=fill),
-               title=legend_title, cex.title=leg.cex.title))
+               title=legend_title, cex.title=leg.title.cex))
       }
     }  # n.groups > 1
 
@@ -528,15 +530,20 @@ function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
     }  # end fences
 
     if (n.groups > 1) {
-      legend_lbl.cex <- ifelse (in.RStudio, .75, .66)
-      p <- update(p, key=list(space="top", columns=n.groups,
-             text=list(levels(by), cex=legend_lbl.cex),
-             points=list(pch=21, fill=pt.fill, col=pt.color, cex=1),
-             border="gray80", background=col.bg, padding.text=2))
+      p <- update(p, 
+           key=list(  # defines the properties of the legend
+             space="top", columns=n.groups,
+             text=list(levels(by), cex=leg.text.cex),
+             points=list(pch=21, fill=pt.fill, col=pt.color, cex=leg.title.cex),
+             border="gray80", background=col.bg, padding.text=2,
+             title=legend_title, cex.title=leg.title.cex))
+
+      box_fill <- .maketrans(box_fill, 0.25*256)  # more trans box needed
     }
 
-    p <- update(p,
 
+    p <- update(p,
+          
         par.settings=list(  # col option does not work directly on panel.bwplot
           box.rectangle=list(fill=box_fill, lwd=2,
                              col=getOption("box_color")),
@@ -583,7 +590,7 @@ function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
               panel.violin(x=x, ...,
                   col=vf,
                   border=getOption("violin_color"),
-                  varwidth=vw, box.width=vbs_size, bw=bw)
+                  varwidth=vw, box.width=vbs_ratio, bw=bw)
             }
 
             if ((box || size.pt>0) && length(x)>1) {
@@ -598,14 +605,19 @@ function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
                 if (!box_adj)  # did the panel.number() access in .panel.bwplot()
                   .panel.bwplot(x=x, ..., pch="|", vbs_mean=vbs_mean,
                       fences=fences,
-                      box.ratio=vbs_size/denom, mean_color=out_fill,
+                      box.ratio=vbs_ratio/denom, mean_color=out_fill,
                       stats=boxplot.stats, k.iqr=k.iqr, do.out=FALSE)
                 else
                   .panel.bwplot(x=x, ...,  pch="|", vbs_mean=vbs_mean,
                       fences=fences,
-                      box.ratio=vbs_size/denom, mean_color=out_fill,
+                      box.ratio=vbs_ratio/denom, mean_color=out_fill,
                       stats=adjboxStats, k.iqr=k.iqr, a=a, b=b, do.out=FALSE)
              }
+
+              # convert name such as "circle" to actual pch num, e.g., 21
+              shp <- .plt.shapes(shape, out_shape)
+              shape <- shp$shape
+              out_shape <- shp$out_shape
 
               # plotting a subset of x requires adjusting y, in .panel.strip
               # identify extreme outliers, if any
@@ -614,14 +626,15 @@ function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
                 x.out_clr <- 1
                 fill_out <- out2_fill
               }
-              else {
-                x.out_clr <- as.numeric(groups[x.out])
-                fill_out <- pt.fill[x.out_clr]
+              else {  # if a by group, and plot regular colors to differentiate
+                fill_out <- fill
+                out2_color <- fill
               }
 
               # plot extreme outliers
-              .panel.stripplot(x=x[x.out],
-                cex=out_size, col=out2_color, fill=fill_out, pch=out_shape, ...)
+#             .panel.stripplot(x=x[x.out],
+              panel.stripplot(x=x[x.out],
+                 cex=out_size, col=out2_color, fill=fill_out, pch=out_shape, ...)
 
               # identify outliers, if any
               x.out <- which(x>=fnc.out[1] & x<fnc.in[1] |
@@ -630,13 +643,13 @@ function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
                 x.out_clr <- 1
                 fill_out <- out_fill
               }
-              else {
-                x.out_clr <- as.numeric(groups[x.out])
-                fill_out <- pt.fill[x.out_clr]
+              else {  # if a by group, and plot regular colors to differentiate
+                fill_out <- fill
+                out_color <- fill
               }
 
               # plot outliers
-              .panel.stripplot(x=x[x.out],
+              panel.stripplot(x=x[x.out],
                  cex=out_size, col=out_color, fill=fill_out, pch=out_shape, ...)
 
               # label outliers
@@ -663,8 +676,9 @@ function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
 
                 x.out <- c(x.lo, x.hi)
                 ID.lbl <- union(ID.lo, ID.hi)  # combine factors
+                ix <- order(-abs(x.out))[1:out_cut]  # subset to largest abs
 
-                panel.text(x.out, y=1.08, labels=ID.lbl,
+                panel.text(x.out[ix], y=1.08, labels=ID.lbl[ix],
                            col=ID_color, cex=ID_size, adj=0, srt=90)
               }
             }  # end box || size.pt > 0
@@ -701,6 +715,7 @@ function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
   if (!is.null(pdf_file)) {
     pdf(pdf_file, width=width, height=height, onefile=FALSE)
     print(p)
+    dev.off()
   }
   else {
     print(p)

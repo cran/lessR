@@ -131,23 +131,23 @@ Plot(
 
     # ----------------------------------
     # Integrated violin/box/scatter plot  [x only]
-    vbs_plot="vbs", vbs_size=0.9, bw=NULL, bw_iter=10,
+    vbs_plot="vbs", vbs_ratio=0.9, bw=NULL, bw_iter=10,
     violin_fill=getOption("violin_fill"),
     box_fill=getOption("box_fill"),
     vbs_pt_fill="black",
-    vbs_mean=FALSE, fences=FALSE,
+    vbs_mean=FALSE, fences=FALSE, n_min_pivot=1,
     k=1.5, box_adj=FALSE, a=-4, b=3,
 
     # -----------
     # Bubble plot [xCategorical, or xCategorical and yCategorical]
-    radius=NULL, power=0.55, low_fill=NULL, hi_fill=NULL,
+    radius=NULL, power=0.5, low_fill=NULL, hi_fill=NULL,
 
     # -----------------------------------------------------------
     # Large data sets, smoothing, contours and binning  [x and y]
     type=c("regular", "smooth", "contour"),
     smooth_points=100, smooth_size=1,
-    smooth_exp=0.25, smooth_bins=128, n_bins=1,
-    contour_n=10, contour_nbins=50,
+    smooth_power=0.25, smooth_bins=128, n_bins=1,
+    contour_n=10, contour_nbins=50, contour_points=FALSE,
 
     # ------------------------------------------------------
     # Bins for frequency polygon or text output of VBS plots
@@ -174,7 +174,7 @@ Plot(
     rotate_x=getOption("rotate_x"), rotate_y=getOption("rotate_y"),
     offset=getOption("offset"),
     axis_fmt=c("K", ",", ".", ""), axis_x_prefix="", axis_y_prefix="",
-    xy_ticks=TRUE, 
+    xy_ticks=TRUE, n_axis_x_skip=0, n_axis_y_skip=0, 
 
     # ------
     # legend
@@ -365,10 +365,14 @@ vp(\dots)
   \item{MD_cut}{Mahalanobis distance cutoff to define an outlier in a 2-variable
        scatterplot.}
   \item{out_cut}{Count or proportion of plotted points to label, in order of their
-       distance from the scatterplot center (means), counting down from
+       distance from the center (means) of the univariate distribution or 
+       scatterplot, counting down from
        the more extreme point. For two-variable plots, assess distance
-       from the center with Mahalanobis distance. For VBS plots of a single
-       continuous variable, refers to outliers on each side of the plot.}
+       from the center with Mahalanobis distance. For box plots or
+       VBS plots of a single
+       continuous variable, refers to outliers on each side of the plot, 
+       and any value greater than the number of outliers determined by
+       the box plot is ignored.}
   \item{out_shape}{Shape of outlier points in a 2-variable scatterplot
         or a VBS plot.
         Modify fill color from the current \code{theme} with the
@@ -515,7 +519,7 @@ vp(\dots)
         Modify fill and border colors from the current \code{theme} with
         the \code{\link{style}} function parameters \code{violin_fill},
         \code{violin_color}, \code{box_fill} and \code{box_color}.}
-  \item{vbs_size}{Width of the violin plot to the plot area. Make the
+  \item{vbs_ratio}{Height of the violin plot relative to the plot area. Make the
         violin (and also the accompanying box plot) larger or smaller by
         making the plot area and/or this value larger or smaller.}
   \item{bw}{Bandwidth for the smoothness of the violin plot. Higher values
@@ -536,6 +540,11 @@ vp(\dots)
         \code{\link{style}} function.}
   \item{fences}{If \code{TRUE}, draw the inner upper and lower fences as
         dotted line segments.}
+  \item{n_min_pivot}{For the pivot table for a VBS plot over at least a \code{by}
+       or \code{facet1} categorical variable, the minimum sample size for a group
+       for the corresponding row to be displayed. The default value is 1 for
+       all rows to be displayed except for those groups that do not contain data.
+       Set to 0 to view all groups.}
   \item{k}{IQR multiplier for the basis of calculating the distance of the
         whiskers of the box plot from the box. Default is Tukey's setting
         of 1.5.}
@@ -556,8 +565,7 @@ vp(\dots)
   \item{power}{Relative size of the scaling of the bubbles to each other.
         Value of 0.5 scales the bubbles so that the area of each
         bubble is the value of the corresponding sizing variable. Default
-        value is 0.55, a  slight emphasis toward emphasizing differences
-        in bubble area beyond area. Value of 1 scales so the radius of 
+        value is 0.5,. Value of 1 scales so the radius of 
         the bubble is the value of the sizing variable, increasing
         the discrepancy of size between the variables.}
   \item{low_fill}{For a categorical variable and the resulting bubble plot,
@@ -573,8 +581,9 @@ vp(\dots)
   \item{smooth_points}{Number of points superimposed on the density plot in the
         areas of the lowest density to help identify outliers, which controls
         how dark are the smoothed points.}
-  \item{smooth_size}{Size of points superimposed on the density plot.}
-  \item{smooth_exp}{Exponent of the function that maps the density scale to
+  \item{smooth_size}{Size of points superimposed on the density plot.
+        The default value is 1, which results and a very small size.}
+  \item{smooth_power}{Exponent of the function that maps the density scale to
         the color scale. Smaller than default of 0.25 yields darker plots.}
   \item{smooth_bins}{Number of bins in both directions for the density
         estimation.}
@@ -588,7 +597,12 @@ vp(\dots)
        default value of 10.}
    \item{contour_nbins}{Number of bins constructed for each \code{x} and
         \code{y} variables from which the form the 2D grid of 
-        estimated densities.}\cr
+        estimated densities.}
+   \item{contour_points}{If \code{TRUE}, then plot the points in the 
+        scatterplot with a light shade of gray with a white border,
+        the data from which the contour curves are estimated. Not responsive
+        to color changes but can use the \code{size} parameter to change the size
+        of the plotted points, with a default size of 0.72.}\cr
 
 
   \item{bin}{If \code{TRUE}, display the default frequency distribution
@@ -625,7 +639,7 @@ vp(\dots)
        adjusts the margins of the plotted figure in approximate inches.
        + values move the corresponding margin away from plot edge.
        Can use in conjunction with \code{offset} that can move axis values
-       into a larger margin space. Not applicable to Trellis graphics.}
+       into a larger margin space. Not applicable to VBS and Trellis graphics.}
   \item{pad_x}{Proportion of padding added to left and right sides of the
        \code{x}-axis, respectively. Value from 0 to 1 for each of the two 
        elements. If only one element specified, value is applied to both
@@ -677,7 +691,16 @@ vp(\dots)
   \item{xy_ticks}{Flag that indicates if tick marks and associated \bold{value
         labels} on the axes are to be displayed. To rotate the axis values, use
         \code{rotate_x}, \code{rotate_y}, and \code{offset} from the
-        \code{\link{style}} function.}\cr
+        \code{\link{style}} function.}
+  \item{n_axis_x_skip}{Particularly useful for Trellis or facet plots in which
+        the axis text labels are subject to overlapping, specify the interval
+        for skipping the label on the $x$-axis. A value of zero means to
+        include all the labels, the default.
+        A value of one means to English every other label, 
+        a value of two indicates to include every second label, etc.
+        Also consider the \code{rotate_x} parameter.}
+  \item{n_axis_y_skip}{Same as for the $x$-axis but applies to the $y$-axis.}\cr
+
 
   \item{legend_title}{Title of the legend for a multiple-variable \code{x}
        or \code{y} plot.}\cr
@@ -873,8 +896,10 @@ In terms of missing data, if the date value exists and the corresponding y-value
 
 
 2-D KERNEL DENSITY\cr
-With \code{smooth=TRUE}, the R function \code{\link{smoothScatter}} is invoked according to the current color theme. Useful for very large data sets. The \code{smooth_points} parameter plots points from the regions of the lowest density. The \code{smooth_bins} parameter specifies the number of bins in both directions for the density estimation. The \code{smooth_exp} parameter specifies the exponent in the function that maps the density scale to the color scale to allow customization of the intensity of the plotted gradient colors. Higher values result in less color saturation, de-emphasizing points from regions of lessor density. These parameters are respectively passed directly to the \code{\link{smoothScatter}} \code{nrpoints}, \code{nbin} and \code{transformation} parameters. Grid lines are turned off,
+Set \code{type} to \code{"smooth"} to implicitly call the R function \code{\link{smoothScatter}}, according to the current color theme. Useful for very large data sets. The \code{smooth_points} parameter plots points from the regions of the lowest density. The \code{smooth_bins} parameter specifies the number of bins in both directions for the density estimation. The \code{smooth_power} parameter specifies the exponent in the function that maps the density scale to the color scale to allow customization of the intensity of the plotted gradient colors. Higher values result in less color saturation, de-emphasizing points from regions of lessor density. These parameters are respectively passed directly to the \code{\link{smoothScatter}} \code{nrpoints}, \code{nbin} and \code{transformation} parameters. Grid lines are turned off,
 by default, but can be displayed by setting the \code{grid_color} parameter.
+
+Or, plot contour curves by setting \code{type} to \code{"contour"}.
 
 COLORS\cr
 A color theme for all the colors can be chosen for a specific plot with the \code{colors} option with the \code{lessR} function \code{\link{style}}. The default color theme is \code{"lightbronze"}. A gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{style}}, such as \code{"sienna"} and \code{"darkred"}. Use the option \code{style(sub_theme="black")} for a black background and partial transparency of plotted colors.
@@ -941,9 +966,14 @@ READABLE OUTPUT\cr
 \code{out_frcst}: Forecasted values.\cr
 \code{out_fitted}: Fitted values to data.\cr
 \code{out_coefs}: Linear and seasonal coefficients from forecasting.\cr
-\code{out_smooth}: Smoothing parameters from exponential smoothing forecasting.\cr.
-\code{out_bubble}: Bubble plot parameters, \code{radius} and \code{power}.\cr.
-\code{out_reg}: Regression statistics from setting the \code{fit parameter}.\cr.
+\code{out_smooth}: Smoothing parameters from exponential smoothing forecasting.\cr
+\code{out_bubble}: Bubble plot parameters, \code{radius} and \code{power}.\cr
+\code{out_reg}: Regression statistics from setting the \code{fit parameter}.\cr
+\code{out_parm}: Parameter settings for a VBS plot of a continuous variable.\cr
+\code{out_pivot}: Pivot table from VBS plot of a continuous variable based on any combination of specified values of parameters \code{by}, \code{facet1}, and \code{facet2}.\cr
+\code{out_by}:  Pivot table from VBS plot of a continuous variable for the levels of the \code{by} variable, if present.\cr
+\code{out_facet1}:  Pivot table from VBS plot of a continuous variable for the levels of the \code{facet1} variable, if present.\cr
+\code{out_facet2}:  Pivot table from VBS plot of a continuous variable for the levels of the \code{facet2} variable, if present.
 
 STATISTICS\cr
 \code{outliers}: Row numbers that contain the outliers.\cr
@@ -984,8 +1014,8 @@ dd=d
 #---------------------------------------------------
 
 Plot(Years, Salary, by=Gender, size=2, fit="lm",
-     fill=c("olivedrab3", "gold1"),
-     color=c("darkgreen", "gold4"))
+     fill=c(M="olivedrab3", W="gold1"),
+     color=c(M="darkgreen", W="gold4"))
 
 # scatterplot with all defaults
 Plot(Years, Salary)
@@ -1087,7 +1117,7 @@ d <- Read("Employee", quiet=TRUE)
 Plot(Salary, facet1=Dept, facet2=Gender)
 
 # all three by (categorical) variables
-Plot(Years, Salary, facet1=Dept, facet2=Gender, by=Plan)
+Plot(Years, Salary, facet1=Dept, facet2=Gender, by=Plan, n_axis_y_skip=1)
 
 # vary both shape and color with a least-squares fit line for each group
 style(color=c("darkgreen", "brown"))
@@ -1108,7 +1138,7 @@ Plot(Years, Salary, by=Gender, ellipse=.50)
 # integrated Violin/Box/Scatterplot, a VBS plot
 Plot(Salary)
 
-Plot(Years, Salary, by=Gender, size=2, fit="lm",
+Plot(Years, by=Gender, size=1.25,
      fill=c("olivedrab3", "gold1"),
      color=c("darkgreen", "gold4"))
 

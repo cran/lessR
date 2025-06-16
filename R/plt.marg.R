@@ -51,7 +51,7 @@
   if (max.y.width < .10) mm <- mm + .02
   if (lab_y_cex > 1) mm <- mm + .10
   if (nzchar(axis_y_pre)) mm <- mm + .14*length(axis_y_pre)
-  if (!is.null(y.lab)) mm <- mm + (n.lab_y.ln * .20)
+  if (!is.null(y.lab)) mm <- mm + (n.lab_y.ln * .18)
 
   return(list(lm=mm, tm=tm, rm=rm, bm=bm,
               n.lab_x.ln=n.lab_x.ln, n.lab_y.ln=n.lab_y.ln))

@@ -1,3 +1,64 @@
+# lessR version 4.4.4, June 16, 2025
+
+## Updates
+
+* `Density()`: Old, deprecated function deleted. Use `Histogram()` with `stat` set to `"density"`.
+
+* `Histogram()`: Parameter `stat_x` changed to `stat`.
+
+* `Histogram()`: Parameter `density` dropped and is now a value of parameter `stat`. Specify `stat="density"` in place of `density=TRUE`.
+
+* `Histogram()`:  When `stat` is `density`, the density curve is plotted from the first value of the estimated density until the last value without extending the $x$-axis further.
+
+* `Histogram()`: When `stat` is `density`, the `line_width` parameter added.
+
+* `Histogram()`: When `stat` is `density`, parameter `x.pt` changed to `x_pt`.
+ 
+* `Plot()`: For bubble plots, where the `size` of the plotted points varies according to the values of a specified variable, legend is now displayed.
+
+* `Plot()`: Two new parameters for Trellis (facet) plots: `n_axis_x_skip` and `n_axis_y_skip`. Trellis or facet plots are based on functions from the lattice package where the axis tick labels are prone to overlapping and becoming unreadable, nor does lattice automatically delete overlapping labels. The default value of 0 directs to include all the axis tick labels. A value of 1 indicate to skip every other label. A value of 2 indicates to skip every second label, and so forth. 
+
+* `Plot()`: For Trellis (facet) plots, any combination of variables for parameters `by`, `facet`, and `facet2`, result in the corresponding pivot or summary table displayed at the R console. If the output is saved into an R object, the name of the pivot table is `out_ pivot` for later reference. Also, the pivot tables for the levels of each source separately are also provided, named `out_by`, `out_facet1`, and `out_facet2` if present in the analysis.
+ 
+* `Plot()`: For the generated pivot table from Trellis (facet) plots, the new parameter `n_min_pivot` specifies the minimum sample size for a group for the corresponding row to be displayed. The default value is zero for all rows to be displayed.
+
+* `Plot()`: For Trellis (facet) plots with a `by` variable plotting points with multiple colors in the same box, the box color now is automatically modified with transparency.
+
+* `Plot()`: Parameters `fill`, `color`, and `shape` can now be named vectors. That is, specify the categorical value from the `by` variable that is assigned to the specific visual aesthetic. For example, for `by=Gender`, `fill=c(M="plum", W="green").
+
+* `Plot()`: New parameter `contour_points`. If `TRUE`, then plot the points in the scatterplot, the data from which the contour curves are estimated. 
+
+* `Plot()`: Parameter name `vbs_size` changed to `vbs_ratio` to be more descriptive of its meaning.
+ 
+* `Plot()`: For `type="smooth"`, the parameter name `smooth_exp` is changed to `smooth_power` to more accurately described the underlying transformation.
+ 
+* `Plot()`: For `type="smooth"`, the smoothed scatterplot now starts with a darker center.
+
+* `Plot()`: For two-variable Cleveland dot plot of differences, the legend is now written in the right margin.
+
+* `Plot()`: For Trellis (facet) plots, when there is a `by` variable, the outliers are now displayed in their regular color for the `by` variable. Otherwise, displayed them and red obscures their group.
+
+* `Plot()`: For box plots, unless grayscale, to provide more emphasis fences are now drawn in `darkred` instead of gray with a line width of 2 instead of 1.
+
+
+## Bug Fixes
+
+* `Histogram()`: When `density` is `TRUE`, `type` is `"normal"` and `theme` is `gray`, then the normal curve is now filled with a transparent light gray instead of not having to fill color.
+
+* `Plot()`: For Trellis (facet) plots, when there is a `by` variable, the outliers now plot with a fill color.
+
+* `Plot()`: For Trellis (facet) plots, when there is a `by` variable, the legend title and legend text now respond appropriately to adjustments to `style()` parameter `axis_cex`.
+
+* `Plot()`: For box plots, including embedded in VBS plots and Trellis (facet) plots, outlier labels now work when `out_cut` is specified was a value greater than zero. Only outlier points are labeled. 
+
+* `Plot()`: For VBS plots as a single panel (not Trellis or facet), statistical output at the console is now restored.
+
+* `Plot()`: For Trellis (facet) plots that are not VBS plots with a `by` variable, the legend title and text now are the correct sizes.
+
+* `Plot()`: For Trellis (facet) plots or VBS plots, that is, use of the lattice package functions, saving PDFs now happens directly instead of first needing the application to close.
+
+
+
 # lessR version 4.4.3, May 8, 2025
 
 ## Major Update

@@ -20,7 +20,7 @@ importFrom("MASS", kde2d)
 
 #importFrom("base", plot)  # does not work, use plot() from "graphics"
 
-importFrom("graphics", abline, arrows, axis, axis.Date, barplot, box, boxplot, grconvertX, grconvertY, hist, legend, lines, mtext, pairs, par, pie, plot, plot.default, plot.new, plot.window, points, polygon, rasterImage, rect, rug, segments, stripchart, strwidth, sunflowerplot, symbols, text, title, axTicks, smoothScatter, filled.contour)
+importFrom("graphics", abline, arrows, axis, axis.Date, barplot, box, boxplot, grconvertX, grconvertY, hist, legend, lines, mtext, pairs, par, pie, plot, plot.default, plot.new, plot.window, points, polygon, rasterImage, rect, rug, segments, stripchart, strwidth, sunflowerplot, symbols, text, title, axTicks, smoothScatter, filled.contour, strheight)
 
 importFrom("grDevices", boxplot.stats, col2rgb, colorRampPalette, colors, dev.cur, dev.list, dev.new, dev.off, dev.set, gray, heat.colors, hcl, palette, pdf, rainbow, rgb, terrain.colors, as.graphicsAnnot, hcl.colors, palette.colors, gray.colors,
 convertColor)
@@ -60,7 +60,6 @@ export (
   corReorder, reord, 
   corReflect, reflect, corProp, cp, corRead,
   corScree, scree, corEFA, efa,
-  Density, dn,
   details, db,
   factors, 
   getColors,

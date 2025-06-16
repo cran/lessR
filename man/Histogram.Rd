@@ -20,7 +20,7 @@ Histogram(
     # ------------------------------------------
     # Data from which to construct the histogram
     x=NULL, data=d, filter=NULL,
-    stat_x=c("count", "proportion"),
+    stat=c("count", "proportion", "density"),
 
     # --------------------
     # Trellis (facet) plot
@@ -46,11 +46,11 @@ Histogram(
     cumulate=c("off", "on", "both"), reg="snow2",
 
     # Density (smooth curve) plot
-    density=FALSE, show_histogram=TRUE,
+    show_histogram=TRUE,
     bandwidth=NULL, type=c("general", "normal", "both"),
     fill_general=NULL, fill_normal=NULL, fill_hist=getOption("se_fill"), 
-    color_general="gray20", color_normal="gray20",
-    x.pt=NULL, y_axis=FALSE,
+    color_general="gray20", color_normal="gray20", line_width=NULL,
+    x_pt=NULL, y_axis=FALSE,
     rug=FALSE, color_rug="black", size_rug=0.5,
 
     # -----------------------------------------------------------------
@@ -99,16 +99,19 @@ hs(\dots)
   \item{filter}{A logical expression or a vector of integers that specify the
         row numbers of the rows to retain to define a subset of rows of
         the data frame to analyze.}
-  \item{stat_x}{Bin and transform values of variable \code{x} into
-       \code{"counts"} by default or \code{"proportion"} if specified,
-       that is, frequencies or relative frequencies.}\cr
+  \item{stat}{Specifies the $y$-axis variable.
+        Bin and transform values of variable \code{x} to plot 
+        \code{"counts"} by default or \code{"proportion"} if specified,
+        that is, frequencies or relative frequencies. Or, specify
+        to plot densities on the $y$-axis.}\cr
 
   \item{facet1}{A categorical variable called a conditioning variable that
         activates \bold{Trellis graphics}, from the lattice package, to provide
         a separate scatterplot (panel) of numeric primary variables \code{x}
         and \code{y} for each level of the variable.}
   \item{facet2}{A second conditioning variable to generate Trellis
-        plots jointly conditioned on both the \code{facet1} and \code{facet2} variables,
+        plots jointly conditioned on both the \code{facet1} and \code{facet2}
+        variables,
         with \code{facet2} as the row variable, which yields a scatterplot (panel)
         for each cross-classification of the levels of numeric \code{x} and
         \code{y} variables.}
@@ -167,10 +170,8 @@ hs(\dots)
   \item{reg}{The color of the superimposed, regular histogram when
         \code{cumulate="both"}.}\cr
 
-  \item{density}{If \code{TRUE}, plot the smoothed \bold{kernel density}
-        estimate.}
   \item{show_histogram}{When \code{density} is \code{TRUE}, plot a histogram
-       behind the density curve.}
+       behind the \bold{density curve}.}
   \item{bandwidth}{Bandwidth of kernel density estimation, which determines the
        smoothness of the resulting density curve, larger values yield more
        smooth curves. Initial value is "nrd0", but unless
@@ -189,7 +190,8 @@ hs(\dots)
        defaults to a light gray.} 
   \item{color_general}{Color of the general density curve border.}
   \item{color_normal}{Color of the normal curve border.}
-  \item{x.pt}{Value of the point on the x-axis for which to draw a unit interval
+  \item{line_width}{Line width of the plotted density curve.}
+  \item{x_pt}{Value of the point on the x-axis for which to draw a unit interval
         around illustrating the corresponding area under the general density curve.
         Only applies when requesting \code{type=general}.}
   \item{y_axis}{Specifies if the y-axis, the density axis, should be included.}
@@ -301,7 +303,7 @@ hs(\dots)
 
 \details{
 OVERVIEW\cr
-Results are based on the standard R \code{\link{hist}} function to calculate and plot a histogram, or a multi-panel display of histograms with Trellis graphics, plus the additional provided color capabilities, a relative frequency histogram, summary statistics and outlier analysis. The \code{freq} option from the standard R \code{\link{hist}} function has no effect as it is always set to \code{FALSE} in each internal call to \code{\link{hist}}. To plot densities, set the parameter \code{density} to \code{TRUE}.
+Results are based on the standard R \code{\link{hist}} function to calculate and plot a histogram, or a multi-panel display of histograms with Trellis graphics, plus the additional provided color capabilities, a relative frequency histogram, summary statistics and outlier analysis. The \code{freq} option from the standard R \code{\link{hist}} function has no effect as it is always set to \code{FALSE} in each internal call to \code{\link{hist}}. To plot densities, set the parameter \code{stat} to \code{density}.
 
 VARIABLES and TRELLIS PLOTS\cr
 At a minimum there is one primary variable, \code{x}, which results in a single histogram. Trellis graphics, from Deepayan Sarkar's \code{lattice} package, may be implemented in which multiple panels are displayed according to the levels of one or two categorical variables, called conditioning variables.  A variable specified with \code{facet1} is a conditioning variable that results in a Trellis plot, the histogram of \code{x} produced at \emph{each} level of the \code{facet1} variable. Inclusion of a second conditioning variable, \code{facet2}, results in a separate histogram for \emph{each} combination of cross-classified values of both \code{facet1} and \code{facet2}. 
@@ -446,7 +448,7 @@ Histogram(Salary, bin_width=20000, xlab="My Variable")
 Histogram(Salary, breaks="Scott", values=TRUE, quiet=TRUE)
 
 # histogram with the number of suggested bins, with proportions
-Histogram(Salary, breaks=15, stat_x="proportion")
+Histogram(Salary, breaks=15, stat="proportion")
 
 # histogram with non-default values for x- and y-axes
 d[2,4] <- 45000
@@ -473,25 +475,25 @@ Histogram(Salary, cumulate="both", reg="mistyrose")
 # -------------
 
 # default density plot
-Histogram(Salary, density=TRUE)
+Histogram(Salary, stat="density")
 
 # normal curve and general density curves superimposed over histogram
 # all defaults
-Histogram(Salary, density=TRUE, type="both")
+Histogram(Salary, stat="density", type="both")
 
 # display only the general estimated density
 #  so do not display the estimated normal curve
 # specify the bandwidth for the general density curve,
 #  use the standard bandwidth option for the density function
-Histogram(Salary, density=TRUE, bandwidth=8000)
+Histogram(Salary, stat="density", bandwidth=8000)
 
 # display only the general estimated density and a corresponding
-#  interval of unit width around x.pt
-Histogram(Salary, density=TRUE, x.pt=40000)
+#  interval of unit width around x_pt
+Histogram(Salary, stat="density", x_pt=40000)
 
 # densities for all specified numeric variables in a list of variables
 # e.g., use the combine or c function to specify a list of variables
-Histogram(c(Years,Salary), density=TRUE)
+Histogram(c(Years, Salary), stat="density")
 
 
 # -------------------------------------------------
