@@ -36,7 +36,7 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
          ellipse_fill="off", ellipse_lwd,
 
          run=FALSE, center_line="off", stack=FALSE,
-         ts_unit=NULL, ts_agg=FALSE, do.agg="sum", ts_ahead=0,
+         ts_unit=NULL, ts_agg="sum", do.agg=FALSE, ts_ahead=0,
          ts_fit=FALSE, n_date_tics=NULL,
          y.fit, y.hat, x.fit, x.hat, y.upr, y.lwr,
          mxf.x, mnf.y, mxf.y,
@@ -53,7 +53,7 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
          add_cex=NULL, add_lwd=1, add_lty="solid",
          add_color=NULL, add_fill=NULL, add_trans=NULL,
 
-         quiet=FALSE, want.labels=TRUE, bubble.title=TRUE, ...)  {
+         quiet=FALSE, ...)  {
 
 
 # preliminaries -----------------------------------------------------------
@@ -71,6 +71,8 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
   }
   else
     by.bub <- FALSE
+
+  want.labels <- TRUE
 
 
 # data structures dimensions ----------------------------------------------
@@ -175,6 +177,7 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
       cnt <- sum(by == levels(by)[1])
       x.dates <- x[1:cnt,1]  # assumes by is sorted by level
     }
+
   if (ts_ahead > 0) x.dates <- c(x.dates, x.hat[,1])
 
    x <- as.matrix(x[,1], ncol=1)  # x to numeric version of dates
@@ -291,7 +294,8 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
     if (axis_y_cex > 1) if (!is.null(by)) rm <- rm + .1  # kludge
   }
 
-  if (ts_ahead > 0) rm <- rm + 0.75  # make room for vertical legend
+  if (ts_ahead > 0)   # make room for vertical legend
+    rm <- rm + getOption("axis_cex")  # default is 0.75
 
   if (center_line != "off") rm <- rm + .4  # room for center_line label
   if (date.var) rm <- rm + 0.10  # make room: last axis date > last data value
@@ -660,22 +664,43 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
           polygon(c(x[1],x,x[length(x)]), c(mn.y,y[,1],mn.y),
                   col=area_fill, border="transparent")
 
+
         if (ts_ahead > 0) {  # forecast
-          trns.red <- .maketrans("darkred", 0.25*256)
-          lines(x.fit[,1], y.fit[,1], col=trns.red, lwd=ln.width)
+          h <- .get.h()
+          if (getOption("theme") == "colors") h <- 0  # default is red
+          if (!(getOption("theme") %in% c("gray", "white"))) {
+                 if (h==0) {clr.f <- rgb(.6,0,0); clr.ft <- rgb(.6,0,0,.15)}
+            else if (h==30) {clr.f <- rgb(.6,.3,0); clr.ft <- rgb(.6,.3,0,.15)} 
+            else if (h==60) {clr.f <- rgb(.6,.6,0); clr.ft <- rgb(.6,.6,0,.15)} 
+            else if (h==120) {clr.f <- rgb(0,.6,0); clr.ft <- rgb(0,.6,0,.15)} 
+            else if (h==240) {clr.f <- rgb(0,.4,.6); clr.ft <- rgb(0,.4,.6,.15)} 
+            else if (h==300) {clr.f <- rgb(.6,0,.4); clr.ft <- rgb(.6,0,.4,.15)} 
+            trns.col <- .maketrans(clr.f, 0.25*256)
+            poly.fill <- clr.ft
+            pt.f.fill <- clr.f
+            ln.f.col <- clr.f
+          }
+          else {  # gray or white background
+            trns.col <- .maketrans("gray10", 0.35*256)
+            poly.fill <- rgb(.5,.5,.5,.45)
+            pt.f.fill <- "gray20"
+            ln.f.col <- "black"
+          }
+          
+          lines(x.fit[,1], y.fit[,1], col=trns.col, lwd=ln.width)
           lines(c(x.fit[nrow(x.fit),1], x.hat[1,1]),  # connect fit with hat
                 c(y.fit[nrow(y.fit),1], y.hat[1,1]),
-                col=trns.red, lwd=ln.width)
+                col=trns.col, lwd=ln.width)
           f.size.pt <- ifelse (size.pt<0.5, .65, size.pt)
-          points(x.hat[,1], y.hat[,1], pch=shape, bg="darkred", cex=f.size.pt)
-          lines(x.hat[,1], y.hat[,1], col="darkred", lwd=ln.width)
-          lines(x.hat[,1], y.upr[,1], col=trns.red, lwd=ln.width)
-          lines(x.hat[,1], y.lwr[,1], col=trns.red, lwd=ln.width)
+          points(x.hat[,1], y.hat[,1], pch=shape, bg=pt.f.fill, cex=f.size.pt)
+          lines(x.hat[,1], y.hat[,1], col=ln.f.col, lwd=ln.width)
+          lines(x.hat[,1], y.upr[,1], col=trns.col, lwd=ln.width)
+          lines(x.hat[,1], y.lwr[,1], col=trns.col, lwd=ln.width)
           xx <- c(x.hat[,1], rev(x.hat[,1]))
           yy <- c(y.upr[,1], rev(y.lwr[,1]))
-          polygon(xx, yy, border=NA, col=rgb(.6,0,0,.15))
+          polygon(xx, yy, border=NA, col=poly.fill)
 
-          lgn.clr <- c("black", trns.red, "darkred")
+          lgn.clr <- c(color[1], trns.col, ln.f.col)
           lgn.nm <- ifelse (nchar(y.name) < 6, y.name, "data")
           .plt.by.legend(c(lgn.nm, "model\nfit", "fore-\ncast"),
                          lgn.clr, lgn.clr, shp="lines", pts_trans, fill_bg,
@@ -955,7 +980,7 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
         }
 
         # interaction means plot, ts without a date var and segments=TRUE
-        if (segments && !stack) {
+        if (segments && !stack && !date.var) {
           if (!is.null(ylab))  # thin line for ANOVA interaction plot
             if (grepl("Cell Means of", ylab, fixed=TRUE)) ln.width <- 0.75
           for (j in 1:(nrow(x.lv)-1)) {

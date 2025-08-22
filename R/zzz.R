@@ -9,7 +9,7 @@ if (getRversion() >= "3.6.0")
 function(...) {
 
   packageStartupMessage("\n",
-      "lessR 4.4.4                         feedback: gerbing@pdx.edu \n",
+      "lessR 4.4.5                         feedback: gerbing@pdx.edu \n",
       "--------------------------------------------------------------\n",
       "> d <- Read(\"\")  Read data file, many formats available, e.g., Excel\n",
       "  d is default data frame, data= in analysis routines optional\n",
@@ -437,6 +437,7 @@ function(...) {
 }
 
 
+
 # function to process filter param values, especially categorical
 .filter <- function(txt) {
 
@@ -639,7 +640,6 @@ function(...) {
       txt3 <- "specify the data table that contains the variable with: data=\n"
       txt <- ifelse (dname == "d",  paste(txt1, txt2, txt3, sep=""), "\n")
 
-#      nm <- eval(parse(text=paste("names(", dname,")")))
       nm <- paste(nms, " ")  # add a space for output listing
 
       if (dname == "d")
@@ -1400,10 +1400,19 @@ function(lab, labcex, cut, nm, var.nm, units) {
 
 
 .showfile <- function(fname, txt) {
-  if (getwd() == "/")
-    workdir <- "top level (root) of your file system"
-  else
-    workdir <- getwd()
+  dir.nm <- dirname(fname)
+
+  if (dir.nm == ".") {  # no path name, just a file name
+    if (getwd() == "/")
+      workdir <- "top level (root) of your file system"
+    else
+      workdir <- getwd()
+    txt.wrt <- "written at the current working directory"
+  }
+  else {
+    workdir <- dir.nm
+    txt.wrt <- "written" 
+  }
 
   cat("\nThe", txt, "written at the current working directory\n")
   cat("       ", fname, " in:  ", workdir, "\n")
@@ -1412,14 +1421,21 @@ function(lab, labcex, cut, nm, var.nm, units) {
 
 
 .showfile2 <- function(fname, txt) {
-  if (getwd() == "/")
-    workdir <- "top level (root) of your file system"
-  else
-    workdir <- getwd()
+  dir.nm <- dirname(fname)
 
-  tx <- character(length = 0)
+  if (dir.nm == ".") {  # no path name, just a file name
+    if (getwd() == "/")
+      workdir <- "top level (root) of your file system"
+    else
+      workdir <- getwd()
+    txt.wrt <- "written at the current working directory"
+  }
+  else {
+    workdir <- dir.nm
+    txt.wrt <- "written" 
+  }
 
-  txt.wrt <- "written at the current working directory."
+  tx <- c()
   tx[length(tx)+1] <- paste("\nThe", txt, txt.wrt)
   tx[length(tx)+1] <- paste("       ", fname, " in:  ", workdir)
 
@@ -2135,6 +2151,17 @@ align_vector <- function(vec, by.call) {
   }
 }
 
+
+.toFmtDate <- function(x.date, ts_unit) {
+  if (ts_unit == "months")
+    x.date <- as.character(zoo::as.yearmon(x.date))
+  else if (ts_unit == "quarters")
+    x.date <- as.character(zoo::as.yearqtr(x.date))
+  else if (ts_unit == "years")
+    x.date <- as.character(format(x.date, "%Y"))
+  else
+    x.date <- as.character(x.date)
+}
 
 
 # debug cat

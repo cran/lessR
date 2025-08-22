@@ -3,8 +3,6 @@
 function(mylevels, color, fill, shp, trans_pts, col.bg, usr,
          pt.size=1.25, pt.lwd=0.5, legend_size=NULL,
          legend_abbrev=NULL, legend_adj=0, legend_title=NULL) {
-p("in legend")
-p(pt.size)
 
   par(xpd=NA)  # allow drawing outside of plot region
 
@@ -62,11 +60,6 @@ p(pt.size)
 
   # fill=length(legend_labels):1  puts the legend labels in the correct
   #   order, but only for inflexible boxes that cannot be resized with pt.cex
-print(pt.size)
-p(length(pt.size))
-p(pt.size)
-p(class(pt.size))
-p(length(pt.size))
   if (length(pt.size) == 1) if (pt.size == 0) pt.size <- 1.2
   if (shp[1] != "lines")
     legend(xleft+legend_adj, ytop, legend=legend_labels, title=legend_title,
@@ -76,12 +69,12 @@ p(length(pt.size))
            text.col=the.clr, y.intersp=yi, bty="n")
   else {  # for plotting data and forecast
     xleft <- usr[2] + epsilon/4
-    legend(xleft+legend_adj, ytop, legend=legend_labels, title=legend_title,
+    legend(xleft+legend_adj, ytop+14, legend=legend_labels, title=legend_title,
            cex=legend_size, pt.cex=pt.size, pt.lwd=pt.lwd,
            title.cex=legend_title_size,
            bg=col.bg, col=color, pt.bg=fill,
            text.col=the.clr, bty="n",
-           lty="solid", lwd=2.5, y.intersp=1.1, seg.len=1.25)
+           lty="solid", lwd=2.5, y.intersp=1.7, seg.len=1.25)
     }
 
   par(xpd=FALSE)  # cancel drawing outside of plot region (need for RStudio)

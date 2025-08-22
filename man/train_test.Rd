@@ -29,6 +29,14 @@ From the input data frame create training and testing data frames. If the \code{
 \examples{
 d <- Read("Employee")
 
+# create two component data frames, train and test, which retain all
+#   variables for the model in the same data frame
+out <- train_test(d)
+names(out)
+# then can copy to regular data frames apart from the list output structure
+d_train <- out$train
+d_test <- out$test
+
 # create four component data frames that separate the response variable, y,
 #   from predictor variables, X: train_x, train_y, test_x, and test_y
 out <- train_test(d, response=Salary)
@@ -38,16 +46,7 @@ X_train <- out$train_x
 y_train <- out$train_y
 X_test <- out$test_x
 y_test <- out$test_y
-
-# create two component data frames, train and test, which retain all
-#   variables for the model in the same data frame
-out <- train_test(d)
-names(out)
-# then can copy to regular data frames apart from the list output structure
-d_train <- out$train
-d_test <- out$test
 }
-
 
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

@@ -209,7 +209,7 @@ We have the date as _Month_, and also have variables _Company_ and stock _Price_
 
 ```{r}
 d <- Read("StockPrice")
-Plot(Month, Price, filter=(Company=="Apple"), area_fill="on")
+Plot(Month, Price, filter=(Company=="Apple"), ts_area_fill="on")
 ```
 
 
@@ -228,12 +228,19 @@ Plot(Month, Price, ts_unit="quarters", ts_agg="mean")
 
 `Plot()` implements exponential smoothing or linear regression with seasonality forecasting with accompanying visualization. Parameters include `ts_ahead` for the number of `ts_units` to forecast into the future, and `ts_format` to provide a specific format for the date variable if not detected correctly by default. Parameter `ts_method` defaults to `es` for exponential smoothing, or set to `lm` for linear regression. Control aspects of the exponential smoothing estimation and prediction algorithms with parameters `ts_level` (alpha), `ts_trend` (beta), `ts_seasons` (gamma), `ts_type` for additive or multiplicative seasonality, and `ts_PIlevel` for the level of the prediction intervals.
 
-To forecast Apple's stock price, focus here on the last several years of the data, beginning with Row 400 through Row 473, the last row of data for apple. In this example, forecast ahead 24 months.
+To forecast Apple's stock price, focus here on the last several years of the data, beginning with Row 400 through Row 473, the last row of data for apple. In this example, forecast ahead 24 months. Here, rely upon the default exponential smoothing estimation procedure from the `fpp3` ecosystem package `fable`.
 
 
 ```{r}
 d <- d[400:473,]
 Plot(Month, Price, ts_unit="months", ts_agg="mean", ts_ahead=24)
+```
+
+Next, implement the classic Holt-Winters exponential smoothing method from the Base~R function `Holt-Winters()`.
+
+```{r}
+Plot(Month, Price, ts_unit="months", ts_agg="mean", ts_ahead=24,
+     ts_source="classic")
 ```
 
 

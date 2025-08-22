@@ -433,16 +433,22 @@ server <- function(input, output, session) {
     if (!input$do_y) {
       out2 <- c(b$out_miss, " ", b$out_count, " ", b$out_chi)
       if (input$my100) out2 <- c(out2, " ", b$out_col)
-     }
-     else {
-       y.name <- input$y.col
-       shiny::req(y.name)
-       cat("Summary Statistics\n", "------------------\n", sep="")
-       pv <- pivot(data(), c(mean, sd, min, median, max), y.name, by=x.name)
-       print(pv, print.gap=2)
-       out2 <- b$out_y
-     }
-     cat("\n"); for (i in 1:length(out2)) cat(out2[i], "\n")
+    }
+    else {
+      y.name <- input$y.col
+      shiny::req(y.name)
+      cat("Summary Statistics\n", "------------------\n", sep="")
+      stats <- c("mean","sd","min","median","max")
+      pv <- do.call(pivot,
+        list(data=data(), compute=stats, variable=as.name(y.name),
+             by=as.name(x.name), quiet=TRUE)
+      )
+      k <- 3L  # Keep cols 1:3 (Type, n, na), rename rest with just the stats
+      names(pv)[seq_len(k + length(stats))] <- c(names(pv)[seq_len(k)], stats)
+      print(pv, print.gap=2)
+      out2 <- b$out_y
+    }
+    cat("\n"); for (i in 1:length(out2)) cat(out2[i], "\n")
   })
 
 

@@ -76,7 +76,7 @@ pc(\dots)
         Can explicitly choose \code{"grays"}
         or \code{"hues"} , or pre-specified R color schemes 
         \code{"rainbow"}, \code{"terrain"}, and \code{"heat"}. 
-        Or, set to the name of \code{y} to map the values of bar fill,
+        Or, set to the name of \code{y} to map the labels of bar fill,
         specified as \code{(count)} if tabulated from the data. Can also
         provide pre-defined color ranges \code{"blues"}, \code{"reds"}
         and \code{"greens"}, as well as
@@ -121,7 +121,7 @@ pc(\dots)
         the number of categories, the colors are recycled.}
   \item{labels_size}{Character expansion factor, the size, of the plotted text, 
         for which the default value is 0.95.}
-  \item{labels_decimals}{Number of decimal digits for which to display the values_
+  \item{labels_decimals}{Number of decimal digits for which to display the labels
         Default is 0 if all numerical y-values are integer, 1 for \code{"\%"},
         and 2 for \code{"prop"}.}\cr
 

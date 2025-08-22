@@ -8,8 +8,14 @@ function(data=d, by, direction=NULL, quiet=getOption("quiet"), ...) {
       "or preceding the variables with:  by\n\n")
   }
 
-  dname <- deparse(substitute(data))
   n.obs <- nrow(data)
+
+  # if a tibble, convert to data frame
+  df.name <- deparse(substitute(data))  # is NULL if from shiny
+  if (exists(df.name, envir=parent.frame())) {
+    if (any(grepl("tbl", class(data), fixed=TRUE)))
+      data <- data.frame(data)
+  }
 
   all.vars <- as.list(seq_along(data))
   names(all.vars) <- names(data)

@@ -23,11 +23,11 @@ train_test <-
   ind <- eval(substitute(response), envir=data.vars, parent.frame())
 
   if (!is.null(ind)) {
-    train_x <- d[train_index, -ind, drop=FALSE]
-    train_y <- d[train_index, ind, drop=FALSE]
+    train_x <- data[train_index, -ind, drop=FALSE]
+    train_y <- data[train_index, ind, drop=FALSE]
 
-    test_x <- d[test_index, -ind, drop=FALSE]
-    test_y <- d[test_index, ind, drop=FALSE]
+    test_x <- data[test_index, -ind, drop=FALSE]
+    test_y <- data[test_index, ind, drop=FALSE]
 
     if (matrix_out) {
       train_x <- as.matrix(train_x)
@@ -40,8 +40,8 @@ train_test <-
   }
 
   else {  # no response variable, all variables treated equally
-    train <- d[train_index, , drop=FALSE]
-    test <- d[test_index, , drop=FALSE]
+    train <- data[train_index, , drop=FALSE]
+    test <- data[test_index, , drop=FALSE]
     if (matrix_out) {
       train <- as.matrix(train)
       test <- as.matrix(test)

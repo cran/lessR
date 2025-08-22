@@ -61,6 +61,7 @@ The name entered for \code{group} is repeat it for the first two columns output 
 
 \examples{
 d <- Read("Anova_rb")
+d
 
 # with the default variable names in the long-form
 reshape_long(d, c("sup1", "sup2", "sup3", "sup4"))

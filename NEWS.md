@@ -1,3 +1,60 @@
+# lessR version 4.4.5, August 21, 2025
+
+## Major Update
+
+* `Plot()`: Time series forecasting from `ts_ahead` set to a value larger than zero is now upgraded to `fable` functions `ETS()` for exponential smoothing forecasting and `TSLM()` time series linear regression forecasting along with other functions from the `fpp3` ecosystem as documented at https://otexts.com/fpp3.
+  + New parameter `ts_source` defaults to `"fable"` but can assume the value of `"classic"` for standard `HoltWinters()` exponential smoothing or linear regression with seasonality first removed and then added back in.
+  + Parameters `ts_trend`, `ts_seasons`, and `ts_error` redefined to accept values of `"A"` for additive effect, `"M"` for multiplicative effect for `ETS()`, and `"N"` for no effect, as well as `"Ad"` and `"Md" for `ETS()`. Enter  `?Plot`  to view the manual for the details. 
+
+
+## Updates
+
+* `sort_by()`: Deprecated function removed, replaced by `order_by` to avoid name conflict with Base R which recently took over that name.
+
+* `order_by()`: Allow to process the alternative data frames called tibbles from the tidyverse. 
+
+* `PieChart()`: Add a blank line after the title of the pie chart to provide more separation from the title and the chart itself.
+
+* `Plot()`: Changed parameter names so that all parameter names applicable to time series analysis begin with `ts_`.
+  + `ts_stack` instead of `stack`. 
+  + `ts_area_fill` instead of `area_fill`. 
+  + `ts_area_split` instead of `area_split`. 
+  + `ts_n_x_tics` instead of `n_date_tics`. 
+
+* `Plot()`: For the time series unit parameter, `ts_unit`, submitted value is now checked to make sure it is valid, for example, `"days"` instead of `"daily"`.
+
+* `Plot()`: For the time series unit parameter, `ts_fitted`, now the `y` data value is also displayed along with the `x`-date value, and the fitted value, and the level.
+
+* `Plot()`: For a forecast from a time series plot, with parameter `ts_ahead`, plotted forecast colors follow the style theme, with a default of red for the default `colors` theme.
+
+* `Plot()`: For a forecast from a time series plot, with parameter `ts_ahead`, more vertical spacing between the legend elements: data, model fit, and forecast.
+
+* `Plot()`: For a time series analysis with a `by` variable, the data are now sorted by that variable implicitly instead of requiring sorting before the analysis.
+ 
+* `Plot()`: For trellis (faceted) plots, if a date variable, now the name of the date variable is displayed because converting it to `NULL`, as with the previous procedure, just leaves a blank space without compressing the space. 
+
+* `STL()`: Saving the output visualization to a PDF file is now possible with new parameters `pdf_file`, `width`, and `height`.
+
+* `STL()`: Output object data frame now includes the data as well as the trend, seasonal, and error components. 
+
+* `STL()`: Output object data frame now includes the formatted dates according to their unit, e.g., "2020 Q1" instead of 2020-01-01 for quarterly data. 
+
+
+## Bug Fixes
+
+* When writing a data frame to a data file, if the file specification includes a path name, the result displayed at the console now correctly reflects that specification.
+
+* `interact("BarChart")`: Selecting a numeric variable from which to compute statistics such as the mean as the `y` variable for the bar chart now works after previous change to `BarChart()` parameters.
+
+* `interact("Histogram")`: Density plots now work again after previous change to `Histogram()` parameters.
+
+* `Plot()`: Parameter `n_axis_y_skip` now works for time series trellis or faceted plots.
+
+* `Plot()`: For the now `classic` time series forecasting with the regression, if seasonality is specified without trend, the fitted and forecasted values are now properly adjusted for the overall level of the time series. 
+
+* `train_test()`: Data frames now can be processed with any valid name, not just `d`.
+
+
 # lessR version 4.4.4, June 16, 2025
 
 ## Updates

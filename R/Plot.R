@@ -23,11 +23,13 @@ function(x, y=NULL, data=d, filter=NULL,
     fit_power=1, fit_se=0.95, fit_color=getOption("fit_color"),
     fit_new=NULL, plot_errors=FALSE, ellipse=0,
 
-    ts_unit=NULL, ts_agg=c("sum", "mean"), ts_NA=NULL,
-    ts_ahead=0, ts_method=c("es", "lm"), ts_format=NULL,
-    ts_fitted=FALSE, ts_level=NULL, ts_trend=NULL, ts_seasons=NULL,
-    ts_type=c("additive", "multiplicative"), ts_PI=0.95,
-    stack=FALSE, area_fill="transparent", area_split=0, n_date_tics=NULL,
+    ts_unit=NULL, ts_ahead=0, ts_method=c("es", "lm"),
+    ts_source=c("fable", "classic"), ts_agg=c("sum", "mean"),
+    ts_NA=NULL, ts_format=NULL, ts_fitted=FALSE, ts_PI=.95,
+    ts_trend=NULL, ts_seasons=NULL, ts_error=NULL,
+    ts_alpha=NULL, ts_beta=NULL, ts_gamma=NULL, ts_new_x=NULL,
+    ts_stack=FALSE, ts_area_fill="transparent", ts_area_split=0,
+    ts_n_x_tics=NULL,
     show_runs=FALSE, center_line=c("off", "mean", "median", "zero"),
 
     stat=c("mean", "sum", "sd", "deviation", "min", "median", "max"),
@@ -59,7 +61,7 @@ function(x, y=NULL, data=d, filter=NULL,
     rotate_x=getOption("rotate_x"), rotate_y=getOption("rotate_y"),
     offset=getOption("offset"),
     axis_fmt=c("K", ",", ".", ""), axis_x_prefix="", axis_y_prefix="",
-    xy_ticks=TRUE, n_axis_x_skip=0, n_axis_y_skip=0, 
+    xy_ticks=TRUE, n_axis_x_skip=0, n_axis_y_skip=0,
 
     legend_title=NULL,
 
@@ -80,6 +82,7 @@ function(x, y=NULL, data=d, filter=NULL,
 
   ts_agg <- match.arg(ts_agg)
   ts_method <- match.arg(ts_method)
+  ts_source <- match.arg(ts_source)
   type <- match.arg(type)
 
   stat.miss <- ifelse (missing(stat), TRUE, FALSE)
@@ -104,10 +107,45 @@ function(x, y=NULL, data=d, filter=NULL,
   if (stat.miss) stat <- "data"  # no aggregation
   if (stat.miss  &&  !stat_x.miss) stat <- stat_x
 
-  if (!missing(contour_n) || !missing(contour_nbins) || 
+  if (!missing(contour_n) || !missing(contour_nbins) ||
       !missing(contour_points))
     type <- "contour"
 
+  if (!is.null(ts_unit)) {
+    valid_units <- c("days", "weeks", "months", "quarters", "years", "days7")
+    if (!(ts_unit %in% valid_units)) {
+      cat("\n"); stop(call.=FALSE, "\n------\n",
+        "Invalid value for parameter ts_unit. Valid values:\n",
+        "  \"days\", \"weeks\", \"months\", \"quarters\", \"years\", \"days7\"
+        \n\n")
+    }
+  }
+
+if (!is.null(ts_error) && is.logical(ts_error)) {
+    cat("\n"); stop(call.=FALSE, "\n------\n",
+      "Parameter  ts_error  now set to  'A' (additive) or ",
+      "'M' (multiplicative).\n Enter  ?Plot  to view the details.\n\n")
+  }
+
+if (!is.null(ts_trend) && is.logical(ts_trend)) {
+    cat("\n"); stop(call.=FALSE, "\n------\n",
+      "Parameter  ts_trend  now set to  'A' (additive) or ",
+      "'M' (multiplicative).\n Enter  ?Plot  to view the details.\n\n")
+  }
+
+if (!is.null(ts_seasons) && is.logical(ts_seasons)) {
+    cat("\n"); stop(call.=FALSE, "\n------\n",
+      "Parameter  ts_seasons  now set to  'A' (additive) or ",
+      "'M' (multiplicative).\n Enter  ?Plot  to view the details.\n\n")
+  }
+
+if (!is.null(ts_trend)) pn(class(ts_trend))
+if (!is.null(ts_seasons)) pn(class(ts_seasons))
+
+  if (!is.null(ts_unit)  &&  !is.null(substitute(facet1))) {
+    cat("\n"); stop(call.=FALSE, "\n------\n",
+      "Parameter  ts_unit  does not yet apply to facet plots.\n\n")
+  }
 
   if (type == "contour"  &&  !is.null(add)) {
     cat("\n"); stop(call.=FALSE, "\n------\n",
@@ -117,11 +155,6 @@ function(x, y=NULL, data=d, filter=NULL,
   if (is.logical(fit[1])) {
     cat("\n"); stop(call.=FALSE, "\n------\n",
       "Now specify a value for  fit  such as \"loess\" or \"lm\".\n\n")
-  }
-
-  if (!is.null(ts_unit)  &&  !is.null(substitute(facet1))) {
-    cat("\n"); stop(call.=FALSE, "\n------\n",
-      "Parameter  ts_unit  does not yet apply to facet plots.\n\n")
   }
 
   if (fit[1] %in% c("xlog", "xylog")) {
@@ -169,6 +202,10 @@ function(x, y=NULL, data=d, filter=NULL,
         ts_PI <- dots[[i]]
         message("\nParameter  ts_PIlevel  is now named  ts_PI\n")
       }
+      if (names(dots)[i] == "stack") {
+        ts_PI <- dots[[i]]
+        message("\nParameter  stack  is now named  ts_stack\n")
+      }
       if (names(dots)[i] == "sort_yx") {
         sort <- dots[[i]]
         message("\nParameter  sort_yx  is now named  sort\n")
@@ -180,7 +217,7 @@ function(x, y=NULL, data=d, filter=NULL,
       if (names(dots)[i] == "type") ts_type <- dots[[i]]
       if (names(dots)[i] == "stat_yx") stat <- dots[[i]]
       if (names(dots)[i] == "smooth_exp") smooth_power <- dots[[i]]
-      if (names(dots)[i] == "area_origin") area_split <- dots[[i]]
+      if (names(dots)[i] == "area_origin") ts_area_split <- dots[[i]]
       if (names(dots)[i] == "vbs_size") vbs_ratio <- dots[[i]]
       if (names(dots)[i] == "run") {
         cat("\n"); stop(call.=FALSE, "\n------\n",
@@ -226,7 +263,7 @@ function(x, y=NULL, data=d, filter=NULL,
   trans <- transparency
 
   if ("on" %in% fill) fill <- getOption("violin_fill")
-  if ("on" %in% area_fill) area_fill <- getOption("violin_fill")
+  if ("on" %in% ts_area_fill) ts_area_fill <- getOption("violin_fill")
 
   # Note: stat is both object (dot plot) and statistic
 
@@ -326,7 +363,7 @@ function(x, y=NULL, data=d, filter=NULL,
   trans.miss <- ifelse (missing(trans), TRUE, FALSE)
   box_fill.miss <- ifelse (missing(box_fill), TRUE, FALSE)
   violin_fill.miss <- ifelse (missing(violin_fill), TRUE, FALSE)
-  area_fill.miss <- ifelse (missing(area_fill), TRUE, FALSE)
+  ts_area_fill.miss <- ifelse (missing(ts_area_fill), TRUE, FALSE)
   seg.miss <- ifelse (missing(segments), TRUE, FALSE)
   seg.y.miss <- ifelse (missing(segments_y), TRUE, FALSE)  # for Cleveland plot
   seg.x.miss <- ifelse (missing(segments_x), TRUE, FALSE)
@@ -363,7 +400,7 @@ function(x, y=NULL, data=d, filter=NULL,
   }
 
   # default point size for a stacked time series
-  if (stack) {
+  if (ts_stack) {
     if (size.miss) size <- 0
     size.miss <- FALSE
   }
@@ -525,6 +562,8 @@ function(x, y=NULL, data=d, filter=NULL,
   }  # end filter
 
 
+# process x variable ------------------------------------------------------
+
   # process row.names if specified
   if (x.name %in% c("row_names", "row.names")) {
     # retain order of row names, otherwise will be alphabetical
@@ -625,44 +664,18 @@ function(x, y=NULL, data=d, filter=NULL,
       }
     }
 
-    # if x.call[,1] has char string values, see if to convert to type Date
-    x11 <- x.call[1,1]
-    if (is.character(x11)) {
+    # if x.call[,1] has char string values, see if convert to type Date
+    if (is.character(x.call[1,1])) {
       if (!is.null(ts_format))  # specify the date format
         x.call[,1] <- as.Date(x.call[,1], format=ts_format)
+      else  # see if a date, and if so, infer the date format
+        x.call <- date.infer(x.call)
+    }
 
-      else {  # guess the date format
-        n.ch <- nchar(x11)
-        if (n.ch %in% 6:10) {
-          isQ <- grepl("Q1|Q2|Q3|Q4", x11)
-          isM <- grepl("Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec", x11)
-          if (isM) {
-            x.call[,1] <- gsub(" ", "", x.call[,1])  # remove all spaces
-            year <- substr(x.call[,1], 1, 4)
-            monthNm <- substr(x.call[,1], 5, 7)
-            x.call[,1] <- as.Date(paste(year, monthNm, "01", sep="-"),
-                                   format="%Y-%b-%d")
-          }
-          else if (isQ) {  # convert dates entered as 2024 Q3 to R Date
-            parts <- strsplit(gsub("\\s+", "", x.call[,1]), "Q")  # remove Q
-            # Extract quarter, `[` is R extraction operator
-            year <- as.numeric(sapply(parts, `[`, 1))  # 1st list element (year)
-            quarter <- as.numeric(sapply(parts, `[`, 2))  # 2nd list element
-            month <- 1 + (quarter - 1) * 3  # get month Q1=1, Q2=4, Q3=7, Q4=10
-            x.call[,1] <- as.Date(paste(year, month, "01", sep="-"))  #to Date
-          }  # end quarter
-          else {  # see if numeric numeric date format
-            punct <- " "  # see if there are two punctuation delimiters
-            if (length(gregexpr("/", x11, fixed=TRUE)[[1]]) == 2) punct <- "/"
-            if (length(gregexpr("-", x11, fixed=TRUE)[[1]]) == 2) punct <- "-"
-            if (length(gregexpr(".", x11, fixed=TRUE)[[1]]) == 2) punct <- "."
-            if (punct %in% c("/", "-", "."))   # only evaluate probable dates
-              x.call[,1] <- .charToDate(x.call[,1], punct)
-          }  # numeric date format
-        }  # end n.ch is 6, 7, 8
-      }  # end do best guess
-      if (.is.date(x.call[1,1])) cat.x <- FALSE
-    }  # is.char x.call[1,1]
+    if (.is.date(x.call[1,1])) {
+     cat.x <- FALSE  # is.char x.call[1,1]
+     date.var <- TRUE
+    }
 
     if (cat.x && run) {
       cat("\n"); stop(call.=FALSE, "\n------\n",
@@ -670,7 +683,6 @@ function(x, y=NULL, data=d, filter=NULL,
         x.name, " is a categorical variable\n\n")
     }
 
-    if (.is.date(x.call[,1])) date.var <- TRUE
   }  # end n.xvar == 1
 
   # more than one x-variable
@@ -930,6 +942,18 @@ function(x, y=NULL, data=d, filter=NULL,
   }
 
   n.by <- ifelse (is.null(by.call), 0, nlevels(by.call))
+
+  # already converted to Date if needed, now sort if needed
+  if (date.var && !is.null(by.call)) {
+    is.sorted <- all(order(data[[by.name]]) == seq_len(nrow(data)))
+    if (!is.sorted) {  # then sort by by.call
+      ix <- order(by.call)
+      x.call <- data.frame(x.call[ix,]);  names(x.call) <- x.name
+      y.call <- data.frame(y.call[ix,]);  names(y.call) <- y.name
+      by.call <- by.call[ix]
+    }
+  }
+
   if (!by.miss) {
     if (all(is.na(by.call))) { # x a data frame
         cat("\n"); stop(call.=FALSE, "\n------\n",
@@ -1074,7 +1098,7 @@ function(x, y=NULL, data=d, filter=NULL,
       ID.call <- data[, ID.col]
       }  # end not row.names
       else  # ID is row.names
-        ID.call <- row.names(data) 
+        ID.call <- row.names(data)
     } # end x.in.global
 
     else {  # in global
@@ -1157,7 +1181,7 @@ function(x, y=NULL, data=d, filter=NULL,
     }
   }
 
-  if (object == "point") {  # see if bubble plot, already set if size a var 
+  if (object == "point") {  # see if bubble plot, already set if size a var
     if (!y.miss) {
       if (data.do) if (cat.x && cat.y) object <- "bubble"
     }
@@ -1366,7 +1390,7 @@ function(x, y=NULL, data=d, filter=NULL,
   if (size.miss) {  # pt.size is a scaler
     if (object=="point" && segments) {  # pts and lines specified
       pt.size <- 0.85 * pt.size  # default pt size when segments specified
-      if (!("transparent" %in% area_fill))
+      if (!("transparent" %in% ts_area_fill))
         pt.size[1] <- 0  # default no points if area shown
       else if (nrows > 50) {
         pt.size <- .75 - 0.002*nrows
@@ -1391,13 +1415,13 @@ function(x, y=NULL, data=d, filter=NULL,
   }
 
   fc <- .plt.colors(object, nn.col, n.by, segments, theme, fill, fill.miss,
-          color, color.miss, area_fill, area_fill.miss, trans, stack,
+          color, color.miss, ts_area_fill, ts_area_fill.miss, trans, ts_stack,
           n.ycol, n.yvar, ord.by.call, run, pt.size)
 
   # assign fills and colors
   pt.fill <- fc$pt_fill
   pt.color <- fc$pt_col
-  area_fill <- fc$area_fill
+  ts_area_fill <- fc$area_fill
 
 
   # ------------------------------------------------
@@ -1450,7 +1474,7 @@ function(x, y=NULL, data=d, filter=NULL,
             violin_fill <- .plt.fill(box_fill, box_fill.miss, ord.by.call,
                                   n.facet1, n.lvl, theme)
           else
-            for (i in seq_len(n.lvl)) violin_fill[i] <- "gray75" 
+            for (i in seq_len(n.lvl)) violin_fill[i] <- "gray75"
         }
       }
       else {
@@ -1551,12 +1575,12 @@ function(x, y=NULL, data=d, filter=NULL,
 
       .plt.lattice(x.call[,1], y.call[,1], facet1.call, facet2.call, by.call,
                    adj.bx.ht, object, n_row, n_col, aspect,
-                   pt.fill, area_fill, pt.color, panel_fill, panel_color,
+                   pt.fill, ts_area_fill, pt.color, panel_fill, panel_color,
                    pt.trans, pt.size, line_width,
                    xlab, ylab, main, shape, lab_cex, axis_cex,
                    max(ellipse), ellipse_color, ellipse_lwd,
                    fit.ln, fit_power, fit_color, fit_lwd, fit_se,
-                   plot_errors, area_split, jitter_y,
+                   plot_errors, ts_area_split, jitter_y,
                    violin, violin_fill, box, box_fill,
                    bw, vbs_ratio, box_adj, a, b, k.iqr, fences, vbs_mean,
                    out_shape, pt.out_size,
@@ -1577,8 +1601,8 @@ function(x, y=NULL, data=d, filter=NULL,
           group.vars <- c(group.vars, by.name)
           pivot.call <- bquote(  # cannot do this in a sub-function
             pivot(data = .(data),
-              compute = c(mean, median, sd, IQR, min, max), 
-              variable = .(as.name(x.name)), 
+              compute = c(mean, median, sd, IQR, min, max),
+              variable = .(as.name(x.name)),
               by = .(as.name(by.name)),
               out_name = c("Mean", "Median", "SD", "IQR", "Min", "Max")
             )
@@ -1586,14 +1610,14 @@ function(x, y=NULL, data=d, filter=NULL,
           pt.tbl <- eval(pivot.call, envir=parent.frame())
           txpiv <- .df_char(pt.tbl)  # convert df to char array
           class(txpiv) <- "out"
-          out_by <- txpiv 
+          out_by <- txpiv
         }
-        if (!facet1.miss)  { 
+        if (!facet1.miss)  {
           group.vars <- c(group.vars, facet1.name)
           pivot.call <- bquote(  # cannot do this in a sub-function
             pivot(data = .(data),
-              compute = c(mean, median, sd, IQR, min, max), 
-              variable = .(as.name(x.name)), 
+              compute = c(mean, median, sd, IQR, min, max),
+              variable = .(as.name(x.name)),
               by = .(as.name(facet1.name)),
               out_name = c("Mean", "Median", "SD", "IQR", "Min", "Max")
             )
@@ -1601,14 +1625,14 @@ function(x, y=NULL, data=d, filter=NULL,
           pt.tbl <- eval(pivot.call, envir=parent.frame())
           txpiv <- .df_char(pt.tbl)  # convert df to char array
           class(txpiv) <- "out"
-          out_facet1 <- txpiv 
+          out_facet1 <- txpiv
         }
         if (!facet2.miss) {
           group.vars <- c(group.vars, facet2.name)
           pivot.call <- bquote(  # cannot do this in a sub-function
             pivot(data = .(data),
-              compute = c(mean, median, sd, IQR, min, max), 
-              variable = .(as.name(x.name)), 
+              compute = c(mean, median, sd, IQR, min, max),
+              variable = .(as.name(x.name)),
               by = .(as.name(facet2.name)),
               out_name = c("Mean", "Median", "SD", "IQR", "Min", "Max")
             )
@@ -1617,14 +1641,14 @@ function(x, y=NULL, data=d, filter=NULL,
           pt.tbl <- eval(pivot.call, envir=parent.frame())
           txpiv <- .df_char(pt.tbl)  # convert df to char array
           class(txpiv) <- "out"
-          out_facet2 <- txpiv 
+          out_facet2 <- txpiv
         }
 
         if (length(group.vars)>0) {
           pivot.call <- bquote(  # cannot do this in a sub-function
             pivot(data = .(data),
-              compute = c(mean, median, sd, IQR, min, max), 
-              variable = .(as.name(x.name)), 
+              compute = c(mean, median, sd, IQR, min, max),
+              variable = .(as.name(x.name)),
               by = .(as.name(paste0("c(",paste(group.vars, collapse=","),")"))),
               out_name = c("Mean", "Median", "SD", "IQR", "Min", "Max")
             )
@@ -1634,9 +1658,9 @@ function(x, y=NULL, data=d, filter=NULL,
 
           txpiv <- .df_char(pt.tbl)  # convert df to char array
           class(txpiv) <- "out"
-          output$out_pivot <- txpiv 
+          output$out_pivot <- txpiv
 
-          txt <- ifelse (length(group.vars) == 1, "table", "tables") 
+          txt <- ifelse (length(group.vars) == 1, "table", "tables")
           title <- paste("\n---------- Pivot", txt, "for", x.name)
           if (n_min_pivot > 1)
             title <- paste(title, "for groups with minimum n of", n_min_pivot)
@@ -1839,7 +1863,7 @@ function(x, y=NULL, data=d, filter=NULL,
         if (n.xvar == 1) {  # one x-variable
           if (cat.x && !cat.y && x.unique) {
             x.vals <- as.character(x.call[,1])  # factor to char vec
-            y.vals <- y.call[,1]  # Extract numeric vector from df 
+            y.vals <- y.call[,1]  # Extract numeric vector from df
             ord <- order(y.vals, decreasing=srt.dwn)
             x.sort <- x.vals[ord]
             x.call[,1] <- factor(x.sort, levels=x.sort)
@@ -1847,7 +1871,7 @@ function(x, y=NULL, data=d, filter=NULL,
           }
           if (!cat.x && cat.y && y.unique) {
             y.vals <- as.character(y.call[,1])  # factor to char vec
-            x.vals <- x.call[,1]  # Extract numeric vector from df 
+            x.vals <- x.call[,1]  # Extract numeric vector from df
             ord <- order(x.vals, decreasing=srt.dwn)
             y.sort <- y.vals[ord]
             y.call[,1] <- factor(y.sort, levels=y.sort)
@@ -1944,6 +1968,12 @@ function(x, y=NULL, data=d, filter=NULL,
       #   if not specified, get the existing ts_unit
       #   if specified, aggregate the values of y.call over x.call
       if (date.var) {
+        if (!quiet) {
+          txt <- "Ryan, Ulrich, Bennett, and Joy's xts package]"
+          cat("[with functions from", txt, "\n")
+          if (!(ts_source=="fable" && ts_ahead > 0)) cat("\n")
+        }
+
         tsdata <- .plt.time(x.call, y.call, by.call, x.name, n.by,
                             ts_unit, ts_agg)
         ts_unit <- tsdata$ts_unit
@@ -1952,10 +1982,12 @@ function(x, y=NULL, data=d, filter=NULL,
         by.call <- tsdata$by.call
         do.agg <- tsdata$do.agg
       }
+      else
+        do.agg <- FALSE
 
       # forecast
+      # --------
       if (ts_ahead > 0) {
-
         if (ts_unit=="unknown") {
           cat("\n"); stop(call.=FALSE, "\n------\n",
             "ts_unit: ", ts_unit, "\n",
@@ -1966,30 +1998,48 @@ function(x, y=NULL, data=d, filter=NULL,
             "Missing values not allowed for a variable for which\n",
             "  to forecast future values.\n\n")
         }
-        f.out <- .plt.forecast(x.call, y.call, by.call,
-          ts_unit, ts_ahead, ts_method, ts_fitted, n_date_tics,
-          ts_level, ts_trend, ts_seasons, ts_type, ts_PI,
-          digits_d)
+
+      # process any exogenous variables
+      exog.df <- NULL  # default: no exogenous variables
+      if (!is.null(ts_new_x)) {  # df of future values of exogenous variables
+        exog.names <- names(ts_new_x)
+        missing.vars <- setdiff(exog.names, names(d)) # all exog vars exist
+        if (length(missing.vars) > 0) {
+          stop("\n------\n",
+               "The following exogenous variables are not in existing data:\n",
+               paste(missing.vars, collapse = ", "), "\n\n",
+               "Please ensure all specified columns are in the input data.\n",
+               call. = FALSE)
+        }
+        # keep only exogenous predictors, excluding index and y variable
+        drop.names <- c(names(d)[1], names(d)[2])
+        exog.df <- d[setdiff(exog.names, drop.names)]
+      }
+
+      f.out <- .plt.forecast(x.call, y.call, by.call,
+          exog.df, ts_new_x,
+          ts_unit, ts_ahead, ts_method, ts_fitted, ts_source, ts_n_x_tics,
+          ts_trend, ts_seasons, ts_error,
+          ts_alpha, ts_beta, ts_gamma, ts_PI, digits_d, quiet)
         y.fit <- f.out$y.fit;  y.hat <- f.out$y.hat
         x.fit <- f.out$x.fit;  x.hat <- f.out$x.hat
         y.upr <- f.out$y.upr;  y.lwr <- f.out$y.lwr
         mx.x <- f.out$mx.x;  mn.y <- f.out$mn.y;  mx.y <- f.out$mx.y
         out_y.frcst <- f.out$y.frcst
+        out_decomp <- f.out$out_decomp
         out_fitted <- f.out$out_fitted
-        out_err <- f.out$out_err
-        out_coefs <- f.out$out_coefs
-        out_smooth <- f.out$out_params
+        out_report <- f.out$out_report
         y.all <- rbind(y.call, y.upr, y.lwr)  # data + PI
         y.all <- unlist(y.all)  # flatten the data frame
-      }
+      }  # end forecast
+
       else {  # no forecast
         y.fit <- NULL;  y.hat <- NULL
         x.fit <- NULL;  x.hat <- NULL
         y.upr <- NULL;  y.lwr <- NULL
         mx.x <- NULL;  mn.y <- NULL;  mx.y <- NULL
-        out_y.frcst <- NULL
-        out_fitted <- NULL; out_err <- NULL
-        out_coefs <- NULL; out_smooth <- NULL
+        out_y.frcst <- NULL; out_decomp <- NULL
+        out_fitted <- NULL; out_report <- NULL
         y.all <- unlist(y.call)  # convert data frame to a vector
       }
 
@@ -2028,7 +2078,7 @@ function(x, y=NULL, data=d, filter=NULL,
         # m out, mostly the visualization, sometimes some stats
         m.out <- .plt.main(x.call, y.call, by.call,
           cat.x, cat.y, object, stat,
-          pt.fill, area_fill, pt.color, pt.trans, segment_color,
+          pt.fill, ts_area_fill, pt.color, pt.trans, segment_color,
           xy_ticks, xlab, ylab, main, main_cex, sub,
           rotate_x, rotate_y, offset, proportion, origin_x, origin_y,
           pt.size, line_width, shape, means,
@@ -2041,8 +2091,8 @@ function(x, y=NULL, data=d, filter=NULL,
           fit.ln, fit_power, fit_color, fit_lwd, fit_new,
           fit_se, se_fill, plot_errors,
           ellipse, ellipse_color, ellipse_fill, ellipse_lwd,
-          run, center_line, stack,
-          ts_unit, ts_agg, do.agg, ts_ahead, ts_fitted, n_date_tics,
+          run, center_line, ts_stack,
+          ts_unit, ts_agg, do.agg, ts_ahead, ts_fitted, ts_n_x_tics,
           y.fit, y.hat, x.fit, x.hat, y.upr, y.lwr,
           mx.x, mn.y, mx.y,
           freq.poly, jitter_x, jitter_y,
@@ -2105,7 +2155,7 @@ function(x, y=NULL, data=d, filter=NULL,
           output <- NULL
 
           if (getOption("suggest"))
-            output <- list(out_suggest=o$out_suggest)
+            if (ts_ahead==0) output <- list(out_suggest=o$out_suggest)
 
           if (!is.null(txdif))
             output$out_dif <- txdif
@@ -2119,8 +2169,9 @@ function(x, y=NULL, data=d, filter=NULL,
           if (length(o$out_outliers) > 1)  # source is .plt.txt
             output$out_outliers <- o$out_outliers
 
-          if (!is.null(o$out_stats))
+          if (!is.null(o$out_stats) && any(nzchar(o$out_stats))) {
             output$out_stats <- o$out_stats
+          }
 
           if (!is.null(txstats))  # from stat option earlier in this file
             output$out_txt <- txstats
@@ -2152,19 +2203,9 @@ function(x, y=NULL, data=d, filter=NULL,
             output$out_bubble <- txbub
           }
 
-          if (!is.null(out_err)) {
-            class(out_err) <- "out"
-            output$out_err <- out_err
-          }
-
-          if (!is.null(out_coefs)) {
-            class(out_coefs) <- "out"
-            output$out_coefs <- out_coefs
-          }
-
-          if (!is.null(out_smooth)) {
-            class(out_smooth) <- "out"
-            output$out_smooth <- out_smooth
+          if (!is.null(out_report)) {
+            class(out_report) <- "out"
+            output$out_report <- out_report
           }
 
           if (!is.null(output)) class(output) <- "out_all"
@@ -2206,24 +2247,32 @@ function(x, y=NULL, data=d, filter=NULL,
 
 
     if (outp) {
-      if (!is.null(output)) print(output)
+      if (!is.null(output)) print(output)  # output what exists till now
 
-      # out_y.frcst is a multi times series, cannot display with class out
-      if (ts_ahead > 0) {  # did a forecast
+      if (ts_ahead > 0  &&  !quiet) {  # did a forecast
+        if (!is.null(out_decomp)) {
+          class(out_decomp) <- "out"
+          print(out_decomp)
+        }
         if (!is.null(out_fitted)) {
+          fitted.title <- "\nFitted\n------\n"
+          class(fitted.title) <- "out"
+          output$fitted.title <- fitted.title
+          print(output$fitted.title)
           print(out_fitted)
           cat("\n")
         }
-        if (!is.null(out_y.frcst)) print(out_y.frcst)
+        if (!is.null(out_y.frcst)) {
+          frcst.title <- "Forecast\n--------\n"
+          class(frcst.title) <- "out"
+          output$frcst.title <- frcst.title
+          print(output$frcst.title)
+          print(out_y.frcst)
+          cat("\n")
+        }
       }  # end ts_ahead > 0
     }  # end outp
-  }
+  }  # end all the other analyses
 
-  if (!is.null(out_fitted)) output$out_fitted <- out_fitted
-  if (!is.null(out_y.frcst)) {
-    output$out_y.frcst <- out_y.frcst
-    cat("\n")
-  }
-
-  if (!is.null(output)) return(invisible(output))
+  if (!is.null(output)) return(invisible(output))  # to stored object
 }

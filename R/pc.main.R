@@ -234,6 +234,7 @@ function(x, y,
   p <- t2xy(seq.int(0, 1, length.out=125), hole)
   polygon(p$x, p$y, col=hole_fill, border=color, lty=lty[1], lwd=lwd)
 
+  main.lbl <- paste(main.lbl, "\n")  # add some separation 
   title(main=main.lbl, cex.main=main_cex, col.main=getOption("main_color"))
 
 

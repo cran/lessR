@@ -70,7 +70,7 @@ head(d)
 
 ## -----------------------------------------------------------------------------
 d <- Read("StockPrice")
-Plot(Month, Price, filter=(Company=="Apple"), area_fill="on")
+Plot(Month, Price, filter=(Company=="Apple"), ts_area_fill="on")
 
 ## -----------------------------------------------------------------------------
 Plot(Month, Price, by=Company)
@@ -81,6 +81,10 @@ Plot(Month, Price, ts_unit="quarters", ts_agg="mean")
 ## -----------------------------------------------------------------------------
 d <- d[400:473,]
 Plot(Month, Price, ts_unit="months", ts_agg="mean", ts_ahead=24)
+
+## -----------------------------------------------------------------------------
+Plot(Month, Price, ts_unit="months", ts_agg="mean", ts_ahead=24,
+     ts_source="classic")
 
 ## -----------------------------------------------------------------------------
 d <- Read("Mach4", quiet=TRUE)

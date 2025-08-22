@@ -75,7 +75,7 @@ function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
   x.name <- gl$xn; x.lbl <- gl$xl; x.lab <- gl$xb
   date.var <- FALSE
   if (is.null(dim(x))) if (.is.date(x)) date.var <- TRUE
-  if (date.var) x.lab <- NULL
+# if (date.var) x.lab <- NULL  # cannot delete the blank space, so do the label
   y.name <- gl$yn; y.lbl <- gl$yl;
   if (!is.null(gl$yb))
     y.lab <- ifelse (is.null(ylab), gl$yb, "")
@@ -218,13 +218,17 @@ function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
   } # end not date.var
 
   else {  # x-variable is a Date
+    if (!is.null(y)) 
+      y.out <- .sparse.labels(y, ax="y", n_axis_y_skip, axis_fmt, axis_y_pre)
+
     if (T.type == "cont_cont") {  # cont - cont
       # set 1 or 2 conditioning variables
       if (is.null(facet2)) {
         p <- lattice::xyplot(y ~ x | facet1, groups=by,
           scales=list(
-            y=list(labels=.axis.format(pretty(y), axis_fmt, "no", axis_y_pre),
-                   at=pretty(y), tck=.8)
+#           y=list(labels=.axis.format(pretty(y), axis_fmt, "no", axis_y_pre),
+#                  at=pretty(y), tck=.8)
+            y = list(at=y.out$at, labels=y.out$labels, tck=0.8)
           ), ...)
       }
       else {  # facet2 is present

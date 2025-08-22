@@ -1,7 +1,7 @@
 STL <- function(x, y=NULL, data=d, filter=NULL,
                 ts_format=NULL, ts_unit=NULL, ts_agg=c("sum","mean"),
-                show_range=FALSE, robust=FALSE, quiet=FALSE, do_plot=TRUE) {
-
+                show_range=FALSE, robust=FALSE, quiet=FALSE, do_plot=TRUE,
+                pdf_file=NULL, width=6.5, height=6) {
   ts_agg <-  match.arg(ts_agg)
 
   x.name <- deparse(substitute(x))
@@ -34,51 +34,29 @@ STL <- function(x, y=NULL, data=d, filter=NULL,
     names(data.vars) <- names(data)
 
     ind <- eval(substitute(x), envir=data.vars)  # col num of x var
-    x.date <- data[, ind]
+    x.date <- data[, ind, drop=FALSE]
 
     # see if x.date has char string values to convert to type Date
-    x11 <- x.date[1]
-    if (is.character(x11)) {
+    if (is.character(x.date[1,1])) {
       if (!is.null(ts_format))  # specify the date format
-        x.date <- as.Date(x.date, format=ts_format)
-      else {  # guess the date format
-        n.ch <- nchar(x11)
-        if (n.ch %in% 6:10) {
-          isQ <- grepl("Q1|Q2|Q3|Q4", x11)
-          isM <- grepl("Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec", x11)
-          if (isM) {
-            x.date <- gsub(" ", "", x.date)  # remove all spaces
-            year <- substr(x.date, 1, 4)
-            monthNm <- substr(x.date, 5, 7)
-            x.date <- as.Date(paste(year, monthNm, "01", sep="-"),
-                                   format="%Y-%b-%d")
-          }
-          else if (isQ) {  # convert dates entered as 2024 Q3 to R Date
-            # returns a list, each element contains the Year and Quarter
-            parts <- strsplit(gsub("\\s+", "", x.date), "Q")  # split on Q
-            # Extract year and quarter, `[` is R extraction operator
-            year <- as.numeric(sapply(parts, `[`, 1))  # 1st list element (year)
-            quarter <- as.numeric(sapply(parts, `[`, 2))  # 2nd list element
-            month <- 1 + (quarter - 1) * 3  # get month Q1=1, Q2=4, Q3=7, Q4=10
-            x.date <- as.Date(paste(year, month, "01", sep="-"))  #to Date
-          }  # end quarter
-          else {  # regular numeric date format
-            punct <- " "  # see if there are two punctuation delimiters
-            if (length(gregexpr("/", x.date[1], fixed=TRUE)[[1]]) == 2) punct <- "/"
-            if (length(gregexpr("-", x.date[1], fixed=TRUE)[[1]]) == 2) punct <- "-"
-            if (length(gregexpr(".", x.date[1], fixed=TRUE)[[1]]) == 2) punct <- "."
-            if (punct %in% c("/", "-", "."))   # only evaluate probable dates
-              x.date <- .charToDate(x.date, punct)
-          }  # regular date format
-        }  # end n.ch is 6, 7, 8
-      }  # end do best guess
-    }  # is.char x.date[1]
+        x.date[,1] <- as.Date(x[,1], format=ts_format)
+      else  # see if a date, and if so, infer the date format
+        x.date <- date.infer(x.date)
+    }
+
+    is_ordered <- all(diff(x.date[,1]) >= 0) 
+    if (!is_ordered) {
+      cat("\n"); stop(call.=FALSE, "\n------\n",
+        "The date variable, ", x.name, ", must be ordered across all data.\n\n",
+        "Perhaps you have multiple groups of ", y.name, ".\n",
+        "If so, use the parameter  filter  to focus on just one group.\n\n")
+    }
 
     ind <- eval(substitute(y), envir=data.vars)  # col num of x var
     y.data <- data[, ind]
 
     #   if not specified, get the existing ts_unit
-    #   if specified, aggregate the values of y.data over x.call
+    #   if specified, aggregate the values of y.data over x
     tsdata <- .plt.time(x.date, y.data, by.call=NULL, x.name, n.by=0,
                         ts_unit, ts_agg)
     ts_unit <- tsdata$ts_unit
@@ -86,9 +64,12 @@ STL <- function(x, y=NULL, data=d, filter=NULL,
     y.data <- tsdata$y.call[,1]
 #   do.agg <- tsdata$do.agg
     y.ts <- .tsMake(x.date, y.data, ts_unit)  # convert data to ts form
-  }
+
+    is.ts <- FALSE
+  }  # end x is not in global
 
   else if (is.ts(x)) {
+    is.ts <- TRUE
     y.ts <- x
     tsPull <- .tsExtract(x)
     y.data <- tsPull$y
@@ -97,8 +78,21 @@ STL <- function(x, y=NULL, data=d, filter=NULL,
 
   # compute components
   decomp <- stl(y.ts, s.window="periodic", robust=robust)
+
+  # set up pdf_file if needed
+  if (!is.null(pdf_file)) {
+    if (!grepl(".pdf", pdf_file))
+      pdf_file <- paste(pdf_file, ".pdf", sep="")
+    pdf(file=pdf_file, width=width, height=height, onefile=FALSE)
+  }
+
   if (do_plot)
-    plot(decomp, col.range="lightgoldenrod")
+    plot(decomp, col.range="lightgoldenrod") 
+
+  if (!is.null(pdf_file)) {
+    dev.off()
+    if (!quiet) .showfile(pdf_file, "STL decomposition")
+  }
 
   # extract components from the stl() decomposition
   seasonal <- decomp$time.series[, "seasonal"]
@@ -145,14 +139,21 @@ STL <- function(x, y=NULL, data=d, filter=NULL,
 
   # output data structure
   te <- .tsExtract(trend)  # te is a multivariate time series
-  de <- as.character(te[[1]][,1])  # dates
+  if (!is.ts)
+    de <- .toFmtDate(te[[1]][,1], ts_unit)  # e.g., 2020-01-01 to 2020 Q1
+  else
+    de <- te[[1]][,1]
   te <- as.numeric(te[[2]][,1])  # trend component
   se <- .tsExtract(seasonal)
   se <- as.numeric(se[[2]][,1])  # seasonal component
   ee <- .tsExtract(error)
   ee <- as.numeric(ee[[2]][,1])  # error component
-  out <- data.frame(de, te, se, ee)
-  names(out) <- c(x.name, "trend", "season", "error")
+  out <- data.frame(de, y.data, te, se, ee)
+  if (is.ts) {
+    x.name <- "date"
+    y.name <- "data"  # not recovered
+  }
+  names(out) <- c(x.name, y.name, "trend", "season", "error")
   return(invisible(out))
 
 }

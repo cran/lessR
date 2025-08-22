@@ -778,7 +778,7 @@ function(
       se_fill = .maketrans("gray55", 65)
       ID_color = "gray90"
       strip_color = .maketrans(clr1, .to256n(0.40))
-      strip_text_color = "gray65"
+      strip_text_color = "gray85"
       segment_color = "gray65"
       lab_color = "gray85"
       main_color = "gray85"

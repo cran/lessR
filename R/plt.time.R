@@ -51,11 +51,6 @@
   # ----------------------------------------------------
   if (!is.null(ts_unit) &&  do.agg) {
 
-    if (!getOption("quiet")) {
-      txt <- "Ryan, Ulrich, Bennett, and Joy's xts package]"
-      cat("[with functions from", txt, "\n")
-    }
-
     # define the aggregation function: aggfun()
     if (ts_agg == "sum")
       aggfun <- function(x) colSums(x)  # leave na.rm=FALSE to have NA agg
@@ -70,10 +65,16 @@
       ep <- xts::endpoints(d.xts, on=ts_unit)
       da.xts <- xts::period.apply(d.xts[,], INDEX=ep, FUN=aggfun)
       # move dates from end of month to beginning of month
-      if (ts_unit == "years")
+      if (ts_unit == "quarters") {
+        idx <- zoo::as.yearqtr(zoo::index(da.xts))
+        zoo::index(da.xts) <- zoo::as.Date(idx)
+      } else if (ts_unit == "months") {
+        idx <- zoo::as.yearmon(zoo::index(da.xts))
+        zoo::index(da.xts) <- zoo::as.Date(idx)
+      } else if (ts_unit == "years") {
+        # Use January 1st of each year
         zoo::index(da.xts) <- as.Date(format(zoo::index(da.xts), "%Y-01-01"))
-      else if (ts_unit %in% c("months", "quarters"))
-        zoo::index(da.xts) <- as.Date(format(zoo::index(da.xts), "%Y-%m-01"))
+      }
       # extract aggregated x.call and y.call from xts time series
       x.call <- data.frame(zoo::index(da.xts))
       names(x.call)[1] <- x.name

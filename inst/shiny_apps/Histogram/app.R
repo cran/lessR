@@ -9,14 +9,14 @@ clr.one <- list(
   "#96AAC3", "dodgerblue3", "cornflowerblue", "steelblue", "darkblue",
   "pink2", "red3", "firebrick2", "darkred",
   "violetred", "mediumorchid", "purple3",
-  "darkorange2", "salmon", "orange3", "sienna", "rosybrown", 
+  "darkorange2", "salmon", "orange3", "sienna", "rosybrown",
   "wheat3", "goldenrod2", "khaki", "yellow2",
   "darkseagreen2", "springgreen3", "seagreen4", "darkgreen",
   "black", "gray45", "slategray4", "gray75", "snow3", "gray95",
   "lavender", "ivory2", "aliceblue", "white")
 
-clr.edge <- list("off", "black", "gray50", "gray75", "white", "ivory", 
-  "darkblue", "darkred", "darkgreen", "rosybrown2", "bisque", 
+clr.edge <- list("off", "black", "gray50", "gray75", "white", "ivory",
+  "darkblue", "darkred", "darkgreen", "rosybrown2", "bisque",
   "slategray2", "aliceblue", "thistle1", "coral", "gold")
 
 clr.qual <- c("hues", "Okabe-Ito", "viridis")
@@ -42,7 +42,7 @@ tags$head(tags$link(rel="stylesheet", href="shiny_dir/styles.css")),
       sidebarLayout(
         sidebarPanel(
 
-          radioButtons("fType", HTML("<h5 class='soft'>Format</h5>"), 
+          radioButtons("fType", HTML("<h5 class='soft'>Format</h5>"),
                        c("Excel"="Excel", "Text"="Text")),
           conditionalPanel(condition="input.fType == 'Text'",
             radioButtons("sep", HTML("<h5 class='soft'>Separator</h5>"),
@@ -51,7 +51,7 @@ tags$head(tags$link(rel="stylesheet", href="shiny_dir/styles.css")),
                          c("Point"=".", "Comma"=",")),
           ),
 
-          radioButtons("fSource", HTML("<h5 class='soft'>Source</h5>"), 
+          radioButtons("fSource", HTML("<h5 class='soft'>Source</h5>"),
                        c("Local"="local", "Web"="web")),
           conditionalPanel(condition="input.fSource == 'local'",
             fileInput("myFile", "Locate your data file",
@@ -95,7 +95,7 @@ tags$head(tags$link(rel="stylesheet", href="shiny_dir/styles.css")),
         checkboxInput("myGeom", div("Colors", class="view"), FALSE),
         conditionalPanel(condition="input.myGeom == true",
           selectInput("myFill", "fill",
-             choices=list("Constant"=clr.one, 
+             choices=list("Constant"=clr.one,
                           "Qualitative"=clr.qual,
                           "Sequential"=clr.seq)),
           selectInput("myColor", "color", choices=clr.edge),
@@ -141,14 +141,14 @@ tags$head(tags$link(rel="stylesheet", href="shiny_dir/styles.css")),
       mainPanel(
         plotOutput('myPlot'),
         verbatimTextOutput("summary"),
-        plotOutput("saved_plot"), 
+        plotOutput("saved_plot"),
         textOutput("help")
       )
 
     )  # end pageWithSidebar
   )  # end tabPanel 2
   )  # end tabsetPanel
-)  # end fluidPage 
+)  # end fluidPage
 
 
 server <- function(input, output, session) {
@@ -180,9 +180,9 @@ server <- function(input, output, session) {
       myPath <- url
        theRead <- myPath
     }
-      
+
     shiny::req(myPath)
-    if (input$fType == "Excel") { 
+    if (input$fType == "Excel") {
       library(openxlsx)
       if (grepl(".xlsx", myPath, fixed=TRUE)) {
         d <- read.xlsx(myPath)
@@ -192,7 +192,7 @@ server <- function(input, output, session) {
         stopApp()
       }
     }
-      if (input$fType == "Text") { 
+      if (input$fType == "Text") {
         if ((grepl(".csv", myPath, fixed=TRUE)) ||
             (grepl(".txt", myPath, fixed=TRUE))) {
             d <- read.csv(myPath, sep=input$sep, dec=input$decimal,
@@ -201,13 +201,13 @@ server <- function(input, output, session) {
         else {
           message("\n>>> Text file must have file type of .csv or .txt <<<\n\n")
           stopApp()
-        }       
+        }
       }  # end fType is "Text"
 
     updateSelectInput(session, inputId="x.col", label="x variable",
                       choices=c("Select a numerical variable" = "",
                               names(d)[sapply(d, is.numeric)]))
-    
+
     return(d)
   })  # end reactive()
 
@@ -224,7 +224,7 @@ server <- function(input, output, session) {
 
 
   output$d.table <- renderTable({
-    if (is.null(input$d.show)) 
+    if (is.null(input$d.show))
       data()
     else {
       nr <- min(11, nrow(data()))
@@ -235,7 +235,7 @@ server <- function(input, output, session) {
           head(data(), n=10)
         else if (input$d.show == "tail")
           tail(data(), n=10)
-        else if (input$d.show == "random") { 
+        else if (input$d.show == "random") {
           dd <- data()
           dd[.(random(10)), ]
         }
@@ -267,7 +267,7 @@ server <- function(input, output, session) {
     v$rng <- max.x - v$min.x
     v$bw1 <- v$rng/45
     if (v$min.x > 1) v$bw1 <- floor(v$bw1)
-    if (v$bw1 == 0) v$bw1 <- 0.5 
+    if (v$bw1 == 0) v$bw1 <- 0.5
     v$bw2 <- v$rng/2.5
     if (v$bw2 > 5) v$bw2 <- ceiling(v$bw2)
     v$bw1 <- round(v$bw1, 3)
@@ -284,13 +284,13 @@ server <- function(input, output, session) {
     }
 
     updateSliderInput(inputId="slider_bw", label="bin_width",
-                min=NA, max=NA, value=NA)
+                      min=10, max=20, value=15)
 
     updateSliderInput(inputId="slider_bs", label="bin_start",
-                min=NA, max=NA, value=NA)
+                      min=0, max=10, value=5)
   })
-  
-  
+
+
 
 # ---------- Density Bandwidth ------------
 # -----------------------------------------
@@ -317,7 +317,7 @@ server <- function(input, output, session) {
   }
 
   observeEvent(input$x.col, {  # if switch variable
-    if (input$myDens) { 
+    if (input$myDens) {
       x.name <- input$x.col
       shiny::req(x.name)
       x <- na.omit(data()[, x.name])
@@ -386,7 +386,7 @@ server <- function(input, output, session) {
     }
     if (!is.null(input$slider_bs)) {
       if (input$slider_bs < v$bs1  || input$slider_bs > v$bs2) {
-        if (!input$myBins) 
+        if (!input$myBins)
           updateSliderInput(session,"slider_bs", min=v$bs1, max=v$bs2,
                             value=v$bs)
       req(input$slider_bs >= v$bs1)  # takes a while for the update
@@ -399,7 +399,7 @@ server <- function(input, output, session) {
     go.new <- v$x.new
     if (go.new) {
       v$x.new <- FALSE
-      req(!go.new) 
+      req(!go.new)
     }
 
     # when Bins button clicked do not want any new re-renderings, but get two
@@ -427,9 +427,9 @@ server <- function(input, output, session) {
              values=input$myValues, cumulate=input$myCumlt,
              xlab=x.name, ylab=y.name,
              quiet=TRUE)
-    
+
       p_bin_width <- in.bw == v$bw
-      p_bin_start <- in.bs == v$bs 
+      p_bin_start <- in.bs == v$bs
       p_fill <- input$myFill == "#96AAC3"
       p_color <- input$myColor == "off"
       p_trans <- input$myTrans == 0
@@ -448,16 +448,16 @@ server <- function(input, output, session) {
     else {  # density plot
       shiny::req(input$slider_bndwd)
 
-      fg.rgb <- col2rgb(input$myFill_gen) 
+      fg.rgb <- col2rgb(input$myFill_gen)
       v$fg.trns <- rgb(fg.rgb[1], fg.rgb[2], fg.rgb[3],
                      alpha=80, maxColorValue=255)
-      fn.rgb <- col2rgb(input$myFill_nrm) 
+      fn.rgb <- col2rgb(input$myFill_nrm)
       v$fn.trns <- rgb(fn.rgb[1], fn.rgb[2], fn.rgb[3],
                      alpha=80, maxColorValue=255)
 
       v$h <- Histogram(x, data=NULL,
              bin_width=in.bw, bin_start=in.bs,
-             density=input$myDens, rug=input$myRug, type=input$myType,
+             stat="density", rug=input$myRug, type=input$myType,
              bandwidth=input$slider_bndwd, show_histogram=input$myHist,
              fill_general=v$fg.trns, fill_normal=v$fn.trns,
              xlab=x.name, ylab=y.name, quiet=TRUE)
@@ -469,7 +469,7 @@ server <- function(input, output, session) {
       p_hist <- input$myHist == TRUE
       p_fill_general <- input$myFill_gen == "steelblue3"
       p_fill_normal <- input$myFill_nrm == "pink1"
-      if (!p_dens) out <- paste(out, ", density=", input$myDens, sep="")
+      if (!p_dens) out <- paste(out, ", stat='density'", sep="")
 
       if (!p_rug) out <- paste(out, ", rug=", input$myRug, sep="")
       if (!p_type) out <- paste(out, ", type=\"", input$myType, "\"", sep="")
@@ -493,7 +493,7 @@ server <- function(input, output, session) {
     h <- v$h
 
 #   v$go <- TRUE
-#   if (v$go) { 
+#   if (v$go) {
       if (!v$in.den)
         out2 <- c(h$out_summary, " ", h$out_outliers, " ", h$out_freq)
       else
@@ -505,7 +505,7 @@ server <- function(input, output, session) {
   v$x.new <- FALSE
   })  # end renderPlot
 
-  # clicking on the Save button generates a pdf file 
+  # clicking on the Save button generates a pdf file
   plotInput <- eventReactive(input$btn_pdf, {
 
     code <- v$code
@@ -587,7 +587,7 @@ server <- function(input, output, session) {
           "# You can replace PATHtoFILE in the following with the path\n",
           "# Remove the # sign in the first column and delete the previous ",
           "Read()\n", sep="", file=r.path, append=TRUE)
-      read.path <- file.path("PATHtoFILE", read.path) 
+      read.path <- file.path("PATHtoFILE", read.path)
       read.code <- paste("# d <- Read(\"", read.path, "\")", sep="")
     }
     cat(read.code, "\n\n", file=r.path, append=TRUE)

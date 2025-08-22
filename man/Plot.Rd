@@ -116,11 +116,13 @@ Plot(
 
     # -----------------------------------------------------------------------
     # Time series and forecasting, plot x values sequentially [xDate, y or Y]
-    ts_unit=NULL, ts_agg=c("sum", "mean"), ts_NA=NULL,
-    ts_ahead=0, ts_method=c("es", "lm"), ts_format=NULL,
-    ts_fitted=FALSE, ts_level=NULL, ts_trend=NULL, ts_seasons=NULL,
-    ts_type=c("additive", "multiplicative"), ts_PI=0.95,
-    stack=FALSE, area_fill="transparent", area_split=0, n_date_tics=NULL,
+    ts_unit=NULL, ts_ahead=0, ts_method=c("es", "lm"),
+    ts_source=c("fable", "classic"), ts_agg=c("sum", "mean"),
+    ts_NA=NULL, ts_format=NULL, ts_fitted=FALSE, ts_PI=.95, 
+    ts_trend=NULL, ts_seasons=NULL, ts_error=NULL, 
+    ts_alpha=NULL, ts_beta=NULL, ts_gamma=NULL, ts_new_x=NULL,
+    ts_stack=FALSE, ts_area_fill="transparent", ts_area_split=0,
+    ts_n_x_tics=NULL,
     # Run chart (indicate with .Index for the name of the x-variable)
     show_runs=FALSE, center_line=c("off", "mean", "median", "zero"),
 
@@ -216,7 +218,7 @@ vp(\dots)
 \arguments{
   \item{x}{By itself, or with \code{y}, by default, a \emph{primary variable},
         that is, plotted by its values mapped to coordinates.
-        The \bold{data values} can be
+        The \strong{data values} can be
         continuous or categorical, cross-sectional or a time series.
         If \code{x} is sorted, with equal intervals
         separating the values, or is a time series, then by default
@@ -241,7 +243,7 @@ vp(\dots)
         each level of the numeric primary variables \code{x} and
         \code{y} on the \emph{same} plot, a \emph{grouping variable}.
         For two-variable plots, applies to the panels of a
-        \bold{Trellis graphic} if \code{facet1} is specified.}
+        \strong{Trellis graphic} if \code{facet1} is specified.}
   \item{facet1}{A categorical variable, the \emph{conditioning variable},
         which activates Trellis (facet) graphics, provided by Deepayan
         Sarkar's (2007) lattice package, to provide
@@ -296,9 +298,9 @@ vp(\dots)
   \item{means}{If the one variable is categorical, expressed as a factor, and
        the other variable continuous, then if \code{TRUE}, by default,
        plot means with the scatterplot. Also applies to a 1-D scatterplot.}
-  \item{size}{When set to a constant, the scaling factor for \bold{standard points}
+  \item{size}{When set to a constant, the scaling factor for \strong{standard points}
       (not bubbles) or a line, with default of 1.0 for points and 2.0 for a line.
-       Set to 0 to not plot the points or lines. If \code{area_fill} for a line
+       Set to 0 to not plot the points or lines. If \code{ts_area_fill} for a line
        chart, then default is 0. When set to a variable, activates a
        bubble plot with the size of each bubble further determined
        by the value of \code{radius}. Applies to the standard two-variable
@@ -355,7 +357,7 @@ vp(\dots)
         vertical jitter.}\cr
 
 
-  \item{ID}{Name of variable to provide the \bold{labels for the selected
+  \item{ID}{Name of variable to provide the \strong{labels for the selected
        plotted points for outlier identification}, row names of data frame
        by default. To label all
        the points use the \code{add} parameter described later.}
@@ -381,7 +383,7 @@ vp(\dots)
   \item{out_size}{Size of outlier points in a 2-variable scatterplot
         or VBS plot.}\cr
 
-  \item{fit}{The \bold{best fit line}. Default value is \code{"off"}, with
+  \item{fit}{The \strong{best fit line}. Default value is \code{"off"}, with
         options \code{"loess"} for non-linear fit, \code{"lm"} for linear model
         least squares, \code{"null"} for the null model, \code{"exp"} for
         exponential growth or decay, \code{"power"} for the general
@@ -417,74 +419,80 @@ vp(\dots)
         parameters \code{ellipse_fill} and \code{ellipse_color}.}\cr
 
 
-  \item{ts_unit}{Specify the time unit from which to plot 
-       \bold{time series data},
-        plotted when the \code{x}-variable is of type \code{Date}.
-        Default value is the time unit that describes the time intervals as
-        they occur in the data.
-        Aggregation according to the time unit will occur as specified, such as
+  \item{ts_unit}{Specify the time unit from which to plot the 
+       \strong{time series data},
+        for the \code{x}-variable of type \code{Date}.
+        Default value is the time unit that describes the regular 
+        time intervals as they occur in the data.
+        Aggregate the time unit as specified, such as
         a daily time series aggregated to \code{"months"}. Dates are currently
         stored as variable type \code{Date()} which stores information as
         calendar dates without times of the day.
         Valid values include: \code{"days"}, \code{"weeks"},
         \code{"months"}, \code{"quarters"}, and \code{"years"}, as well as 
         \code{"days7"} to provide seasonality for daily data on a weekly instead
-        of annual basis.
-        Otherwise, for forecasting, the time unit for detecting seasonality
-        will usually be `"months"` or `"quarters"`. }
+        of annual basis. Otherwise the time unit for detecting seasonality
+        is typically \code{"months"} or \code{"quarters"}.}
+  \item{ts_ahead}{Forecast this specified number of \code{ts_units} ahead
+        of the last time period in the time series data.}
+  \item{ts_method}{Default is \code{"es"} for exponential smoothing forecasting.
+       Or, choose \code{"lm"} for at least squares linear regression model
+       that accounts for seasonality.}
+  \item{ts_source}{Default is \code{"fable"} for access to forecasting
+        functions \code{ETS()} and \code{TSLM()} from the package of the
+        same name and related functions
+        from the \code{fpp3} ecosystem, or \code{"classic"} for Base R forecasting
+        functions.}
   \item{ts_agg}{Function by which to aggregate over time according to
         \code{ts_unit}. Default is \code{"sum"} with an option for
-        \code{"means"}.}
+        \code{"mean"}.}
   \item{ts_NA}{By default, \code{y} missing values, those with value \code{NA},
     do not plot, leaving a blank space. Or, specify a value, usually 0,
     to replace the \code{NA} to plot a y-value such as 0 for the corresponding
     date on the x-axis. However, forecasting with missing data does not work.}
-  \item{ts_ahead}{Forecast this specified number of \code{ts_units} ahead
-        of the last time period in the time series data.}
-  \item{ts_method}{Default is \code{"es"} for exponential smoothing forecasting.
-       Or, choose \code{"lm"} for at least squares linear regression model.}
   \item{ts_format}{A specified format for R function \code{as.Date()}
     that describes the values of the date variable on the x-axis,
     needed if the function cannot identify the date format to properly
     decode the given date values. For example, describe a character string
     date such as \code{"09/01/2024"} by the format \code{"\%m/\%d/\%Y"}.
     See \code{details} for more information.}
-  \item{ts_fitted}{If \code{TRUE}, for each data value display the fitted value,
-        ts_level, trend, and seasonal component.}
-  \item{ts_level}{Holt-Winters exponential smoothing level parameter,
-       \code{alpha}. By default, the algorithm chooses an optimal numerical
-       value from 0 to 1, or user specify.}
-  \item{ts_trend}{Trend parameter. If \code{FALSE}, then no trend in the
-       model estimation. For Holt-Winters exponential smoothing, the trend parameter,
-       \code{beta}. By default, the algorithm chooses an optimal numerical
-       value from 0 to 1, or user specify.}
-  \item{ts_seasons}{The seasonality parameter, which applies to both
-      exponential smoothing, \code{gamma}, and de-seasonalized
-      regression forecasting.
-      For exponential smoothing, by default, the algorithm chooses an optimal
-      numerical value from 0 to 1, or user specify. Or set to \code{FALSE}
-      to remove the effect. Defaults to \code{FALSE} for annual data, which
-      cannot exhibit intra-annual seasonality. For linear
-      regression time series forecasting, set to \code{FALSE} to not
-      de-seasonalize.}
-  \item{ts_type}{Type of seasonal model for exponential smoothing forecasting.
-      Default is \code{"additive"} with a \code{"multiplicative"} option.}
+  \item{ts_fitted}{If \code{TRUE} and \code{ts_ahead} activated for forecasting,
+        for each data value display the fitted value,
+        level, trend, and seasonal component.}
   \item{ts_PI}{Level of the prediction interval about the forecasted
-       Holt-Winters values with a default of \code{0.95}.}
-  \item{stack}{If \code{TRUE}, multiple time plots are stacked on each other, with
-       \code{area} set to \code{TRUE} by default.}
-  \item{area_fill}{Specifies the area under the line segments, if present.
-       If \code{stack} is \code{TRUE}, then
+       values with a default of \code{0.95}.}
+  \item{ts_trend}{Trend parameter. Default value is \code{NULL} so that the
+       value is chosen that results in the best model for the data. The values
+       of \code{"A"} and \code{"M"} specify additive and multiplicative models,
+       respectively. Specify \code{"N"} to remove the effect from the model.
+       See documentation for the valid 
+       values for the various forecasting procedures.}
+  \item{ts_seasons}{See \code{ts_trend}.}
+  \item{ts_error}{See \code{ts_trend}.}
+  \item{ts_alpha}{Exponential smoothing level parameter. Sets the value for
+      \code{HoltWinters()}, a suggestion for \code{"fable"} function \code{ETS()}.}
+  \item{ts_beta}{Exponential smoothing trend parameter. See \code{ts_alpha}.}
+  \item{ts_gamma}{Exponential smoothing gamma parameter. See \code{ts_alpha}.}
+  \item{ts_new_x}{A data frame of the variable names and new values for
+       exogenous predictive variables for model fitting and forecasting.
+       The number of rows of
+       new data values determines the number of future time periods
+       for which to forecast. Currently applicable only to the default
+       \code{"fable"} linear model for \code{ts_method="lm"}.}
+  \item{ts_stack}{If \code{TRUE}, multiple time plots are stacked on each other,
+        with \code{area} set to \code{TRUE} by default.}
+  \item{ts_area_fill}{Specifies the area under the line segments, if present.
+       If \code{ts_stack} is \code{TRUE}, then
        default is gradation from default color range, e.g., \code{"blues"}.
        If not specified, and \code{fill} is specified with no plotted points
-       and \code{area_fill} is not specified,,
+       and \code{ts_area_fill} is not specified,
        then \code{fill} generally specifies the area under the line segments.}
-  \item{area_split}{[Applies only to a Trellis plot activated with parameter
-       \code{facet1}.] Value of \code{y} that defines a reference line that splits
+  \item{ts_area_split}{Applies only to a Trellis plot activated with parameter
+       \code{facet1}. Value of \code{y} that defines a reference line that splits
        the filled area under the time series line. Values of \code{y}
        less than this value are below the corresponding reference line, values
        larger are above the line.}
-  \item{n_date_tics}{Suggested number of ticks for the dates on the \code{x}-axis 
+  \item{ts_n_x_tics}{Suggested number of ticks for the dates on the \code{x}-axis 
        to override the default of approximately 7.}
   \item{show_runs}{If \code{TRUE}, display the individual runs in the run analysis.
         Also, sets \code{run} to \code{TRUE}. Customize the color of the line
@@ -496,7 +504,7 @@ vp(\dots)
         Currently does not apply to Trellis plots.} \cr
 
 
-  \item{stat}{Apply \bold{specified aggregation} such as \code{"mean"} for the
+  \item{stat}{Apply \strong{specified aggregation} such as \code{"mean"} for the
        numerical \code{y} variable to each of the levels of categorical
        variable \code{x}.
        The resulting dot plot, or Cleveland plot, is analogous to a bar chart.}
@@ -508,7 +516,7 @@ vp(\dots)
 
 
   \item{vbs_plot}{A character string that specifies the components of the
-        \bold{integrated Violin-Box-Scatterplot (VBS) of a continuous variable}.
+        \strong{integrated Violin-Box-Scatterplot (VBS) of a continuous variable}.
         A \code{"v"} in the string indicates a violin plot, a \code{"b"}
         indicates a box plot with flagged outliers, and a \code{"s"}
         indicates a 1-variable scatterplot. Default value is \code{"vbs"}.
@@ -555,7 +563,7 @@ vp(\dots)
         of the whiskers. If explicitly set, activates \code{box_adj}.}\cr
 
 
-  \item{radius}{Scaling factor of the bubbles in a \bold{bubble plot}, which
+  \item{radius}{Scaling factor of the bubbles in a \strong{bubble plot}, which
         sets the radius of the largest displayed bubble in inches. To
         activate, either set the value of \code{size} to
         a third variable where the default is 0.10,
@@ -576,8 +584,8 @@ vp(\dots)
         ending with this color.}\cr
 
 
-  \item{type}{Set to \code{"smooth"} for a \bold{smoothed density plot}
-        for two numerical variables or \code{"contour"} for a \bold{contour plot}.}
+  \item{type}{Set to \code{"smooth"} for a \strong{smoothed density plot}
+        for two numerical variables or \code{"contour"} for a \strong{contour plot}.}
   \item{smooth_points}{Number of points superimposed on the density plot in the
         areas of the lowest density to help identify outliers, which controls
         how dark are the smoothed points.}
@@ -609,7 +617,7 @@ vp(\dots)
         for the text output of the Violin-Box-Scatter (VBS) Plot, or,
         if \code{values} is set to \code{"count"}, a frequency polygon.}
   \item{bin_start}{Optional specified starting value of the bins for a
-        \bold{frequency polygon or for the text output of a
+        \strong{frequency polygon or for the text output of a
         Violin-Box-Scatter (VBS) Plot}. Also, sets \code{bin} to \code{TRUE}.}
   \item{bin_width}{Optional specified bin width value. Also, sets
         \code{bin} to \code{TRUE}.}
@@ -622,7 +630,7 @@ vp(\dots)
   \item{cumulate}{Specify a cumulative frequency polygon.}\cr
 
 
-  \item{xlab, ylab}{\bold{Axis label} for \code{x}-axis or \code{y}-axis.
+  \item{xlab, ylab}{\strong{Axis label} for \code{x}-axis or \code{y}-axis.
        If not specified, then the label becomes
        the name of the corresponding variable label if it exists, or, if not, the
        variable name. If \code{xy_ticks} is \code{FALSE}, no \code{ylab}
@@ -666,7 +674,7 @@ vp(\dots)
        is set to \code{"count"} or related  where the origin is zero
        by default.}\cr
 
-  \item{rotate_x}{\bold{Rotation in degrees of the value labels} on
+  \item{rotate_x}{\strong{Rotation in degrees of the value labels} on
         the \code{x}-axis, usually to accommodate longer values,
         typically used in conjunction with \code{offset}. When equal 90
         the value labels are perpendicular to the x-axis and a different
@@ -688,7 +696,7 @@ vp(\dots)
         such as \code{"$"}.}
   \item{axis_y_prefix}{Prefix for axis labels on the \code{y}-axis,
         such as \code{"$"}.}
-  \item{xy_ticks}{Flag that indicates if tick marks and associated \bold{value
+  \item{xy_ticks}{Flag that indicates if tick marks and associated \strong{value
         labels} on the axes are to be displayed. To rotate the axis values, use
         \code{rotate_x}, \code{rotate_y}, and \code{offset} from the
         \code{\link{style}} function.}
@@ -696,17 +704,16 @@ vp(\dots)
         the axis text labels are subject to overlapping, specify the interval
         for skipping the label on the $x$-axis. A value of zero means to
         include all the labels, the default.
-        A value of one means to English every other label, 
+        A value of one means to skip every other label, 
         a value of two indicates to include every second label, etc.
         Also consider the \code{rotate_x} parameter.}
   \item{n_axis_y_skip}{Same as for the $x$-axis but applies to the $y$-axis.}\cr
-
 
   \item{legend_title}{Title of the legend for a multiple-variable \code{x}
        or \code{y} plot.}\cr
 
 
-  \item{add}{\bold{Overlay one or more objects}, text or a geometric figures,
+  \item{add}{\strong{Overlay one or more objects}, text or a geometric figures,
        on the plot.
        Possible values are any text to be written, the first argument, which is
        \code{"text"}, or,
@@ -747,7 +754,7 @@ vp(\dots)
         the variable will be analyzed as categorical instead of continuous.
         Default is 0. Use to specify that such variables are to be analyzed
         as categorical, a kind of informal R factor.
-        \bold{[deprecated]}: Best to convert a categorical integer variable
+        \strong{[deprecated]}: Best to convert a categorical integer variable
         to a factor.}
   \item{value_labels}{For factors, default is the factor labels, and for
         character variables, default is the character values.
@@ -759,14 +766,14 @@ vp(\dots)
         they also apply to the \code{y}-axis. Control the plotted size
         with \code{axis_cex} and \code{axis_x_cex} from the lessR
         \code{\link{style} function.}
-        \bold{[deprecated]}: Better to convert a categorical integer variable to
+        \strong{[deprecated]}: Better to convert a categorical integer variable to
         a factor.}
-  \item{rows}{\bold{Deprecated} old parameter name that is now called \code{filter}.}
-  \item{by1}{\bold{Deprecated} old parameter name, replaced with the more descriptive
+  \item{rows}{\strong{Deprecated} old parameter name that is now called \code{filter}.}
+  \item{by1}{\strong{Deprecated} old parameter name, replaced with the more descriptive
         \code{facet1}.}
-  \item{by2}{\bold{Deprecated} old parameter name, replaced with the more descriptive
+  \item{by2}{\strong{Deprecated} old parameter name, replaced with the more descriptive
         \code{facet2}.}\cr
-  \item{smooth}{\bold{Deprecated} old parameter name, replaced with 
+  \item{smooth}{\strong{Deprecated} old parameter name, replaced with 
        \code{type="smooth"} to also allow for \code{type="contour"}.}\cr
 
 
@@ -890,10 +897,48 @@ Also, \code{Plot()} will convert character string dates such as \code{2024 Aug} 
 
 The parameter \code{ts_unit} aggregates the date variable according to its specified value. The aggregation is based on two functions from the \code{xts} package, \code{endpoints()} and \code{period.apply()}. For example, a data variable has daily values but is plotted with aggregated quarterly values.
 
-Specify the function by which to aggregate with the parameter \code{ts_agg}. The default is \code{"sum"}.
+Specify the function by which to aggregate with the parameter \code{ts_agg}. The default is \code{"sum"}. Or, choose \code{"mean"}.
 
 In terms of missing data, if the date value exists and the corresponding y-value is missing, with value \code{NA}, then the visualization leaves a corresponding y-value blank. If the date value is also missing, then the nearest adjacent points are connected by line segment which runs over the missing data value. For example, consider a daily time series such that "2021-01-07" and "2021-01-09" are both present with their corresponding y values, but there is no date value or y value for January 8, that is, "2021-01-08". The entire row of data is missing. The resulting visualization plot the y-value for January 7 and also for January 9, with a line segment connecting those two points. There is no corresponding label on the x-axis for the missing data value but the January 9 value is appropriately placed two days after the January 7 value on the visualization.
 
+Initiate forecasting from time series data by setting \code{ts_ahead} to an integer greater than zero. Following are tables that define the valid values for specifying trend, seasonality, and error for the four forecasting functions embedded within \code{lessR}, adopting the indicated parameter values from the \code{fable} package. Each of these functions is not called directly but instead follows from the \code{Plot()} parameter values. Use the parameters \code{ts_trend}, \code{ts_seasons}, and \code{ts_error} to override their default values with the specified values in the tables.
+
+Multiplicative effects require that the variable plotted is positive. Additive trend is linear. Multiplicatively, the time series grows (or shrinks) at a constant percentage rate, which defines an exponential trend. Multiplicative seasonality scales the seasonal effect in proportion to the level of the time series. For example, if the time series level doubles, then the seasonal pattern also doubles in magnitude.
+
+\bold{Exponential Smoothing Forecasting}\cr\cr
+\bold{ETS()}: Default with \emph{suggested} additive trend, seasonality, and error. 
+\tabular{lll}{
+  \emph{Trend} \tab \emph{Season} \tab \emph{Error} \cr
+-------------------------------------- \tab ---------------------------------\tab -------------------------- \cr
+  "N": No trend \tab "N": No seasonality \tab "A": Additive error \cr
+  "A": Additive (linear) trend \tab "A": Additive seasonality \tab "M": Multiplicative error\cr
+  "M": Multiplicative trend \tab "M": Multiplicative seasonality \tab  \cr
+  "Ad": Additive damped trend \tab \tab  \cr
+  "Md": Multiplicative damped trend \tab  \tab  \cr
+}
+
+\bold{HoltWinters()}:  \code{ts_source="classic"}, default additive trend, seasonality.
+\tabular{lll}{
+  \emph{Trend} \tab \emph{Season} \tab \emph{Error} \cr
+---------------------------- \tab ---------------------------------\tab -------------------- \cr
+  "N": No trend \tab "N": No seasonality \tab \cr
+  "A": Additive (linear)  trend \tab "A": Additive seasonality \tab "A": Additive error\cr
+      \tab "M": Multiplicative seasonality \tab \cr
+}
+
+\bold{Linear Regression with Seasonality Forecasting}\cr\cr
+\bold{TSLM()}: \code{ts_method="lm"}, default additive trend, seasonality.\cr
+\bold{stl() and lm()}: \code{ts_method="lm"} and  \code{ts_source="classic"}
+\tabular{lll}{
+  \emph{Trend} \tab \emph{Season} \tab \emph{Error} \cr
+---------------------------- \tab ---------------------------- \tab -------------------- \cr
+  "N": No trend \tab "N": No seasonality \cr
+  "A": Additive (linear) trend  \tab "A": Additive seasonality \tab "A": Additive error \cr
+}
+
+The \code{fable} function \code{ETS()} likely yields more accurate prediction than the classic Holt-Winters procedure, and provides for more model specifications as well, which is why \code{Plot()} defaults to setting \code{ts_source} to \code{"fable"}. Recognize that any specified parameter values are only suggested values. See Hyndman, R. J., & Athanasopoulos, G. (2021) for more details. Regarding linear regression, it is not clear if one of the approaches has less predictive error in general than the other, though neither approach has as many model specifications as does \code{ETS()} exponential smoothing.
+
+Both linear regression methods implement the classic minimization of squared residuals for model estimation provided by the Base R function \code{lm()}. The distinction between the two regression estimation procedures is how seasonality is estimated. The \code{fable} function \code{TSLM()} creates dummy variables for the seasons. Or, extract seasonality with \code{stl()}, do the linear regression, and then add back the seasonality, accomplished with \code{ts_source} set to \code{"classic"}. The \code{slm()} approach also provides a full decomposition that includes the trend and seasonal effects at each time period if \code{ts_fitted} is set to \code{TRUE} to display the fitted values for the data.
 
 2-D KERNEL DENSITY\cr
 Set \code{type} to \code{"smooth"} to implicitly call the R function \code{\link{smoothScatter}}, according to the current color theme. Useful for very large data sets. The \code{smooth_points} parameter plots points from the regions of the lowest density. The \code{smooth_bins} parameter specifies the number of bins in both directions for the density estimation. The \code{smooth_power} parameter specifies the exponent in the function that maps the density scale to the color scale to allow customization of the intensity of the plotted gradient colors. Higher values result in less color saturation, de-emphasizing points from regions of lessor density. These parameters are respectively passed directly to the \code{\link{smoothScatter}} \code{nrpoints}, \code{nbin} and \code{transformation} parameters. Grid lines are turned off,
@@ -990,6 +1035,8 @@ Gerbing, D. W. (2023). R Data Analysis without Programming, 2nd edition, Chapter
 Gerbing, D. W. (2020). R Visualizations: Derive Meaning from Data, Chapter 5, NY: CRC Press.
 
 Gerbing, D. W. (2021). Enhancement of the Command-Line Environment for use in the Introductory Statistics Course and Beyond, \emph{Journal of Statistics and Data Science Education}, 29(3), 251-266, https://www.tandfonline.com/doi/abs/10.1080/26939169.2021.1999871.
+
+Hyndman, R. J., & Athanasopoulos, G. (2021). \emph{Forecasting: Principles and Practice} (3rd ed.). Melbourne, Australia: OTexts. Retrieved from https://otexts.com/fpp3/
 
 Hubert, M. and Vandervieren, E. (2008). An adjusted boxplot for skewed distributions, Computational Statistics and Data Analysis 52, 51865201.
 
@@ -1177,7 +1224,7 @@ Plot(Salary, stat_x="count")  # bin the values
 # time charts
 #------------
 # run chart, with default fill area
-Plot(.Index, Salary, area_fill="on")
+Plot(.Index, Salary, ts_area_fill="on")
 
 # two run charts in same panel
 # or could do a multivariate time series
