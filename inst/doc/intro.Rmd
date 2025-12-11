@@ -1,4 +1,4 @@
----
+I love you my darling all the days of my life I love you---
 title: "Introduction to lessR"
 output: rmarkdown::html_vignette
 vignette: >
@@ -17,11 +17,26 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(lessR)
+options(lessR.use_plotly = FALSE)
 ```
 
 The vignette examples of using **lessR** became so extensive that the maximum R package installation size was exceeded. Find a limited number of examples below. Find many more vignette examples at:
 
 [lessR examples](https://web.pdx.edu/~gerbing/lessR/examples/)
+
+
+## Visualization Function Structure in lessR
+
+- **`Chart()`**  
+  Creates visualizations of *summarized* data, typically frequency or statistical tables from one or two categorical variables. Produces bar charts, pie charts, radar charts, stacked charts, and hierarchical displays such as sunburst and treemap diagrams. Use `Chart()` when each category or combination of categories corresponds to a numeric summary such as a count or a statistic.
+
+- **`X()`**  
+  Visualizes *a single raw variable*, numeric or categorical. Generates histograms, density curves, dot plots, boxplots, violin plots, and other univariate graphics directly from the observed data values.
+
+- **`XY()`**  
+  Displays *relationships between variables*, typically one x-variable and one y-variable. Produces scatterplots, line charts, bubble charts, time-series plots, and regression visualizations, with optional grouping and faceting.
+
+Together, these three functions provide a unified and intuitive workflow: the structure of the input data—summarized table, single variable, or paired variables—naturally determines which visualization function to use, ensuring consistency and simplicity across all lessR graphics.
 
 
 ## Read Data
@@ -49,33 +64,33 @@ l
 
 [more examples of bar charts and pie charts](https://web.pdx.edu/~gerbing/lessR/examples/BarChart.html)
 
-Consider the categorical variable Dept in the Employee data table.  Use `BarChart()` to tabulate and display the visualization of the number of employees in each department, here relying upon the default data frame (table) named _d_. Otherwise add the `data=` option for a data frame with another name.
+Consider the categorical variable Dept in the Employee data table.  Use `Chart()` to tabulate and display the visualization of the number of employees in each department, here relying upon the default data frame (table) named _d_. Otherwise add the `data=` option for a data frame with another name.
 
 ```{r bcEx, fig.width=4, fig.height=3.5, fig.align='center', fig.cap="Bar chart of tablulated counts of employees in each department."}
-BarChart(Dept)
+Chart(Dept)
 ```
 
 Specify a single fill color with the `fill` parameter, the edge color of the bars with `color`. Set the transparency level with `transparency`. Against a lighter background, display the value for each bar with a darker color using the `labels_color` parameter. To specify a color, use color names, specify a color with either its `rgb()` or `hcl()` color space coordinates, or use the **lessR** custom color palette function `getColors()`.
 
 ```{r fig.width=4, fig.height=3.75, fig.align='center'}
-BarChart(Dept, fill="darkred", color="black", transparency=.8,
+Chart(Dept, fill="darkred", color="black", transparency=.8,
          labels_color="black")
 ```
 
 Use the `theme` parameter to change the entire color theme: "colors", "lightbronze", "dodgerblue", "slatered", "darkred", "gray", "gold", "darkgreen", "blue", "red", "rose", "green", "purple", "sienna", "brown", "orange", "white", and "light". In this example, changing the full theme accomplishes the same as changing the fill color. Turn off the displayed value on each bar with the parameter `labels` set to `off`. Specify a horizontal bar chart with base R parameter `horiz`.
 
 ```{r fig.width=4, fig.height=3.5, fig.align='center'}
-BarChart(Dept, theme="gray", labels="off", horiz=TRUE)
+Chart(Dept, theme="gray", labels="off", horiz=TRUE)
 ```
 
 ## Histogram
 
 [more examples of histograms](https://web.pdx.edu/~gerbing/lessR/examples/Histogram.html)
 
-Consider the continuous variable _Salary_ in the Employee data table.  Use `Histogram()` to tabulate and display the number of employees in each department, here relying upon the default data frame (table) named _d_, so the `data=` parameter is not needed.
+Consider the continuous variable _Salary_ in the Employee data table.  Use `X()` to tabulate and display the number of employees in each department, here relying upon the default data frame (table) named _d_, so the `data=` parameter is not needed.
 
 ```{r hs, fig.width=4, fig.height=3.5, fig.align='center', fig.cap="Histogram of tablulated counts for the bins of Salary."}
-Histogram(Salary)
+X(Salary)
 ```
 
 By default, the `Histogram()` function provides a color theme according to the current, active theme. The function also provides the corresponding frequency distribution, summary statistics, the table that lists the count of each category, from which the histogram is constructed, as well as an outlier analysis based on Tukey's outlier detection rules for box plots.
@@ -85,7 +100,7 @@ Use the parameters `bin_start`, `bin_width`, and `bin_end` to customize the hist
 Easy to change the color, either by changing the color theme with `style()`, or just change the fill color with `fill`. Can refer to standard R colors, as shown with **lessR** function `showColors()`, or implicitly invoke the **lessR** color palette generating function `getColors()`. Each 30 degrees of the color wheel is named, such as `"greens"`, `"rusts"`, etc, and implements a sequential color palette.
 
 ```{r binwidth, fig.width=4, fig.height=3.5, fig.align='center', fig.cap="Customized histogram."}
-Histogram(Salary, bin_start=35000, bin_width=14000, fill="reds")
+X(Salary, bin_start=35000, bin_width=14000, fill="reds")
 ```
 
 ## Scatterplot
@@ -95,25 +110,25 @@ Histogram(Salary, bin_start=35000, bin_width=14000, fill="reds")
 Specify an X and Y variable with the plot function to obtain a scatter plot. For two variables, both variables can be any combination of continuous or categorical. One variable can also be specified. A scatterplot of two categorical variables yields a bubble plot. Below is a scatterplot of two continuous variables. 
 
 ```{r sp, fig.width=4}
-Plot(Years, Salary)
+XY(Years, Salary)
 ```
 
 Enhance the default scatterplot with parameter `enhance`. The visualization includes the mean of each variable indicated by the respective line through the scatterplot, the 95% confidence ellipse, labeled outliers, least-squares regression line with 95% confidence interval, and the corresponding regression line with the outliers removed. 
 
 ```{r spEnhance, fig.width=4}
-Plot(Years, Salary, enhance=TRUE)
+XY(Years, Salary, enhance=TRUE)
 ```
 
 The default plot for a single continuous variable includes not only the scatterplot, but also the superimposed violin plot and box plot, with outliers identified. Call this plot the VBS plot.
 
 ```{r x1, fig.height=3}
-Plot(Salary)
+XY(Salary)
 ```
 
 Following is a scatterplot in the form of a bubble plot for two categorical variables.
 
 ```{r spBubble, fig.width=4}
-Plot(JobSat, Gender)
+Chart(JobSat, Gender, type="bubble")
 ```
 
 ## Means and Proportions

@@ -17,7 +17,7 @@ interact(app)
 
 
 \details{
-Valid names are \code{"BarChart"}, \code{"PieChart"}, \code{"Histogram"}, \code{"ScatterPlot"}, \code{"Trellis"}. If missing, then the valid names are listed. Valid abbreviations, respectively, are \code{"bc"}, \code{"pc"}, \code{"hs"}, and \code{"Plot"}.
+Valid names are \code{"BarChart"}, \code{"Histogram"}, \code{"ScatterPlot"}. If missing, then the valid names are listed.
 }
 
 \author{David W. Gerbing (Portland State University; \email{gerbing@pdx.edu})}

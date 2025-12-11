@@ -5,7 +5,6 @@ function(object, nn_col, n.by, segments, theme, fill, fill.miss,
 
   n.clrs <- max(nn_col, n.by)  # n_col goes to lattice
 
-
   ### area fill
   ### ---------
 
@@ -54,8 +53,10 @@ function(object, nn_col, n.by, segments, theme, fill, fill.miss,
     }  # end n.clrs > 1
 
     if ((trans > 0)) {  # default fill trans is 0.1
-       if (area_fill[1] != "transparent")
+       if (area_fill[1] != "transparent") {
+         area_fill <- .color_range(area_fill, n.clrs)
          area_fill <- .maketrans(area_fill, (1-trans)*256)
+       }
     }
 
   }  # end segments  --- area_fill

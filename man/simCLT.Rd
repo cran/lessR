@@ -9,7 +9,7 @@ Show the distribution of sample means and relevant summary statistics, such as t
 
 \usage{
 simCLT(ns, n, p1=0, p2=1, seed=NULL,
-       type=c("normal", "uniform", "lognormal", "antinormal"),
+       dist=c("normal", "uniform", "lognormal", "antinormal"),
        fill="lightsteelblue3", n_display=0, digits_d=3, 
        subtitle=TRUE, pop=TRUE, 
        main=NULL, pdf=FALSE, width=5, height=5, \dots)
@@ -29,7 +29,7 @@ simCLT(ns, n, p1=0, p2=1, seed=NULL,
   \item{seed}{Default seed is the R default. Enter a positive integer value
        to obtain a reproducible result, the same result for the same seed.}\cr
 
-  \item{type}{The general population distribution.}
+  \item{dist}{The general population distribution.}
   \item{fill}{Fill color of the graphs.}
   \item{n_display}{Number of samples for which to display the sample mean
         and data values.}
@@ -75,7 +75,7 @@ simCLT(ns=1000, n=2)
 # plot of the uniform dist from 0 to 4
 #  and corresponding sampling distribution with 10000 samples
 #  each of size 2
-simCLT(ns=1000, n=2, p1=0, p2=4, type="uniform", bin_width=0.01)
+simCLT(ns=1000, n=2, p1=0, p2=4, dist="uniform", bin_width=0.01)
 
 # save the population and sample distributions to pdf files
 # simCLT(100, 10, pdf=TRUE)

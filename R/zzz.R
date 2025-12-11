@@ -4,139 +4,176 @@
 if (getRversion() >= "3.6.0")
   globalVariables(c("d", "mydata", "l", "mylabels", "mycor"))
 
+## zzz.R  — lessR startup ----------------------------------------------------
 
-.onAttach <-
-function(...) {
 
-  packageStartupMessage("\n",
-      "lessR 4.4.5                         feedback: gerbing@pdx.edu \n",
-      "--------------------------------------------------------------\n",
-      "> d <- Read(\"\")  Read data file, many formats available, e.g., Excel\n",
-      "  d is default data frame, data= in analysis routines optional\n",
-      "\n",
-      "Many examples of reading, writing, and manipulating data, \n",
-      "graphics, testing means and proportions, regression, factor analysis,\n",
-      "customization, forecasting, and aggregation from pivot tables\n",
-      "  Enter: browseVignettes(\"lessR\")\n\n",
-      "View lessR updates, now including time series forecasting\n",
-      "  Enter: news(package=\"lessR\")\n\n",
-      "Interactive data analysis\n",
-      "  Enter: interact()\n")
+.onAttach <- function(libname, pkgname) {
+  packageStartupMessage(
+    "\n",
+    "lessR 4.5                            feedback: gerbing@pdx.edu \n",
+    "--------------------------------------------------------------\n",
+    "> d <- Read(\"\")  Read data file, many formats available, e.g., Excel\n",
+    "  d is the default data frame, data= in analysis routines optional\n",
+    "\n",
+    "Many examples of reading, writing, and manipulating data, graphics,\n",
+    "testing means and proportions, regression, factor analysis,\n",
+    "customization, forecasting, and aggregation to pivot tables.\n",
+    "  Enter: browseVignettes(\"lessR\")\n\n",
+    "View lessR updates, now including modern time series forecasting\n",
+    "  and many, new Plotly interactive visualizations output. Most\n",
+    "  visualization functions are now reorganized to three functions:\n",
+    paste0(
+      "     Chart(): type=\"bar\", \"pie\", \"radar\", \"bubble\", ",
+      "\"treemap\", \"icicle\"\n"
+    ),
+    "     X(): type=\"histogram\", \"density\", \"vbs\" and more\n",
+    paste0(
+      "     XY(): type=\"scatter\" for a scatterplot, or ",
+      "\"contour\", \"smooth\"\n"
+    ),
+    "   Most previous function calls still work, such as:\n",
+    "     BarChart(), Histogram, and Plot().\n",
+    "  Enter: news(package=\"lessR\"), or ?Chart, ?X, or ?XY\n",
+    "There is also Flows() for Sankey flow diagrams, see ?Flows\n\n",
+    "Interactive data analysis for constructing visualizations.\n",
+    "  Enter: interact()\n"
+  )
+}
 
-  options(warn = -1)  # suppress warnings while bin.width, etc., allowed
 
-  options(theme = "colors")
-  options(sub_theme = "default")
+.onLoad <- function(libname, pkgname) {
 
-  options(panel_fill = "white")
-  options(window_fill = getOption("panel_fill"))
-  options(panel_color = "gray45")  # lattice
-  options(panel_lwd = 1.0)
-  options(panel_lty = "solid")
+  if (requireNamespace("conflicted", quietly = TRUE)) {
+    conflicted::conflict_prefer("style", "lessR", quiet=TRUE) # vs plotly::style
+    conflicted::conflict_prefer("order_by", "lessR", quiet=TRUE)  # vs dplyr
+    conflicted::conflict_prefer("STL", "lessR", quiet=TRUE)  # vs feasts::STL
+    conflicted::conflict_prefer("recode", "lessR", quiet=TRUE)  # vs feasts::STL
+  }
 
-  # .maketrans("gray50", .to256("trans_bar_fill"))
-  options(bar_fill = NULL)
-  options(bar_fill_discrete = c("#4398D0", "#B28B2A", "#5FA140", "#D57388",
-          "#9A84D6", "#00A898", "#C97E5B", "#909711", "#00A3BA", "#D26FAF",
-          "#00A76F", "#BD76CB"))  # getColors("hues")
-  options(bar_fill_cont = rgb(150,170,195, maxColorValue=255))
-  options(trans_bar_fill = 0.10)
-  options(bar_color = rgb(132,150,175, maxColorValue=255))
-  options(bar_color_discrete = "transparent")
-  options(bar_color_cont = rgb(132,150,175, maxColorValue=255))
+  # helper: set an option only if not already set
+  .set_opt_default <- function(name, value) {
+    if (is.null(getOption(name, NULL)))
+      options(structure(list(value), names = name))
+  }
 
-  options(pt_fill = rgb(50,78,92, maxColorValue=255))  #  #324E5C
-  options(trans_pt_fill = 0.10)
-  options(pt_color = rgb(50,78,92, maxColorValue=255))  # old 70 80 90
-  options(out_fill = "firebrick4")
-  options(out_color = "firebrick4")
-  options(out2_fill = "firebrick2")
-  options(out2_color = "firebrick2")
+# options(warn = -1)  # suppress warnings while bin_width, etc., allowed
 
-  options(violin_fill = "#7485975A")  # .maketrans(hcl(240,20,55), 90)
-  options(violin_color = "gray15")
-  options(box_fill = rgb(65,155,210, maxColorValue=255)) # old getColors("hues")
-  options(box_color = "gray15")
-  options(line_color = "gray15")
+  ## Core defaults (respect user overrides)
+  .set_opt_default("theme", "colors")
+  .set_opt_default("sub_theme", "default")
 
-  options(bubble_text_color = "#F7F2E6")  # rgb(247,242,230, maxColorValue=255)
-  options(ellipse_fill = "#92806F28")   # .maketrans(hcl(50,20,55), 40)
-  options(ellipse_color = "gray20")
-  options(ellipse_lwd = 1)
-  options(se_fill = "#1A1A1A19")  # old .maketrans("gray10", 40) "darkblue", 25
-  options(fit_color = rgb(92,64,50, maxColorValue = 255))
-  options(fit_lwd = 2)
-  options(heat = "gray30")
-  options(segment_color = "gray40")
-  options(ID_color = "gray50")
+  .set_opt_default("panel_fill",  "white")
+  .set_opt_default("window_fill", getOption("panel_fill"))
+  .set_opt_default("panel_color", "gray45")
+  .set_opt_default("panel_lwd",   1.0)
+  .set_opt_default("panel_lty",   "solid")
 
-  options(main_color = "gray15")
-  options(main_cex = 1)
-  options(lab_color = "gray15")
-  options(lab_x_color = NULL)
-  options(lab_y_color = NULL)
-  options(lab_cex = .98)
-  options(lab_x_cex = NULL)
-  options(lab_y_cex = NULL)
+  .set_opt_default("bar_fill", NULL)
+  .set_opt_default(
+    "bar_fill_discrete",
+    c("#4398D0","#B28B2A","#5FA140","#D57388","#9A84D6","#00A898",
+      "#C97E5B","#909711","#00A3BA","#D26FAF","#00A76F","#BD76CB")
+  )
+  .set_opt_default("bar_fill_cont",  rgb(150,170,195, maxColorValue=255))
+  .set_opt_default("trans_bar_fill", 0.10)
+  .set_opt_default("bar_color",      rgb(132,150,175, maxColorValue=255))
+  .set_opt_default("bar_color_discrete", "transparent")
+  .set_opt_default("bar_color_cont", rgb(132,150,175, maxColorValue=255))
 
-  options(axis_color = "gray15")
-  options(axis_x_color = NULL)
-  options(axis_y_color = NULL)
-  options(axis_lwd = 1)
-  options(axis_x_lwd = NULL)
-  options(axis_y_lwd = NULL)
-  options(axis_lty = "solid")
-  options(axis_x_lty = NULL)
-  options(axis_y_lty = NULL)
-  options(axis_cex = .75)
-  options(axis_x_cex = NULL)
-  options(axis_y_cex = NULL)
-  options(axis_text_color = "gray20")
-  options(axis_x_text_color = NULL)
-  options(axis_y_text_color = NULL)
-  options(rotate_x = 0)
-  options(rotate_y = 0)
-  options(offset = 0.5)
+  .set_opt_default("pt_fill",   rgb(50,78,92, maxColorValue=255))
+  .set_opt_default("trans_pt_fill", 0.10)
+  .set_opt_default("pt_color",  rgb(50,78,92, maxColorValue=255))
 
-  options(grid_color = "#DED9CD")  # rgb(222,217,205, maxColorValue=255)
-  options(grid_x_color = NULL)
-  options(grid_y_color = NULL)
-  options(grid_lwd = 0.5)
-  options(grid_x_lwd = NULL)
-  options(grid_y_lwd = NULL)
-  options(grid_lty = "solid")
-  options(grid_x_lty = NULL)
-  options(grid_y_lty = NULL)
+  .set_opt_default("out_fill",  "firebrick4")
+  .set_opt_default("out_color", "firebrick4")
+  .set_opt_default("out2_fill", "firebrick2")
+  .set_opt_default("out2_color","firebrick2")
 
-  options(strip_fill = "#7F7F7F37")  # .maketrans("gray50", 55))
-  options(strip_color = "gray40")
-  options(strip_text_color = "gray15")
+  .set_opt_default("violin_fill", "#7485975A")
+  .set_opt_default("violin_color","gray15")
+  .set_opt_default("box_fill",    rgb(65,155,210, maxColorValue=255))
+  .set_opt_default("box_color",   "gray15")
+  .set_opt_default("line_color",  "gray15")
 
-  #Plot(Years, Salary, bg="grey85", grid="grey77") on cheap Dell monitor
+  .set_opt_default("bubble_text_color", "#F7F2E6")
+  .set_opt_default("ellipse_fill",      "#92806F28")
+  .set_opt_default("ellipse_color",     "gray20")
+  .set_opt_default("ellipse_lwd",       1)
 
-  options(add_fill = "#D9D9D920")
-  options(add_trans = 0.0)
-  options(add_color = "gray50")
-  options(add_cex = 0.75)
-  options(add_lwd = 0.5)
-  options(add_lty = "solid")
+  .set_opt_default("se_fill",  "#1A1A1A19")
+  .set_opt_default("fit_color", rgb(92,64,50, maxColorValue=255))
+  .set_opt_default("fit_lwd",   2)
 
-  options(n_cat = 1)
-  options(suggest = TRUE)
-  options(note = TRUE)
-  options(quiet = FALSE)
-  options(brief = FALSE)
+  .set_opt_default("heat",          "gray30")
+  .set_opt_default("segment_color", "gray40")
+  .set_opt_default("ID_color",      "gray50")
 
-  options(explain = TRUE)
-  options(interpret = TRUE)
-  options(results = TRUE)
-  options(document = TRUE)
-  options(code = TRUE)
+  .set_opt_default("main_color", "gray15")
+  .set_opt_default("main_cex",   1)
+  .set_opt_default("lab_color",  "gray15")
+  .set_opt_default("lab_x_color", NULL)
+  .set_opt_default("lab_y_color", NULL)
+  .set_opt_default("lab_cex",     0.98)
+  .set_opt_default("lab_x_cex",   NULL)
+  .set_opt_default("lab_y_cex",   NULL)
 
-  options(out.signifstars = FALSE)
-  options(scipen = 30)
+  .set_opt_default("axis_color", "gray15")
+  .set_opt_default("axis_x_color", NULL)
+  .set_opt_default("axis_y_color", NULL)
+  .set_opt_default("axis_lwd",   1)
+  .set_opt_default("axis_x_lwd", NULL)
+  .set_opt_default("axis_y_lwd", NULL)
+  .set_opt_default("axis_lty",   "solid")
+  .set_opt_default("axis_x_lty", NULL)
+  .set_opt_default("axis_y_lty", NULL)
+  .set_opt_default("axis_cex",   0.75)
+  .set_opt_default("axis_x_cex", NULL)
+  .set_opt_default("axis_y_cex", NULL)
+  .set_opt_default("axis_text_color", "gray20")
+  .set_opt_default("axis_x_text_color", NULL)
+  .set_opt_default("axis_y_text_color", NULL)
+  .set_opt_default("rotate_x", 0)
+  .set_opt_default("rotate_y", 0)
+  .set_opt_default("offset",   0.5)
 
-  options(mc_doScale_quiet=TRUE)  # for mc() function in robustbase
+  .set_opt_default("grid_color",  "#DED9CD")
+  .set_opt_default("grid_x_color", NULL)
+  .set_opt_default("grid_y_color", NULL)
+  .set_opt_default("grid_lwd",   0.5)
+  .set_opt_default("grid_x_lwd", NULL)
+  .set_opt_default("grid_y_lwd", NULL)
+  .set_opt_default("grid_lty",   "solid")
+  .set_opt_default("grid_x_lty", NULL)
+  .set_opt_default("grid_y_lty", NULL)
+
+  .set_opt_default("strip_fill",       "#7F7F7F37")
+  .set_opt_default("strip_color",      "gray40")
+  .set_opt_default("strip_text_color", "gray15")
+
+  .set_opt_default("add_fill",  "#D9D9D920")
+  .set_opt_default("add_trans", 0.0)
+  .set_opt_default("add_color", "gray50")
+  .set_opt_default("add_cex",   0.75)
+  .set_opt_default("add_lwd",   0.5)
+  .set_opt_default("add_lty",   "solid")
+
+  .set_opt_default("n_cat",   1)
+  .set_opt_default("suggest", TRUE)
+  .set_opt_default("note",    TRUE)
+  .set_opt_default("quiet",   FALSE)
+  .set_opt_default("brief",   FALSE)
+
+  .set_opt_default("lessR.use_plotly", TRUE)
+  .set_opt_default("explain",  TRUE)
+  .set_opt_default("interpret",TRUE)
+  .set_opt_default("results",  TRUE)
+  .set_opt_default("document", TRUE)
+  .set_opt_default("code",     TRUE)
+
+  .set_opt_default("out.signifstars", FALSE)
+  .set_opt_default("scipen",          30)
+
+  .set_opt_default("mc_doScale_quiet", TRUE)
 }
 
 
@@ -181,7 +218,7 @@ function(...) {
 
 
 # get decimal digits to display for variable x, then apply
-.decdig <- function(x, digits_d) {
+.decdig <- function(x, digits_d=NULL) {
   dec.pt <- getOption("OutDec")
   ok <- is.finite(x)  # get rid of missing data
   x.var <- x[ok]  # evaluate digits on x.var w/o NA's
@@ -839,7 +876,6 @@ function(...) {
     tx[length(tx)] <- paste(tx[length(tx)], txt2, sep="")  # no leading blank
   }
   return(tx)
-
 }
 
 
@@ -1314,60 +1350,81 @@ function(lab, labcex, cut, nm, var.nm, units) {
   usr <- par("usr")
   ax <- .axes_dim()  # get axis values parameters: color, lwd, lty, cex
 
-  if (is.null(x.lvl)  &&  !is.null(axT1)) {  # numeric, uses axT1
+  # x-ax\is
+  # -------
+
+  # numeric, uses axT1
+  if (is.null(x.lvl)  &&  !is.null(axT1)) {
     if (!y.only) {  # do x axis in calling routine for time series
-      axT <- axT1[which(axT1 >= usr[1]  &  axT1 <= usr[2])]
-      lbl <- .axis.format(axT, axis_fmt, axis_x_pre, axis_y_pre="no")
+      axT1 <- axT1[which(axT1 >= usr[1]  &  axT1 <= usr[2])]
+      axL1 <- .axis.format(axT1, axis_fmt, axis_x_pre, axis_y_pre="no")
       if (rotate_x==0) {  # mgp[2] for tic marks and value label separation
-        axis(1, at=axT, labels=lbl,
+        axis(1, at=axT1, labels=axL1,
              col=ax$axis_x_color, col.axis=ax$axis_x_text_color,
              lwd=ax$axis_x_lwd, lty=ax$axis_x_lty, cex.axis=ax$axis_x_cex)
       }
-      else {
+      else {  # rotate_x
         # text() for labels to achieve rotation with srt and offset
         # so par$mgp[2] does not work, instead adjust text(... y= ...)
-        axis(1, at=axT, labels=FALSE,
+        axis(1, at=axT1, labels=FALSE,
              col=ax$axis_x_color, col.axis=ax$axis_x_text_color,
              lwd=ax$axis_x_lwd, lty=ax$axis_x_lty, cex.axis=ax$axis_x_cex)
-        text(x=axT, y=usr[3]- par("cxy")[2]/4.5, labels=lbl,
+        text(x=axT1, y=usr[3] - par("cxy")[2]/4.5, labels=axL1,
              pos=1, xpd=TRUE, cex=ax$axis_x_cex, col=ax$axis_x_text_color,
              srt=rotate_x, offset=offset, font=fnt, ...)
       }  # end axis(), text()
+    } # end not time series 
+    else {
+      axT1 <- NULL
+      axL1 <- NULL
     }
-  }
+  }  # end numeric
 
-  else if (!is.null(x.lvl)) {  # categorical, uses x.lvl
+  # categorical, uses x.lvl
+  else if (!is.null(x.lvl)) {
+    axL1 <- x.lvl
     if (rotate_x==0) {  # mgp[2] for tic marks and value label separation active
-      axis(1, at=axT1, labels=x.lvl,
+      axis(1, at=axT1, labels=axL1,
            col=ax$axis_x_color, col.axis=ax$axis_x_color,
            lwd=ax$axis_x_lwd, lty=ax$axis_x_lty, cex.axis=ax$axis_x_cex)
     }
     else {  # rotate_x
       axis(1, at=axT1, labels=FALSE, col=ax$axis_x_color,
           lwd=ax$axis_x_lwd, lty=ax$axis_x_lty)
-      text(x=axT1, y=usr[3]- par("cxy")[2]/4.5, labels=x.lvl,
+      text(x=axT1, y=usr[3]- par("cxy")[2]/4.5, labels=axL1,
            pos=1, xpd=TRUE, cex=ax$axis_x_cex, col=ax$axis_x_text_color,
            srt=rotate_x, offset=offset, font=fnt, ...)
     }
   }  # end categorical x
 
-  if (is.null(y.lvl)  &&  !is.null(axT2)) {
+  else  # axT1 not processed  (bc just sends the numerical axis)
+    axL1 <- NULL
+
+  # y-axis
+  # ------
+  if (is.null(y.lvl)  &&  !is.null(axT2)) {  # numerical
+    axT2 <- axT2[which(axT2 >= usr[3]  &  axT2 <= usr[4])]
+    axL2 <- .axis.format(axT2, axis_fmt, axis_x_pre="no", axis_y_pre)
     axis(2, at=axT2, labels=FALSE, col=ax$axis_y_color,
         lwd=ax$axis_y_lwd, lty=ax$axis_y_lty)
-    axT <- axT2[which(axT2 >= usr[3]  &  axT2 <= usr[4])]
-    lbl <- .axis.format(axT, axis_fmt, axis_x_pre="no", axis_y_pre)
-    text(x=usr[1], y=axT, labels=lbl,
+    text(x=usr[1], y=axT2, labels=axL2,
          pos=2, xpd=TRUE, cex=ax$axis_y_cex, col=ax$axis_y_text_color,
          srt=rotate_y, font=fnt, ...)
   }
 
   else if (!is.null(y.lvl)) {  # categorical
+    axL2 <- y.lvl
     axis(2, at=axT2, labels=FALSE, col=ax$axis_y_color,
         lwd=ax$axis_y_lwd, lty=ax$axis_y_lty)
-    text(x=usr[1], y=axT2, labels=y.lvl,
+    text(x=usr[1], y=axT2, labels=axL2,
          pos=2, xpd=TRUE, cex=ax$axis_y_cex, col=ax$axis_y_text_color,
          srt=rotate_y, font=fnt, ...)
   }
+
+  else  # axT2 not processed  (bc just sends the numerical axis)
+    axL2 <- NULL
+
+  return(list(axT1=axT1, axL1=axL1, axT2=axT2, axL2=axL2))
 }
 
 
@@ -1557,13 +1614,13 @@ function(lab, labcex, cut, nm, var.nm, units) {
 
 
 # num.cat var is integer with small number of unique values
-.is.num.cat <- function(x, n_cat) {
+.is.num.cat <- function(x, n_cat=10, max.n=100) {
 
   x <- sort(unique(na.omit(x)))
-
   nu.x <- length(x)
 
-  if (.is.integer(x)  &&  nu.x <= n_cat) {
+  # limit the sample size for the integer test
+  if (.is.integer(sample(x, size=min(max.n,length(x))))  &&  nu.x<=n_cat) {
     eq.int <- TRUE
     d.x <- diff(x)  # check for equal intervals
     if (nu.x > 2) {
@@ -1601,7 +1658,7 @@ function(lab, labcex, cut, nm, var.nm, units) {
 
 
 # reorder fill, etc. to match the level order of the grouping factor by.call
-align_vector <- function(vec, by.call) {
+.align_vector <- function(vec, by.call) {
   vec_name <- deparse(substitute(vec))
 
   if (!is.factor(by.call)) stop("by.call must be a factor")
@@ -1719,19 +1776,29 @@ align_vector <- function(vec, by.call) {
 
 # get rgb color from a color name with specified transparency
 .maketrans <- function(col.name, trans.level) {
-
-  col.trans <- numeric(length(col.name))
-
-  for (i in 1:length(col.name)) {
-    r.tr <- col2rgb(col.name[i])[1]
-    g.tr <- col2rgb(col.name[i])[2]
-    b.tr <- col2rgb(col.name[i])[3]
-
-    col.trans[i] <- rgb(r.tr, g.tr, b.tr, alpha=trans.level, maxColorValue=256)
-  }
-
-  return(col.trans)
+  sapply(col.name, function(clr) {
+    rgb.vals <- grDevices::col2rgb(clr)
+    r <- rgb.vals[1]; g <- rgb.vals[2]; b <- rgb.vals[3]
+    grDevices::rgb(r, g, b, alpha = trans.level, maxColorValue = 256)
+  }, USE.NAMES = FALSE)
 }
+
+
+#.maketrans <- function(col.name, trans.level) {
+
+#  col.trans <- numeric(length(col.name))
+
+#  for (i in 1:length(col.name)) {
+#    r.tr <- col2rgb(col.name[i])[1]
+#    g.tr <- col2rgb(col.name[i])[2]
+#    b.tr <- col2rgb(col.name[i])[3]
+#  }
+
+#  col.trans[i] <- rgb(r.tr, g.tr, b.tr, alpha=trans.level, maxColorValue=256)
+#}
+
+#  return(col.trans)
+#}
 
 
 # from theme, get the associated sequential, divergent or hues palette name
@@ -1905,7 +1972,7 @@ align_vector <- function(vec, by.call) {
 # better, more general scaling function
 .scale.clr <- function(x, fill, fill_split, fill_chroma, theme) {
 
-    fill.n <- ifelse (is.null(fill), 0, length(fill))
+    n.fill <- ifelse (is.null(fill), 0, length(fill))
 
     # rescale absolute distance from midpoint
     x.dist <- abs(x - fill_split)
@@ -1913,7 +1980,7 @@ align_vector <- function(vec, by.call) {
     x.normed <- x.dist / mx.xd  # scaled between 0 and 1
     lum.range <- 30 + ((1-x.normed)*70)  # 100 (light) down to 30 (dark)
 
-    if (fill.n == 0) {  # hue and chroma by defaulting to theme
+    if (n.fill == 0) {  # hue and chroma by defaulting to theme
       if (theme %in% c("gray", "white")) {
         chroma <- 0
         hue <- 0  # arbitrary
@@ -1924,16 +1991,16 @@ align_vector <- function(vec, by.call) {
       }
     }  # end not fill
 
-    else if (fill.n == 1) {  # hue and chroma from fill name
+    else if (n.fill == 1) {  # hue and chroma from fill name
       hc <- .getHC(fill)
       hue <- hc[1]
       chroma <- hc[2]
     }
 
-    if (fill.n < 2)
+    if (n.fill < 2)
       fill <- hcl(h=hue, c=chroma, l=lum.range)
 
-    else if (fill.n == 2) {  # length of fill is 2, so divergent scale
+    else if (n.fill == 2) {  # length of fill is 2, so divergent scale
       hc <- .getHC(fill[1])
       hue1 <- hc[1]
       chroma1 <- ifelse (hue1=="black", 0, hc[2])
@@ -1954,7 +2021,7 @@ align_vector <- function(vec, by.call) {
 
     else {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
-        "With  fill_scaled  specify only one or two fill colors,\n",
+        "With  fill_scaled  specify one or two fill colors,\n",
         "  for either a sequential or a divergent color palette.\n\n")
     }
 
@@ -1976,6 +2043,44 @@ align_vector <- function(vec, by.call) {
   pp <- parse(text=txt)
 
   return(eval(pp))   # get fill
+}
+
+
+.auto_text_color <- function(cols, bg = "white", threshold = 0.5) {
+  # cols: vector of hex ("#RRGGBB"), rgba("r,g,b,a"), or R color names
+  # bg:   fallback if col2rgb fails
+  # threshold: luminance cutoff for black/white switch
+
+  parse_one <- function(col) {
+    col <- as.character(col)
+
+    if (grepl("^rgba?\\(", col)) {
+      # rgba(r,g,b,...) form
+      nums <- suppressWarnings(as.numeric(strsplit(gsub("[rgba() ]", "", col), ",")[[1]]))
+      r <- nums[1]; g <- nums[2]; b <- nums[3]
+    } else {
+      # try normal R color or hex
+      rgb <- tryCatch(
+        grDevices::col2rgb(col)[, 1],
+        error = function(e) grDevices::col2rgb(bg)[, 1]
+      )
+      r <- rgb[1]; g <- rgb[2]; b <- rgb[3]
+    }
+
+    # normalize to [0,1]
+    r <- r/255; g <- g/255; b <- b/255
+
+    # linearize (sRGB companding)
+    lin <- function(u) ifelse(u <= 0.03928, u/12.92, ((u+0.055)/1.055)^2.4)
+    rL <- lin(r); gL <- lin(g); bL <- lin(b)
+
+    # relative luminance
+    L <- 0.2126*rL + 0.7152*gL + 0.0722*bL
+
+    if (is.na(L)) "black" else if (L < threshold) "white" else "black"
+  }
+
+  vapply(cols, parse_one, character(1))
 }
 
 
@@ -2101,7 +2206,7 @@ align_vector <- function(vec, by.call) {
 }
 
 
-# remove x=  and y= for suggestions for Plot
+# remove x=  and y= for suggestions for XY
 .rm.arg.2 <-  function(argm, fc) {
 
   fc <- sub(",,", ",", fc, fixed=TRUE)
@@ -2111,7 +2216,7 @@ align_vector <- function(vec, by.call) {
   fc3 <- gsub("  ", " ", fc2, fixed=TRUE)
   fc3 <- gsub(") #", ")  #", fc3, fixed=TRUE)  # restore blank before #
 
-  if (grepl("(", argm, fixed=TRUE)) fc3 <- gsub("Plot", "Plot(", fc3)
+  if (grepl("(", argm, fixed=TRUE)) fc3 <- gsub("XY", "XY(", fc3)
   fc3 <- gsub("((", "(", fc3, fixed=TRUE)
   fc3 <- sub(", ,", ",", fc3, fixed=TRUE)
 
@@ -2161,6 +2266,160 @@ align_vector <- function(vec, by.call) {
     x.date <- as.character(format(x.date, "%Y"))
   else
     x.date <- as.character(x.date)
+}
+
+
+# A base-R resolver for x, y, by, facet1, facet2, ID that supports the common forms:
+# 	•	bare name: by = Gender
+# 	•	character name: by = "Gender"
+# 	•	numeric index: by = 3
+# 	•	expression: by = cut(Age, 5) or by = interaction(Sex, Dept)
+# 	•	missing / NULL
+
+# It also lets you request coercion (e.g., make by/facets factors).
+
+# The .resolve_one() approach works cleanly even when by = NULL (or facet1, facet2, ID, etc. are omitted). The helper is designed to always return the same shape of result, with present = FALSE if the argument was missing or NULL.
+
+#  rby <- .resolve_one(data, by, want = "factor")
+#  by.name <- rby$name; by.call <- rby$value
+
+
+`%||%` <- function(a,b) if (is.null(a) || !length(a)) b else a
+
+# want: "auto","factor","numeric","character","logical","no"
+.resolve <- function(data, arg,
+                     want = c("auto","factor","numeric","character","logical","no")) {
+  want <- match.arg(want)
+  out  <- list(present = FALSE, name = NULL, value = NULL)
+  if (missing(arg) || is.null(arg)) return(out)
+
+  expr <- substitute(arg)
+
+  if (is.data.frame(data)) {
+    if (is.character(arg) && length(arg) == 1L && arg %in% names(data)) {
+      val <- data[[arg]]; nm <- arg
+    } else if (is.numeric(arg) && length(arg) == 1L && is.finite(arg) &&
+               arg >= 1 && arg <= ncol(data)) {
+      val <- data[[arg]]; nm <- names(data)[arg] %||% paste0("V", arg)
+    } else {
+      # Evaluate inside a data mask; base functions available; no global leakage
+      data_env <- list2env(data, parent = baseenv())
+      val <- try(eval(expr, envir = data_env), silent = TRUE)
+      if (inherits(val, "try-error")) return(out)
+      nm <- deparse(expr, nlines = 1)
+    }
+  } else {
+    # data = NULL → resolve in caller/global env
+    val <- try(eval(expr, envir = parent.frame(), enclos = baseenv()), silent = TRUE)
+    if (inherits(val, "try-error")) {
+      if (is.character(arg) && length(arg) == 1L &&
+          exists(arg, envir = parent.frame(), inherits = TRUE)) {
+        val <- get(arg, envir = parent.frame(), inherits = TRUE); nm <- arg
+      } else return(out)
+    } else nm <- deparse(expr, nlines = 1)
+  }
+
+  val <- switch(want,
+    auto      = val,
+    factor    = if (is.factor(val)) val else factor(val),
+    numeric   = suppressWarnings(as.numeric(val)),
+    character = as.character(val),
+    logical   = as.logical(val),
+    no        = val
+  )
+
+  out$present <- TRUE; out$name <- nm; out$value <- val; out
+}
+
+
+.vbs_summary_table <- function(x_vec, grp_vec, grp_label, digits_d = NULL) {
+
+  .vbs_stats <- function(z) {
+    z <- z[!is.na(z)]
+    c(
+      n      = length(z),
+      Mean   = mean(z),
+      Median = median(z),
+      SD     = stats::sd(z),
+      IQR    = stats::IQR(z),
+      Min    = min(z),
+      Max    = max(z)
+    )
+  }
+
+  ## ---- grouped vs ungrouped ----
+  if (!is.null(grp_vec)) {
+    tmp_list <- tapply(x_vec, grp_vec, .vbs_stats)
+    mat      <- do.call(rbind, tmp_list)     # groups x stats
+    grp_vals <- names(tmp_list)
+  } else {
+    mat      <- rbind(.vbs_stats(x_vec))     # 1 x stats
+    grp_vals <- grp_label
+  }
+
+  ## Build data frame first
+  res <- data.frame(
+    grp = grp_vals,
+    mat,
+    row.names        = NULL,
+    check.names      = FALSE,
+    stringsAsFactors = FALSE
+  )
+  names(res)[1] <- grp_label
+
+  ## ---- Apply .fmt() if digits_d specified ----
+  if (!is.null(digits_d)) {
+    num_cols <- vapply(res, is.numeric, logical(1))
+    num_cols[1] <- FALSE  # don't format the group label column
+
+    res[, num_cols] <- lapply(
+      res[, num_cols, drop = FALSE],
+      function(col) .fmt(col, d = digits_d)
+    )
+  }
+
+  ## Convert to character array for output
+  tx <- .df_char(res)
+  class(tx) <- "out"
+  tx
+}
+
+
+# ---- Drop casewise missing across x, y, by, facet -----------------------
+
+.drop_casewise_missing <- function(x.call = NULL,
+                                   y.call = NULL,
+                                   by.call = NULL,
+                                   facet.call = NULL) {
+  # Build a combined data.frame of all columns we care about
+  blocks <- list()
+
+  if (!is.null(x.call)) {
+    # vector, matrix, or data.frame
+    x_df <- as.data.frame(x.call)
+    blocks[["x"]] <- x_df
+  }
+
+  if (!is.null(y.call)) {
+    blocks[["y"]] <- data.frame(..y = y.call)
+  }
+
+  if (!is.null(by.call)) {
+    # vector, matrix, or data.frame (incl. cbind(Gender, Plan))
+    by_df <- as.data.frame(by.call)
+    blocks[["by"]] <- by_df
+  }
+
+  if (!is.null(facet.call)) {
+    # vector, matrix, or data.frame (incl. two facet vars)
+    facet_df <- as.data.frame(facet.call)
+    blocks[["facet"]] <- facet_df
+  }
+
+  if (!length(blocks)) return(NULL)
+
+  df <- do.call(cbind, blocks)
+  stats::complete.cases(df)
 }
 
 

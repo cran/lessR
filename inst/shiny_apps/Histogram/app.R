@@ -32,7 +32,7 @@ addResourcePath("shiny_dir", system.file("shiny_apps", package="lessR"))
 
 
 ui <- fluidPage(
-tags$head(tags$link(rel="stylesheet", href="shiny_dir/styles.css")),
+  tags$head(tags$link(rel="stylesheet", href="shiny_dir/styles.css")),
 
   tabsetPanel(
 
@@ -84,43 +84,43 @@ tags$head(tags$link(rel="stylesheet", href="shiny_dir/styles.css")),
         sidebarPanel(
           selectInput('x.col', 'x Variable', ""),
 
-        tags$hr(),
-        checkboxInput("myBins", div("Bins", class="view"), FALSE),
-        conditionalPanel(condition="input.myBins == true",
-          uiOutput("slider_bw"),
-          uiOutput("slider_bs")
-        ),
+          tags$hr(),
+          checkboxInput("myBins", div("Bins", class="view"), FALSE),
+          conditionalPanel(condition="input.myBins == true",
+            uiOutput("slider_bw"),
+            uiOutput("slider_bs")
+          ),
 
-        tags$hr(),
-        checkboxInput("myGeom", div("Colors", class="view"), FALSE),
-        conditionalPanel(condition="input.myGeom == true",
-          selectInput("myFill", "fill",
-             choices=list("Constant"=clr.one,
-                          "Qualitative"=clr.qual,
-                          "Sequential"=clr.seq)),
-          selectInput("myColor", "color", choices=clr.edge),
-          sliderInput("myTrans", "transparency", min=0, max=1, value=0)
-        ),
+          tags$hr(),
+          checkboxInput("myGeom", div("Colors", class="view"), FALSE),
+          conditionalPanel(condition="input.myGeom == true",
+            selectInput("myFill", "fill",
+               choices=list("Constant"=clr.one,
+                            "Qualitative"=clr.qual,
+                            "Sequential"=clr.seq)),
+            selectInput("myColor", "color", choices=clr.edge),
+            sliderInput("myTrans", "transparency", min=0, max=1, value=0)
+          ),
 
-        tags$hr(),
-        checkboxInput("myValCm", div("Values, Cumulate", class="view"), FALSE),
-        conditionalPanel(condition="input.myValCm == true",
-          checkboxInput("myValues", "values", value=FALSE),
-          selectInput("myCumlt", "cumulate", choices=list("off", "on", "both"))
-        ),
+          tags$hr(),
+          checkboxInput("myValCm", div("Counts, Cumulate", class="view"), FALSE),
+          conditionalPanel(condition="input.myValCm == true",
+            checkboxInput("myValues", "counts", value=FALSE),
+            selectInput("myCumlt", "cumulate", choices=list("off", "on", "both"))
+          ),
 
-        tags$hr(),
-        checkboxInput("mySmooth", div("Smooth", class="view"), FALSE),
-        conditionalPanel(condition="input.mySmooth == true",
-          checkboxInput("myDens", "density", TRUE),
-          checkboxInput("myHist", "show_histogram", TRUE),
-          checkboxInput("myRug", "rug", FALSE),
-          radioButtons("myType", "type",
-                     c("general"="general", "normal"="normal", "both"="both")),
-          uiOutput("slider_bndwd"),
-          selectInput("myFill_gen", "fill_general", choices=clr.den_g),
-          selectInput("myFill_nrm", "fill_normal", choices=clr.den_n)
-        ),
+          tags$hr(),
+          checkboxInput("mySmooth", div("Smooth", class="view"), FALSE),
+          conditionalPanel(condition="input.mySmooth == true",
+            checkboxInput("myDens", "density", TRUE),
+            checkboxInput("myHist", "show_histogram", TRUE),
+            checkboxInput("myRug", "rug", FALSE),
+            radioButtons("myKind", "kind",
+                       c("general"="general", "normal"="normal", "both"="both")),
+            uiOutput("slider_bndwd"),
+            selectInput("myFill_gen", "fill_general", choices=clr.den_g),
+            selectInput("myFill_nrm", "fill_normal", choices=clr.den_n)
+          ),
 
           tags$hr(),
           checkboxInput("do_pdf", div("Save", class="view"), FALSE),
@@ -138,15 +138,15 @@ tags$head(tags$link(rel="stylesheet", href="shiny_dir/styles.css")),
 
         ),  # end sidebarPanel
 
-      mainPanel(
-        plotOutput('myPlot'),
-        verbatimTextOutput("summary"),
-        plotOutput("saved_plot"),
-        textOutput("help")
-      )
+        mainPanel(
+          plotOutput('myPlot'),
+          verbatimTextOutput("summary"),
+          plotOutput("saved_plot"),
+          textOutput("help")
+        )
 
-    )  # end pageWithSidebar
-  )  # end tabPanel 2
+      )  # end pageWithSidebar
+    )  # end tabPanel 2
   )  # end tabsetPanel
 )  # end fluidPage
 
@@ -159,8 +159,8 @@ server <- function(input, output, session) {
   v$x.new <- FALSE
 
 
-# ------- Read and Display Data -----------
-# -----------------------------------------
+  # ------- Read and Display Data -----------
+  # -----------------------------------------
 
   # process the URL for reading from the web
   theURL <- eventReactive(input$submitURL, {
@@ -178,7 +178,7 @@ server <- function(input, output, session) {
       if (!(grepl("http://", url)))
         url <- paste("http://", url, sep="")
       myPath <- url
-       theRead <- myPath
+      theRead <- myPath
     }
 
     shiny::req(myPath)
@@ -192,21 +192,21 @@ server <- function(input, output, session) {
         stopApp()
       }
     }
-      if (input$fType == "Text") {
-        if ((grepl(".csv", myPath, fixed=TRUE)) ||
-            (grepl(".txt", myPath, fixed=TRUE))) {
-            d <- read.csv(myPath, sep=input$sep, dec=input$decimal,
-                          na.strings="")  # default is NOT a blank char missing
-        }
-        else {
-          message("\n>>> Text file must have file type of .csv or .txt <<<\n\n")
-          stopApp()
-        }
-      }  # end fType is "Text"
+    if (input$fType == "Text") {
+      if ((grepl(".csv", myPath, fixed=TRUE)) ||
+          (grepl(".txt", myPath, fixed=TRUE))) {
+        d <- read.csv(myPath, sep=input$sep, dec=input$decimal,
+                      na.strings="")  # default is NOT a blank char missing
+      }
+      else {
+        message("\n>>> Text file must have file type of .csv or .txt <<<\n\n")
+        stopApp()
+      }
+    }  # end fType is "Text"
 
     updateSelectInput(session, inputId="x.col", label="x variable",
                       choices=c("Select a numerical variable" = "",
-                              names(d)[sapply(d, is.numeric)]))
+                                names(d)[sapply(d, is.numeric)]))
 
     return(d)
   })  # end reactive()
@@ -243,11 +243,11 @@ server <- function(input, output, session) {
     }
   }, striped=TRUE)  # end renderTable
 
-# -----------------------------------------
+  # -----------------------------------------
 
 
-# ------- Bin Width and Bin Start ---------
-# -----------------------------------------
+  # ------- Bin Width and Bin Start ---------
+  # -----------------------------------------
 
   # get default bin_width and bin_start values for initial histogram
   #  and bin width and start sliders
@@ -292,28 +292,28 @@ server <- function(input, output, session) {
 
 
 
-# ---------- Density Bandwidth ------------
-# -----------------------------------------
+  # ---------- Density Bandwidth ------------
+  # -----------------------------------------
   get_bw <- function(x) {
-      bw <- bw.nrd0(x)
-      irep <- 0
-      repeat {  # iterated value of bw
-        irep <- irep + 1
-        d.gen <- suppressWarnings(density(x, bw))  # no missing data
-        xd <- diff(d.gen$y)
-        flip <- 0
-        for (j in 2:length(xd))
-          if (sign(xd[j-1]) != sign(xd[j])) flip <- flip + 1
-        if (flip > 1  &&  irep <= 25)
-          bw <- 1.1 * bw
-        else
-          break;
-      }  # end repeat
+    bw <- bw.nrd0(x)
+    irep <- 0
+    repeat {  # iterated value of bw
+      irep <- irep + 1
+      d.gen <- suppressWarnings(density(x, bw))  # no missing data
+      xd <- diff(d.gen$y)
+      flip <- 0
+      for (j in 2:length(xd))
+        if (sign(xd[j-1]) != sign(xd[j])) flip <- flip + 1
+      if (flip > 1  &&  irep <= 25)
+        bw <- 1.1 * bw
+      else
+        break;
+    }  # end repeat
 
-      v$bndwd <- bw  # cutoff of 7 to keep bw*.15 > 1
-      v$bndwd1 <- ifelse (bw>7, floor(bw*0.15), round(bw*0.15, 2))
-      if (v$bndwd1 == 0) v$bndwd1 <- 0.00001
-      v$bndwd2 <- ifelse (bw>7, ceiling(bw*1.5), round(bw*1.5, 2))
+    v$bndwd <- bw  # cutoff of 7 to keep bw*.15 > 1
+    v$bndwd1 <- ifelse (bw>7, floor(bw*0.15), round(bw*0.15, 2))
+    if (v$bndwd1 == 0) v$bndwd1 <- 0.00001
+    v$bndwd2 <- ifelse (bw>7, ceiling(bw*1.5), round(bw*1.5, 2))
   }
 
   observeEvent(input$x.col, {  # if switch variable
@@ -349,27 +349,27 @@ server <- function(input, output, session) {
   })
 
 
-# ------------ The Histogram --------------
-# -----------------------------------------
+  # ------------ The Histogram --------------
+  # -----------------------------------------
 
   output$myPlot <- renderPlot({
     if (input$myBins) {
       if (is.null(input$slider_bw)) {
-    # bin_width slider, only activates for a variable change
-    output$slider_bw <- renderUI({
-      req(!is.null(v$bw1))
-      sliderInput(inputId="slider_bw", label="bin_width",
-                  min=v$bw1, max=v$bw2, value=v$bw)
-    })
+        # bin_width slider, only activates for a variable change
+        output$slider_bw <- renderUI({
+          req(!is.null(v$bw1))
+          sliderInput(inputId="slider_bw", label="bin_width",
+                      min=v$bw1, max=v$bw2, value=v$bw)
+        })
       }
 
-    # bin_start slider, only activates for a variable change
+      # bin_start slider, only activates for a variable change
       if (is.null(input$slider_bs)) {
-    output$slider_bs <- renderUI({
-      req(!is.null(v$bs1))
-      sliderInput(inputId="slider_bs", label="bin_start",
-                  min=v$bs1, max=v$bs2, value=v$bs)
-    })
+        output$slider_bs <- renderUI({
+          req(!is.null(v$bs1))
+          sliderInput(inputId="slider_bs", label="bin_start",
+                      min=v$bs1, max=v$bs2, value=v$bs)
+        })
       }
     }
 
@@ -380,8 +380,8 @@ server <- function(input, output, session) {
         if (!input$myBins)
           updateSliderInput(session,"slider_bw", min=v$bw1, max=v$bw2,
                             value=v$bw)
-      req(input$slider_bw >= v$bw1)  # takes a while for the update
-      req(input$slider_bw <= v$bw2)
+        req(input$slider_bw >= v$bw1)  # takes a while for the update
+        req(input$slider_bw <= v$bw2)
       }
     }
     if (!is.null(input$slider_bs)) {
@@ -389,8 +389,8 @@ server <- function(input, output, session) {
         if (!input$myBins)
           updateSliderInput(session,"slider_bs", min=v$bs1, max=v$bs2,
                             value=v$bs)
-      req(input$slider_bs >= v$bs1)  # takes a while for the update
-      req(input$slider_bs <= v$bs2)
+        req(input$slider_bs >= v$bs1)  # takes a while for the update
+        req(input$slider_bs <= v$bs2)
       }
     }
 
@@ -417,16 +417,17 @@ server <- function(input, output, session) {
     in.bs <- ifelse (is.null(input$slider_bs), v$bs, input$slider_bs)
     v$in.den <- ifelse (input$mySmooth, TRUE, FALSE)
 
-    out <- paste("Histogram(", x.name, sep="")
+    out <- paste("X(", x.name, sep="")
 
     if (!v$in.den) {
 
-      v$h <- Histogram(x, data=NULL,
-             bin_width=in.bw, bin_start=in.bs, bin_end=NULL,
-             fill=input$myFill, color=input$myColor, transparency=input$myTrans,
-             values=input$myValues, cumulate=input$myCumlt,
-             xlab=x.name, ylab=y.name,
-             quiet=TRUE)
+      v$h <- X(x, data=NULL,
+               type="histogram",
+               bin_width=in.bw, bin_start=in.bs, bin_end=NULL,
+               fill=input$myFill, color=input$myColor, transparency=input$myTrans,
+               counts=input$myValues, cumulate=input$myCumlt,
+               xlab=x.name, ylab=y.name,
+               quiet=TRUE)
 
       p_bin_width <- in.bw == v$bw
       p_bin_start <- in.bs == v$bs
@@ -436,13 +437,13 @@ server <- function(input, output, session) {
       p_values <- input$myValues == FALSE
       p_cumul <- input$myCumlt == "off"
 
-  if (!p_bin_width) out <- paste(out, ", bin_width=", in.bw, sep="")
-  if (!p_bin_start) out <- paste(out, ", bin_start=", in.bs, sep="")
-  if (!p_fill) out <- paste(out, ", fill=\"", input$myFill, "\"", sep="")
-  if (!p_color) out <- paste(out, ", color=\"", input$myColor, "\"", sep="")
-  if (!p_trans) out <- paste(out, ", transparency=", input$myTrans, sep="")
-  if (!p_values) out <- paste(out, ", values=", input$myValues, sep="")
-  if (!p_cumul) out <- paste(out, ", cumulate=\"", input$myCumlt, "\"", sep="")
+      if (!p_bin_width) out <- paste(out, ", bin_width=", in.bw, sep="")
+      if (!p_bin_start) out <- paste(out, ", bin_start=", in.bs, sep="")
+      if (!p_fill) out <- paste(out, ", fill=\"", input$myFill, "\"", sep="")
+      if (!p_color) out <- paste(out, ", color=\"", input$myColor, "\"", sep="")
+      if (!p_trans) out <- paste(out, ", transparency=", input$myTrans, sep="")
+      if (!p_values) out <- paste(out, ", counts=", input$myValues, sep="")
+      if (!p_cumul) out <- paste(out, ", cumulate=\"", input$myCumlt, "\"", sep="")
     }
 
     else {  # density plot
@@ -450,38 +451,40 @@ server <- function(input, output, session) {
 
       fg.rgb <- col2rgb(input$myFill_gen)
       v$fg.trns <- rgb(fg.rgb[1], fg.rgb[2], fg.rgb[3],
-                     alpha=80, maxColorValue=255)
+                       alpha=80, maxColorValue=255)
       fn.rgb <- col2rgb(input$myFill_nrm)
       v$fn.trns <- rgb(fn.rgb[1], fn.rgb[2], fn.rgb[3],
-                     alpha=80, maxColorValue=255)
+                       alpha=80, maxColorValue=255)
 
-      v$h <- Histogram(x, data=NULL,
-             bin_width=in.bw, bin_start=in.bs,
-             stat="density", rug=input$myRug, type=input$myType,
-             bandwidth=input$slider_bndwd, show_histogram=input$myHist,
-             fill_general=v$fg.trns, fill_normal=v$fn.trns,
-             xlab=x.name, ylab=y.name, quiet=TRUE)
+      v$h <- X(x, data=NULL,
+               type="histogram",
+               bin_width=in.bw, bin_start=in.bs,
+               stat="density", rug=input$myRug, kind=input$myKind,
+               bandwidth=input$slider_bndwd, show_histogram=input$myHist,
+               fill_general=v$fg.trns, fill_normal=v$fn.trns,
+               xlab=x.name, ylab=y.name, quiet=TRUE)
 
       p_dens <- input$myDens == FALSE
       p_rug <- input$myRug == FALSE
-      p_type <- input$myType == "general"
+      p_kind <- input$myKind == "general"
       p_bw <- (abs(input$slider_bndwd-v$bndwd) < 1)
       p_hist <- input$myHist == TRUE
       p_fill_general <- input$myFill_gen == "steelblue3"
       p_fill_normal <- input$myFill_nrm == "pink1"
-      if (!p_dens) out <- paste(out, ", stat='density'", sep="")
 
+      if (!p_dens) out <- paste(out, ", stat='density'", sep="")
       if (!p_rug) out <- paste(out, ", rug=", input$myRug, sep="")
-      if (!p_type) out <- paste(out, ", type=\"", input$myType, "\"", sep="")
+      if (!p_kind) out <- paste(out, ", type=\"", input$myKind, "\"", sep="")
       if (!p_bw) out <- paste(out, ", bandwidth=", input$slider_bndwd, sep="")
       if (!p_hist) out <- paste(out, ", show_histogram=",input$myHist, sep="")
       if (!p_fill_general) out <- paste(out, ", fill_general=\"",
                                         input$myFill_gen, "\"", sep="")
       if (!p_fill_normal) out <- paste(out, ", fill_normal=\"",
-                                      input$myFill_nrm, "\"", sep="")
+                                       input$myFill_nrm, "\"", sep="")
     }  # end dens
 
-    out <- paste(out, ")", sep="")
+    # always explicit about type
+    out <- paste(out, ", type=\"histogram\")", sep="")
     cat(out, "\n")
     v$code <- out  # save the code for a pdf file
 
@@ -489,21 +492,19 @@ server <- function(input, output, session) {
     # print stats
     output$summary <- renderPrint({
 
-    shiny::req(v$h)
-    h <- v$h
+      shiny::req(v$h)
+      h <- v$h
 
-#   v$go <- TRUE
-#   if (v$go) {
       if (!v$in.den)
         out2 <- c(h$out_summary, " ", h$out_outliers, " ", h$out_freq)
       else
         out2 <- c(h$out_stats, " ", h$out_ss, " ", h$out_outliers)
       for (i in 1:length(out2)) cat(out2[i], "\n")
-#   }
-  })
+    })
 
-  v$x.new <- FALSE
+    v$x.new <- FALSE
   })  # end renderPlot
+
 
   # clicking on the Save button generates a pdf file
   plotInput <- eventReactive(input$btn_pdf, {
@@ -523,23 +524,25 @@ server <- function(input, output, session) {
     style(axis_cex=getOption("l.axc"))
 
     if (!v$in.den)
-      Histogram(x, data=NULL,
-             bin_width=input$slider_bw, bin_start=input$slider_bs,
-             fill=input$myFill, color=input$myColor, transparency=input$myTrans,
-             values=input$myValues, cumulate=input$myCumlt,
-             xlab=x.name, ylab=y.name, quiet=TRUE,
-             pdf_file=pdf.path,
-             width=as.numeric(input$w), height=as.numeric(input$h))
+      X(x, data=NULL,
+        type="histogram",
+        bin_width=input$slider_bw, bin_start=input$slider_bs,
+        fill=input$myFill, color=input$myColor, transparency=input$myTrans,
+        counts=input$myValues, cumulate=input$myCumlt,
+        xlab=x.name, ylab=y.name, quiet=TRUE,
+        pdf_file=pdf.path,
+        width=as.numeric(input$w), height=as.numeric(input$h))
 
     else  # density
-      Histogram(x, data=NULL,
-             bin_width=input$slider_bw, bin_start=input$slider_bs,
-             density=input$myDens, rug=input$myRug, type=input$myType,
-             bandwidth=input$slider_bndwd, show_histogram=input$myHist,
-             fill_general=v$fg.trns, fill_normal=v$fn.trns,
-             xlab=x.name, ylab=y.name, quiet=TRUE,
-             pdf_file=pdf.path,
-             width=as.numeric(input$w), height=as.numeric(input$h))
+      X(x, data=NULL,
+        type="histogram",
+        bin_width=input$slider_bw, bin_start=input$slider_bs,
+        stat="density", rug=input$myRug, type=input$myType,
+        bandwidth=input$slider_bndwd, show_histogram=input$myHist,
+        fill_general=v$fg.trns, fill_normal=v$fn.trns,
+        xlab=x.name, ylab=y.name, quiet=TRUE,
+        pdf_file=pdf.path,
+        width=as.numeric(input$w), height=as.numeric(input$h))
 
     # reset back to shiny setting
     style(lab_cex=1.201, axis_cex=1.011, suggest=FALSE)
@@ -570,7 +573,7 @@ server <- function(input, output, session) {
       cat("# The # symbol indicates a comment rather than an R instruction\n\n",
           "# Begin the R session by loading the lessR functions ",
           "from the library\n", sep="", file=r.path)
-      cat("library(\"lessR\")\n\n", file=r.path, append=TRUE)
+    cat("library(\"lessR\")\n\n", file=r.path, append=TRUE)
 
     if (input$do_cmt) {
       cat("# Read your data into an R data table, the data frame, here d",
@@ -600,11 +603,11 @@ server <- function(input, output, session) {
     cat(code, "\n\n", file=r.path, append=TRUE)
 
 
-    anlys <- "Histogram()"
+    anlys <- "X()"
     if (input$do_cmt)
       cat("# If accessing data with a name other than d, must add  data=NAME\n",
           paste("#   to the", anlys, "call, where NAME is the name of your",
-          "data frame"), "\n", sep="", file=r.path, append=TRUE)
+                "data frame"), "\n", sep="", file=r.path, append=TRUE)
 
   })
   output$saved_plot <- renderPlot({ plotInput() })

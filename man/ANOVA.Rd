@@ -18,6 +18,7 @@ ANOVA(my_formula, data=d, filter=NULL,
          brief=getOption("brief"), digits_d=NULL, 
          Rmd=NULL, jitter_x=0.4,
          res_rows=NULL, res_sort=c("zresid", "fitted", "off"),
+         quiet=getOption("quiet"), 
          graphics=TRUE, pdf=FALSE, width=5, height=5,
          fun_call=NULL, \dots)
 
@@ -55,6 +56,8 @@ av_brief(\dots, brief=TRUE)
        as the sort criterion for the display of the rows of data and associated
        residuals. Other values are \code{"fitted"} for the fitted values and
       \code{"off"} to not sort the rows of data.}
+  \item{quiet}{If set to \code{TRUE}, no text output. Can change system default
+       with \code{\link{style}} function.}
   \item{graphics}{Produce graphics. Default is \code{TRUE}.  In \code{Rmd} can
         be useful to set to \code{FALSE} so that \code{\link{regPlot}} can be used
         to place the graphics within the output file.}

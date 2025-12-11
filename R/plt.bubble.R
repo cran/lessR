@@ -1,6 +1,6 @@
 .plt.bubble <-
 function(x, y, size, radius, power, fill, color,
-         size_cut, prop, bubble_text, object) {
+         size_cut, prop, bubble_text, object, pt.trans) {
 
   cords <- data.frame(x, y, size)
   cords <- na.omit(cords)
@@ -9,9 +9,11 @@ function(x, y, size, radius, power, fill, color,
   adj <- .RSadj(radius=radius)  # reg R multiply by 1.6
   radius <- adj$radius
 
+  fill.alpha <- fill
+# fill.alpha <- .maketrans(fill, pt.trans)  # wipes out all fill color
   sz <- cords[,3]**power  # radius unscaled for all the points
   symbols(cords[,1], cords[,2], circles=sz, inches=radius,
-          fg=color, bg=fill, add=TRUE)
+          fg=color, bg=fill.alpha, add=TRUE)
   mxru <- max(sz)
   sz <- 2 * (sz/mxru) * radius  # scaled diameter
 

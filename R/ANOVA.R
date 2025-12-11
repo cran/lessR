@@ -3,6 +3,7 @@ function(my_formula, data=d, filter=NULL,
          brief=getOption("brief"), digits_d=NULL,
          Rmd=NULL, jitter_x=0.4,
          res_rows=NULL, res_sort=c("zresid", "fitted", "off"),
+         quiet=getOption("quiet"), 
          graphics=TRUE, pdf=FALSE, width=5, height=5,
          fun_call=NULL, ...) {
 
@@ -342,6 +343,9 @@ function(my_formula, data=d, filter=NULL,
 
   class(output) <- "out_all"
 
-  return(output)
+  if (!quiet)
+    return(output)
+  else
+    invisible(output)
 
 }

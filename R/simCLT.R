@@ -1,25 +1,20 @@
 simCLT <- 
 function(ns, n, p1=0, p2=1, seed=NULL,
-         type=c("normal", "uniform", "lognormal", "antinormal"),
+         dist=c("normal", "uniform", "lognormal", "antinormal"),
          fill="lightsteelblue3", n_display=0, digits_d=3, 
          subtitle=TRUE, pop=TRUE, 
          main=NULL, pdf=FALSE, width=5, height=5, ...) {
 
 
-  # a dot in a parameter name to an underscore
   dots <- list(...)
-  if (!is.null(dots)) if (length(dots) > 0) {
-    change <- c("n.display", "digits.d")
-    for (i in 1:length(dots)) {
-      if (names(dots)[i] %in% change) {
-        nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
-        assign(nm, dots[[i]])
-        get(nm)
-      }
-    }
+  if (!is.null(dots$type)) {
+    message("\nThe argument 'type' is deprecated in simCLT().\n",
+            "Please use 'dist' instead, e.g. simCLT(..., dist = 'normal').\n")
+    dist <- dots$type
+    dots$type <- NULL
   }
 
-  type <- match.arg(type)
+  dist <- match.arg(dist)
 
   if (missing(ns)) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
@@ -49,7 +44,7 @@ function(ns, n, p1=0, p2=1, seed=NULL,
   # data generation and plot population
   if (!is.null(seed)) set.seed(seed)
 
-  if (type == "normal") {
+  if (dist == "normal") {
     mu <- p1
     sigma <- p2
     data.raw <- rnorm(ns*n, mu, sigma)
@@ -58,9 +53,10 @@ function(ns, n, p1=0, p2=1, seed=NULL,
       prob_znorm(mu=mu, sigma=sigma, xlab="Normal Population", 
                  r=0.535, g=0.610, b=0.704)
     }
-  }
+  }  # end dist is normal
 
-  if (type == "uniform") {
+
+  if (dist == "uniform") {
     min <- p1
     max <- p2
     mu <- (min + max) / 2
@@ -72,7 +68,8 @@ function(ns, n, p1=0, p2=1, seed=NULL,
       x.max <- max + 2
       x <- seq(x.min, x.max, length=500)
       y <- dunif(x, min, max)
-      plot(x, y, type="n", ylim=c(0,max(y)+.1), axes=FALSE, xlab="", ylab="")
+      plot.new()
+      plot.window(xlim=range(x), ylim=c(0, max(y)+.1))
       if (max-min < 10) axis(1, at=seq(x.min, x.max, by=1)) else axis(1)
       usr <- par("usr")
       rect(usr[1], usr[3], usr[2], usr[4], col="ghostwhite", border="black")
@@ -82,9 +79,10 @@ function(ns, n, p1=0, p2=1, seed=NULL,
       else txt=""  
       title(xlab="Uniform Population", sub=txt)  
     }
-  }
+  }  # end dist is uniform
 
-  if (type == "lognormal") {
+
+  if (dist == "lognormal") {
     meanlog <- p1
     sdlog <- p2
     varlog <- sdlog^2
@@ -98,7 +96,8 @@ function(ns, n, p1=0, p2=1, seed=NULL,
       x.max <- ceiling(mu + 4*sigma)
       x <- seq(0, x.max, length=500)
       y <- dlnorm(x, meanlog=meanlog, sdlog=sdlog)
-      plot(x, y, type="n", axes=FALSE, xlab="", ylab="")
+      plot.new()
+      plot.window(xlim = range(x), ylim = range(y))
       axis(1)
       usr <- par("usr")
       rect(usr[1], usr[3], usr[2], usr[4], col="ghostwhite", border="black")
@@ -109,9 +108,10 @@ function(ns, n, p1=0, p2=1, seed=NULL,
       else txt=""  
       title(xlab="Lognormal Population", sub=txt)
     }
-  }
+  }  # end dist is lognormal
 
-  if (type == "antinormal") {
+
+  if (dist == "antinormal") {
 
     if (!requireNamespace("triangle", quietly=TRUE)) {
       stop("Package \"triangle\" needed for these simulations\n",
@@ -136,9 +136,9 @@ function(ns, n, p1=0, p2=1, seed=NULL,
 
     if (pop) {
       x1 <- seq(0, x.max/2, length=250)
-      y1 <- triangle::dtriangle(x1, a=0, b=x.max/2, c=0+.01)  # triangle function
-      plot(0, type="n", axes=FALSE, xlim=c(0-.5, x.max+.5),
-           ylim=c(0,max(y1)+.1), xlab="", ylab="")
+      y1 <- triangle::dtriangle(x1, a=0, b=x.max/2, c=0+.01) # triangle function
+      plot.new()
+      plot.window(xlim = c(0 - .5, x.max + .5), ylim = c(0, max(y1) + .1))
       axis(1)
       usr <- par("usr")
       rect(usr[1], usr[3], usr[2], usr[4], col="ghostwhite", border="black")
@@ -155,7 +155,7 @@ function(ns, n, p1=0, p2=1, seed=NULL,
       else txt=""  
       title(xlab="Anti-Normal Population", sub=txt)
     }
-  }
+  }  # end dist is "antinormal" 
 
   if (pdf) {
     dev.off()
@@ -172,7 +172,7 @@ function(ns, n, p1=0, p2=1, seed=NULL,
   cat("\n")
   cat("Population mean, mu :", mu, "\n")
   if (!is.null(sigma)) cat("Pop std dev, sigma  :", sigma, "\n")
-  if (type == "lognormal") {
+  if (dist == "lognormal") {
     cat("Population skew:     ", pop.skew, "\n")
     cat("Population median:   ", pop.med, "\n")
   }
@@ -202,14 +202,15 @@ function(ns, n, p1=0, p2=1, seed=NULL,
     pdf(file=pdf_file, width=width, height=height)
   }
 
-  .dn.main(Ymean, type="normal", xlab="", 
+  .dn.main(Ymean, kind="normal", xlab="", 
          fill_hist=fill, 
          col.nrm="black", col.gen="black",
-         fill_nrm="transparent",
-         fill_gen="transparent",
+         fill_nrm="transparent", fill_gen="transparent",
+         use_plotly=FALSE,
          quiet=TRUE, pdf_file=NULL)
   if (subtitle) 
-    txt <- paste(toString(sprintf("%i", ns)), "samples, each of size", toString(n), "from", type)
+    txt <- paste(toString(sprintf("%i", ns)),
+                 "samples, each of size", toString(n), "from", dist)
   else txt=""
   title(xlab="Sample Mean", sub=txt)
 
@@ -225,9 +226,9 @@ function(ns, n, p1=0, p2=1, seed=NULL,
   cat("\n")
   cat("Observed 95% range of Sample Mean\n", 
       "   Original Units:",  quantile(Ymean, prob=c(.025,.975)),"\n")
-  if (type != "antinormal") se <- sigma /sqrt(n) else se <- sx / sqrt(n)
+  if (dist != "antinormal") se <- sigma /sqrt(n) else se <- sx / sqrt(n)
   z <- (Ymean-mu) / se
-  if (type == "antinormal") cat("   Estimated from Data,")
+  if (dist == "antinormal") cat("   Estimated from Data,")
   cat("  Standard Errors:",  quantile(z, prob=c(.025,.975)),"\n")
 
   if (n_display > 0)

@@ -1,6 +1,0 @@
-ttp  <-
-function(...) {
-
-  ttestPower(...)
-
-}

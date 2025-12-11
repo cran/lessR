@@ -9,7 +9,7 @@ Abbreviation: \code{lr}
 
 A wrapper for the standard R \code{\link{glm}} function with \code{family="binomial"}, automatically provides a logit regression analysis with graphics from a single, simple function call with many default settings, each of which can be re-specified.  By default the data exists as a data frame with the default name of \code{d}, such as data read by the \code{lessR} \code{Read} function.  Specify the model in the function call according to an R \code{\link{formula}}, that is, the response variable followed by a tilde, followed by the list of predictor variables, each pair separated by a plus sign.
 
-The response variable for analysis has values only of 0 and 1, with 1 designating the reference group. If the response variable is a factor with two levels, they factor levels are automatically converted to a numeric variable with values of 0 and 1.
+The response variable for analysis has values only of 0 and 1, with 1 designating the reference group. If the response variable is a factor with two levels, the factor levels are automatically converted to a numeric variable with values of 0 and 1.
 
 Default output includes the inferential analysis of the estimated coefficients and model, sorted residuals and Cook's Distance, and sorted fitted values for existing data or new data.  For a single predictor variable model, the scatterplot of the data with plotted logit function is provided.
 
@@ -60,7 +60,7 @@ lr(\dots)
   \item{res_sort}{Default is \code{"cooks"}, for specifying Cook's distance as
        the sort criterion for the display of the rows of data and associated
        residuals. Other values are \code{"rstudent"} for Studentized residuals,
-       and \code{"off"} to not provide the analysis.}
+       \code{"dffits"}, and \code{"off"} to not provide the analysis.}
   \item{pred}{Default is \code{TRUE}, which, produces confidence and prediction
        intervals for each row, or selected rows, of data.}
   \item{pred_all}{Default is \code{FALSE}, which produces prediction intervals
@@ -100,17 +100,17 @@ lr(\dots)
 
 \details{
 OVERVIEW\cr
-\code{Logit} combines the following function calls into one, as well as provide ancillary analyses such as as graphics, organizing output into tables and sorting to assist interpretation of the output. The basic analysis successively invokes several standard R functions beginning with the standard R function for estimation of the logit model, \code{\link{glm}} with \code{family="binomial"}. The output of the analysis is stored in the object \code{lm.out}, available for further analysis in the R environment upon completion of the \code{Logit} function. By default automatically provides the analyses from the standard R functions, \code{\link{summary}}, \code{\link{confint}} and \code{\link{anova}}, with some of the standard output modified and enhanced. The residual analysis invokes \code{\link{fitted}}, \code{\link{resid}}, \code{\link{rstudent}}, and \code{\link{cooks.distance}} functions.  The option for prediction intervals calls the standard generic R function \code{\link{predict}}.
+\code{Logit} combines the following function calls into one, as well as provide ancillary analyses such as graphics, organizing output into tables and sorting to assist interpretation of the output. The basic analysis successively invokes several standard R functions beginning with the standard R function for estimation of the logit model, \code{\link{glm}} with \code{family="binomial"}. The output of the analysis is stored in the object \code{lm.out}, available for further analysis in the R environment upon completion of the \code{Logit} function. By default automatically provides the analyses from the standard R functions, \code{\link{summary}}, \code{\link{confint}} and \code{\link{anova}}, with some of the standard output modified and enhanced. The residual analysis invokes \code{\link{fitted}}, \code{\link{resid}}, \code{\link{rstudent}}, and \code{\link{cooks.distance}} functions.  The option for prediction intervals calls the standard generic R function \code{\link{predict}}.
 
 The default analysis provides the model's parameter estimates and corresponding hypothesis tests and confidence intervals, goodness of fit indices, the ANOVA table, analysis of residuals and influence as well as the fitted value and standard error for each observation in the model.
 
 DATA\cr
-The name \code{d} is by default provided by the \code{\link{Read}} function included in this package for reading and displaying information about the data in preparation for analysis. If all the variables in the model are not in the same data frame, the analysis will not be complete.  The data frame does not need to be attached, just specified by name with the \code{data} option if the name is not the default \code{d}.
+The name \code{d} is by default provided by the \code{\link{Read}} function included in this package for reading and displaying information about the data in preparation for analysis. If all the variables in the model are not in the same data frame, the analysis will not complete.  The data frame does not need to be attached, just specified by name with the \code{data} option if the name is not the default \code{d}.
 
 The \code{filter} parameter subsets rows (cases) of the input data frame according to a logical expression. Use the standard R operators for logical statements as described in \code{\link{Logic}} such as \code{&} for and, \code{|} for or and \code{!} for not, and use the standard R relational operators as described in \code{\link{Comparison}} such as \code{==} for logical equality \code{!=} for not equals, and \code{>} for greater than. See the Examples.
 
 GRAPHICS\cr
-For models with a single predictor variable, a scatter plot of the data is produced, which also includes the fitted values_ As with the density histogram plot of the residuals and the scatterplot of the fitted values and residuals, the scatterplot includes a colored background with grid lines. If more than a single predictor variable, then a scatter plot matrix is produced.
+For models with a single predictor variable, a scatter plot of the data is produced, which also includes the fitted values. As with the density histogram plot of the residuals and the scatterplot of the fitted values and residuals, the scatterplot includes a colored background with grid lines. If more than a single predictor variable, then a scatter plot matrix is produced.
 
 FORECASTS\cr
 Fitted and forecasted values are listed for all rows of data if the number of rows is less than 25 or if \code{pred_all=TRUE}. If only some of the rows are listed, sorted by the fitted value, the first and last four rows of data are listed. Also the 4 rows immediately around the fitted value of 0.5 are listed.
@@ -119,7 +119,7 @@ RESIDUAL ANALYSIS\cr
 By default the residual analysis lists the data and fitted value for each observation as well as the residual, Studentized residual, Cook's distance and dffits, with the first 20 observations listed and sorted by Cook's distance. The residual displayed is the actual difference between fitted and observed, that is, with the setting in the \code{\link{residuals}} of \code{type="response"}.  The \code{res_sort} option provides for sorting by the Studentized residuals or not sorting at all.  The \code{res_rows} option provides for listing these rows of data and computed statistics statistics for any specified number of observations (rows).  To turn off the analysis of residuals, specify \code{res_rows=0}.
 
 INVOKED R OPTIONS\cr
-The \code{\link{options}} function turns off the stars for different significance levels (show.signif.stars=FALSE), turns off scientific notation for the output (scipen=30), and sets the width of the text output at the console to 120 characters. The later option can be re-specified with the \code{text_width} option. After \code{Logit} is finished with a normal termination, the options are re-set to their values before the \code{Logit} function began executing.
+The \code{\link{options}} function turns off the stars for different significance levels (show.signif.stars=FALSE), turns off scientific notation for the output (scipen=30), and sets the width of the text output at the console to 120 characters. The latter option can be re-specified with the \code{text_width} option. After \code{Logit} is finished with a normal termination, the options are re-set to their values before the \code{Logit} function began executing.
 
 COLORS\cr
 The default color theme is \code{"colors"}, but a gray scale is available with \code{"gray"}, and other themes are available as explained in \code{\link{style}}, such as \code{"red"} and \code{"green"}. Use the option \code{style(sub_theme="black")} for a black background and partial transparency of plotted colors.
@@ -149,7 +149,7 @@ Logit(Gender ~ Years)
 lr(Gender ~ Years)
 
 # Modify the default settings as specified
-Logit(Gender ~ Years, res_row=8, res_sort="rstudent", digits_d=8, pred=FALSE)
+Logit(Gender ~ Years, res_rows=8, res_sort="rstudent", digits_d=8, pred=FALSE)
 
 Logit(Gender ~ Years)
 

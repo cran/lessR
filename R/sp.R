@@ -1,6 +1,0 @@
-sp <-
-function(...) {
-
-  ScatterPlot(...)
-
-}

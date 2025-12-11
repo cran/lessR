@@ -1,5 +1,0 @@
-ss <-
-function(...)
-
-  SummaryStats(...)
-

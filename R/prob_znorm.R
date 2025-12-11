@@ -6,18 +6,6 @@ function(mu=0, sigma=1, color_border="gray10",
          pdf_file=NULL, width=5, height=5, ...) {
 
 
-  # a dot in a parameter name to an underscore
-  dots <- list(...)
-  if (!is.null(dots)) if (length(dots) > 0) {
-    change <- c("color.border", "y.axis", "axis.size", "pdf.file")
-    for (i in 1:length(dots)) {
-      if (names(dots)[i] %in% change) {
-        nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
-        assign(nm, dots[[i]])
-        get(nm)
-      }
-    }
-  }
 # plot normal curve with integer SD lines
     
   if ( (r<0 || r>1)  ||  (g<0 || g>1)  || (b<0 || b>1)  ||  (a<0) || a>1) { 
@@ -25,18 +13,6 @@ function(mu=0, sigma=1, color_border="gray10",
       "Values of r, g, b and a must all be between 0 and 1, inclusive.\n\n")
   }
 
-  dots <- list(...)  # check for deprecated parameters
-  if (length(dots) > 0) {
-    for (i in 1:length(dots)) {
-      if (substr(names(dots)[i], 1, 4) == "col.") {
-        cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "options that began with the abbreviation  col  now begin with  ",
-          "color \n\n")
-      if (names(dots)[i] == "mag")  axis_size <- dots[[i]]
-      }
-    }
-  }
-   
   if (mu==0  && sigma==1) z <- FALSE
 
   xmin <- mu - 4*sigma
@@ -56,8 +32,9 @@ function(mu=0, sigma=1, color_border="gray10",
     .opendev(pdf_file, width, height)
 #   par(mar=c(3,2,1.75,2), mgp=c(1,.5,0))
   }
-  plot(x,y, type="l", lwd=2, col=color_border, axes=FALSE, xlab="", ylab="",
-       main=main)
+
+  base::plot(x,y, type="l", lwd=2, col=color_border, axes=FALSE,
+             xlab="", ylab="", main=main)
   if (z)
     title(xlab=xlab, line=3.5)
   else

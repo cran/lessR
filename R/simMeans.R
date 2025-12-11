@@ -6,20 +6,6 @@ function(ns, n, mu=0, sigma=1, seed=NULL,
          main=NULL, pdf_file=NULL, width=5, height=5, ...) {
 
 
-  # a dot in a parameter name to an underscore
-  dots <- list(...)
-  if (!is.null(dots)) if (length(dots) > 0) {
-    change <- c("ylim.bound", "show.title", "show.data",
-                "max.data", "set_mu", "digits.d", "pdf.file")
-    for (i in 1:length(dots)) {
-      if (names(dots)[i] %in% change) {
-        nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
-        assign(nm, dots[[i]])
-        get(nm)
-      }
-    }
-  }
-
   if (missing(ns)) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "Specify the number of samples, each of a given size, with:  ns\n\n")
@@ -28,17 +14,6 @@ function(ns, n, mu=0, sigma=1, seed=NULL,
   if (missing(n)) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "Specify the size of each sample, the number of data values, with:  n\n\n")
-  }
-
-  dots <- list(...)  # check for deprecated parameters
-  if (length(dots) > 0) {
-    for (i in 1:length(dots)) {
-      if (substr(names(dots)[i], 1, 4) == "col.") {
-        cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "options that began with the abbreviation  col  now begin with  ",
-          "color \n\n")
-      }
-    }
   }
 
   if (sigma < 0) { 
@@ -106,8 +81,8 @@ function(ns, n, mu=0, sigma=1, seed=NULL,
   orig.params <- par(no.readonly=TRUE)
   par(mar=c(3,3,1.75,2), mgp=c(1.75,.5,0))
 
-  plot(0, type = "n", xlim=c(1,ns), ylim = c(l,u), xlab="", ylab="Sample Mean", 
-       cex.main=.95, cex.axis=.8)
+  base::plot(0, type = "n", xlim=c(1,ns), ylim = c(l,u),
+             xlab="", ylab="Sample Mean", cex.main=.95, cex.axis=.8)
 
   # background color
   usr <- par("usr")

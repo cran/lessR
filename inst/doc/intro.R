@@ -7,6 +7,7 @@ knitr::opts_chunk$set(
 
 ## ----setup--------------------------------------------------------------------
 library(lessR)
+options(lessR.use_plotly = FALSE)
 
 ## ----read---------------------------------------------------------------------
 d <- Read("Employee")
@@ -16,32 +17,32 @@ l <- rd("Employee_lbl")
 l
 
 ## ----bcEx, fig.width=4, fig.height=3.5, fig.align='center', fig.cap="Bar chart of tablulated counts of employees in each department."----
-BarChart(Dept)
+Chart(Dept)
 
 ## ----fig.width=4, fig.height=3.75, fig.align='center'-------------------------
-BarChart(Dept, fill="darkred", color="black", transparency=.8,
+Chart(Dept, fill="darkred", color="black", transparency=.8,
          labels_color="black")
 
 ## ----fig.width=4, fig.height=3.5, fig.align='center'--------------------------
-BarChart(Dept, theme="gray", labels="off", horiz=TRUE)
+Chart(Dept, theme="gray", labels="off", horiz=TRUE)
 
 ## ----hs, fig.width=4, fig.height=3.5, fig.align='center', fig.cap="Histogram of tablulated counts for the bins of Salary."----
-Histogram(Salary)
+X(Salary)
 
 ## ----binwidth, fig.width=4, fig.height=3.5, fig.align='center', fig.cap="Customized histogram."----
-Histogram(Salary, bin_start=35000, bin_width=14000, fill="reds")
+X(Salary, bin_start=35000, bin_width=14000, fill="reds")
 
 ## ----sp, fig.width=4----------------------------------------------------------
-Plot(Years, Salary)
+XY(Years, Salary)
 
 ## ----spEnhance, fig.width=4---------------------------------------------------
-Plot(Years, Salary, enhance=TRUE)
+XY(Years, Salary, enhance=TRUE)
 
 ## ----x1, fig.height=3---------------------------------------------------------
-Plot(Salary)
+XY(Salary)
 
 ## ----spBubble, fig.width=4----------------------------------------------------
-Plot(JobSat, Gender)
+Chart(JobSat, Gender, type="bubble")
 
 ## ----fig.height=4.25, fig.width=5---------------------------------------------
 ttest(Salary ~ Gender)

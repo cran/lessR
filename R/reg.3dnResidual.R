@@ -25,9 +25,9 @@ function(lm.out, pdf=FALSE, width=5, height=5, manage.gr=FALSE, ...) {
   # frequency distribution of residuals
   .dn.main(lm.out$residuals, 
     fill_hist=getOption("se_fill"),
-    col.nrm="gray40", col.gen="gray40",
+    col.nrm="gray40", col.gen="gray40", fill.miss=TRUE,
     fill_nrm="transparent", fill_gen="transparent",
-    xlab="Residuals", quiet=TRUE)
+    xlab="Residuals", use_plotly=FALSE, quiet=TRUE)
 
   if (pdf) {
     dev.off()

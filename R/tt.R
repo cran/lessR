@@ -1,4 +1,0 @@
-tt <-
-function(...)
-
-  ttest(...)

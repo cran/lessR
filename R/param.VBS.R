@@ -39,7 +39,7 @@ function(x, ID, facet1, facet1.miss, by0, by.miss,
     x.val <- paste0(x.val, collapse=" ")  # convert char to num
     lvl.c <- .fmtc(lvl[i], max(max.lvl,6), j="left")
     if (max_f.col > 1)  # replications
-      tx[length(tx)+1] <- paste(lvl.c, "    ",  .fmti(max_f.col,3),
+      tx[length(tx)+1] <- paste(lvl.c, "    ", .fmti(max_f.col,3),
         "     ", x.val, txt, sep="")
     else
       tx[length(tx)+1] <- paste(lvl.c, "     0" )  # no reps
@@ -92,7 +92,7 @@ if (getOption("suggest") && !quiet) {
 
   txsug <- ">>> Suggestions"
 
-  fc <- paste("Plot(", x.name, sep="")
+  fc <- paste("X(", x.name, sep="")
 
   txts <- character(length=3)
   cmts <- character(length=3)
@@ -108,12 +108,14 @@ if (getOption("suggest") && !quiet) {
     txts[3] <- ", vbs_mean=TRUE"
     if (cmts[1] == "") cmts[3] <- " Show mean"
   }
+    txts[4] <- ", type=\"vbs\""
+
   if (any(txts != ""))
-    txsug <- paste(txsug, "\n", fc, txts[1], txts[2], txts[3], ") # ",
+    txsug <- paste(txsug, "\n", fc, txts[1], txts[2], txts[3], txts[4], ") # ",
       cmts[1], cmts[2], cmts[3], sep="")
 
   if (!grepl("box_adj", fncl)) {
-    txt <- ", box_adj=TRUE)  # Adjust boxplot whiskers for asymmetry"
+    txt <- ", box_adj=TRUE, type=\"vbs\")  # Adjust boxplot whiskers for asymmetry"
     txsug <- paste(txsug, "\n", fc, txt, sep="")
   }
 
@@ -250,6 +252,7 @@ if (facet1.miss && by.miss) {
 # -------
 # Group Vars: x-variable with by and/or facet categorical variables
 else {
+
   if (facet1.miss && !by.miss) facet1 <- by0
   frq <- table(x, facet1)
   n.lvl <- nlevels(facet1)
@@ -299,8 +302,9 @@ else {
     if (grepl("v", vbs_plot) || grepl("s", vbs_plot))
       txprm <- .get.param(size, jitter_y, jitter_x, bw)
     else
-      txprm <- ""
-    output <- list(out_grp=txgrp, out_rep=txrep, out_parm=txprm)
+      txprm <- ""  # summary stats in out_grp
+    output <- list(out_rep=txrep, out_parm=txprm)
+#   output <- list(out_grp=txgrp, out_rep=txrep, out_parm=txprm)
   }  # end !reps
 
   # discrete, numerical variable with a categorical variable
@@ -339,7 +343,8 @@ else {
          out_rep=txrep, out_parm=txprm)
     }
     else  # 9 or more levels
-      output <- list(out_grp=txgrp, out_rep=txrep, out_parm=txprm)
+      output <- list(out_rep=txrep, out_parm=txprm)
+#     output <- list(out_grp=txgrp, out_rep=txrep, out_parm=txprm)
 
     }
   }  # end two.var

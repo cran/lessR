@@ -9,21 +9,16 @@ function(app) {
     if (app == "barchart") app <- "BarChart"
     if (app == "bc") app <- "BarChart"
     if (grepl("bar", app)) app <- "BarChart"
-    if (app == "piechart") app <- "PieChart"
-    if (app == "pc") app <- "PieChart"
-    if (grepl("pie", app)) app <- "PieChart"
     if (app == "histogram") app <- "Histogram"
     if (app == "hs") app <- "Histogram"
     if (grepl("hist", app)) app <- "Histogram"
     if (app == "scatterplot") app <- "ScatterPlot"
     if (app == "plot") app <- "ScatterPlot"
-    if (app == "trellis") app <- "Trellis"
-    if (app == "VBS") app <- "Trellis"
   }
 
   # locate all shiny app examples that exist, as folders in shiny_apps
 # validApps <- list.files(system.file("shiny_apps", package="lessR"))
-  validApps <- c("BarChart", "PieChart", "Histogram", "ScatterPlot", "Trellis")
+  validApps <- c("BarChart", "Histogram", "ScatterPlot")
   validAppsMsg <-
     paste0("Valid names (enclose in quotes):\n '",
            paste(validApps, collapse = "', '"), "'")

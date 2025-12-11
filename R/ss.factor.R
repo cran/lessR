@@ -111,12 +111,13 @@ function(x, by=NULL, brief=FALSE, digits_d=NULL, x.name, y.name=NULL,
     txttl <- .title2(x.name, y.name, x.lbl, y.lbl, is.null(by), new.ln=FALSE)
   }
 
+  n.dim <- length(dim(as.table(x)))
 
-  # two variables 
+
+  # two variables
   # print table, chi-square analysis
   # -------------------------------------
-  if (!is.null(by) || is.matrix(x)) { 
-    n.dim <- 2
+  if (n.dim == 2) {
 
     # potential abbreviation of column labels
     mx.chr <- max(nchar(colnames(x)))
@@ -185,7 +186,8 @@ function(x, by=NULL, brief=FALSE, digits_d=NULL, x.name, y.name=NULL,
                   freq_df=freq_df, pvalue=ch$p.value))
 
 
-    # full analysis
+# full analysis ------ when stack100=TRUE, proportions not correct, ignored
+
     nan.flag <- FALSE
 
     for (i in 1:ncol(xx)) {
@@ -207,9 +209,8 @@ function(x, by=NULL, brief=FALSE, digits_d=NULL, x.name, y.name=NULL,
       Sum[i] <- sum(x.col[,i])
       if (is.nan(Sum[i])) nan.flag <- TRUE
     }
-    x.col2 <- round(rbind(x.col,Sum),digits_d)
+    x.col2 <- round(rbind(x.col,Sum))
     names(dimnames(x.col2)) <- names(dimnames(x.col))
-
     buf <- digits_d - 3  # 3 decimal digits already accounted for
     mx.ln <- max(max.ln)
     if (buf < max.c1) buf <- mx.ln - 4
@@ -253,7 +254,7 @@ function(x, by=NULL, brief=FALSE, digits_d=NULL, x.name, y.name=NULL,
 
 
   # one variable
-  else { 
+  else if (n.dim == 1) { 
     lnx <- length(names(x))
     if (lnx == sum(x)  &&  is.smry_tbl) {  # x is vector of counts, if unique
       if (length(x) > 100)
@@ -271,9 +272,7 @@ function(x, by=NULL, brief=FALSE, digits_d=NULL, x.name, y.name=NULL,
                   chi="", lbl="", freq=x, freq_df="", prop="",
                   pvalue=""))
     }
-
     # table not of unique values, so proceed
-    n.dim <- 1
 
     # potential abbreviation of column labels
     #  if (is.na(names(x)[length(x)])) names(x)[length(x)] <- "missing"
@@ -354,26 +353,32 @@ function(x, by=NULL, brief=FALSE, digits_d=NULL, x.name, y.name=NULL,
     txlbl <- ""
     ch <- NULL
 
-    if (nrow(x) > 1) {  # nrow(x) is the number of levels of table x
-      tx <- character(length = 0)
-      ch <- suppressWarnings(chisq.test(x))  # provide own warning of small n
-      tx[length(tx)+1] <- 
-        "Chi-squared test of null hypothesis of equal probabilities"
-      tx[length(tx)+1] <- paste("  Chisq = ", .fmt(ch$statistic,3), ", df = ",
-        ch$parameter, ", p-value = ", .fmt(ch$p.value,3), sep="")
-      if (any(ch$expected < 5)) 
-        tx[length(tx)+1] <- paste(">>> Low cell expected frequencies,",
-            "so chi-squared approximation may not be accurate", "\n")
-      txchi <- tx
-      
-      txlbl <- ""
-      tx <- character(length = 0)
-      if (!is.null(c.nm)) {
-        tx[length(tx)+1] <- "Unabbreviated labels"
-        tx[length(tx)+1] <- "--------------------"
-        tx[length(tx)+1] <- paste(c.nm, sep="", collapse="\n")
-        txlbl <- tx
+    if (length(dim(as.table(x))) < 3) {
+      if (nrow(x) > 1) {  # nrow(x) is the number of levels of table x
+        tx <- character(length = 0)
+        ch <- suppressWarnings(chisq.test(x))  # provide own warning of small n
+        tx[length(tx)+1] <- 
+          "Chi-squared test of null hypothesis of equal probabilities"
+        tx[length(tx)+1] <- paste("  Chisq = ", .fmt(ch$statistic,3), ", df = ",
+          ch$parameter, ", p-value = ", .fmt(ch$p.value,3), sep="")
+        if (any(ch$expected < 5)) 
+          tx[length(tx)+1] <- paste(">>> Low cell expected frequencies,",
+              "so chi-squared approximation may not be accurate", "\n")
+        txchi <- tx
+        
+        txlbl <- ""
+        tx <- character(length = 0)
+        if (!is.null(c.nm)) {
+          tx[length(tx)+1] <- "Unabbreviated labels"
+          tx[length(tx)+1] <- "--------------------"
+          tx[length(tx)+1] <- paste(c.nm, sep="", collapse="\n")
+          txlbl <- tx
+        }
       }
+    }
+    else {
+      txchi <- " "
+      txlbl <- " "
     }
 
     freq_df <- data.frame(x)  #  a pivot result, two vars, Cats and Freq

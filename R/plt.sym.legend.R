@@ -1,6 +1,6 @@
 # plot legend for size variables, i.e., bubbles
 .plt.sym.legend <-
-function(size, color, fill, shp, col.bg, usr, radius, power) {
+function(size, fill, color, shp, usr, radius, power, bub.alpha) {
 
   min.size <- min(size, na.rm=TRUE)
   max.size <- max(size, na.rm=TRUE)
@@ -35,9 +35,11 @@ function(size, color, fill, shp, col.bg, usr, radius, power) {
   x.coords <- rep(xleft, 3)  # in user coordinates
   y.coords <- (ytop + size.inch[2]*.30) + (ll$text$y * 1.8)  # y size
 
+  fill.alpha <- fill
+#  fill.alpha <- .maketrans(fill, bub.alpha)  # wipes out all fill color
   sz <- mylevels**power  # radius unscaled for all the points
   symbols(x.coords, y.coords, circles=sz, inches=radius,
-          fg=color, bg=fill, add=TRUE)
+          fg=color, bg=fill.alpha, add=TRUE)
 
   # labels text and title
   x.offset <- strwidth("00") * 1.2 

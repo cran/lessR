@@ -13,64 +13,68 @@ clr.one <- list(
   "wheat3", "goldenrod2", "khaki", "yellow2",
   "darkseagreen2", "springgreen3", "seagreen4", "darkgreen",
   "black", "gray45", "slategray4", "gray75", "snow3", "gray95",
-  "lavender", "ivory2", "aliceblue", "white")
+  "lavender", "ivory2", "aliceblue", "white"
+)
 
-clr.edge <- list("off", "black", "gray50", "gray75", "white", "ivory", 
+clr.edge <- list(
+  "off", "black", "gray50", "gray75", "white", "ivory", 
   "darkblue", "darkred", "darkgreen", "rosybrown2", "bisque", 
-  "slategray2", "aliceblue", "thistle1", "coral", "gold")
+  "slategray2", "aliceblue", "thistle1", "coral", "gold"
+)
 
 clr.qual <- c("hues", "Okabe-Ito", "viridis")
 
-clr.seq <- list("reds", "rusts", "browns", "olives", "greens",
+clr.seq <- list(
+  "reds", "rusts", "browns", "olives", "greens",
   "emeralds", "turquoises", "aquas", "blues", "purples", "violets",
-  "magentas", "grays")
+  "magentas", "grays"
+)
 
-addResourcePath("shiny_dir", system.file("shiny_apps", package="lessR"))
-
+addResourcePath("shiny_dir", system.file("shiny_apps", package = "lessR"))
 
 ui <- fluidPage(
-tags$head(tags$link(rel="stylesheet", href="shiny_dir/styles.css")),
+  tags$head(tags$link(rel = "stylesheet", href = "shiny_dir/styles.css")),
 
   tabsetPanel(
 
     tabPanel("Data",
-      titlePanel(div("Upload a text (.csv, .txt) or Excel file", id="hp")),
+      titlePanel(div("Upload a text (.csv, .txt) or Excel file", id = "hp")),
 
       sidebarLayout(
         sidebarPanel(
 
           radioButtons("fType", HTML("<h5 class='soft'>Format</h5>"), 
-                       c("Excel"="Excel", "Text"="Text")),
-          conditionalPanel(condition="input.fType == 'Text'",
+                       c("Excel" = "Excel", "Text" = "Text")),
+          conditionalPanel(condition = "input.fType == 'Text'",
             radioButtons("sep", HTML("<h5 class='soft'>Separator</h5>"),
-                         c(Comma=",", Semicolon=";", Tab="\t"), ","),
+                         c(Comma = ",", Semicolon = ";", Tab = "\t"), ","),
             radioButtons("decimal", HTML("<h5 class='soft'>Decimal</h5>"),
-                         c("Point"=".", "Comma"=",")),
+                         c("Point" = ".", "Comma" = ","))
           ),
 
           radioButtons("fSource", HTML("<h5 class='soft'>Source</h5>"), 
-                       c("Local"="local", "Web"="web")),
-          conditionalPanel(condition="input.fSource == 'local'",
+                       c("Local" = "local", "Web" = "web")),
+          conditionalPanel(condition = "input.fSource == 'local'",
             fileInput("myFile", "Locate your data file",
-                      accept=c(".csv", ".txt", ".xlsx", ".xlsm")),
+                      accept = c(".csv", ".txt", ".xlsx", ".xlsm"))
           ),
-          conditionalPanel(condition="input.fSource == 'web'",
+          conditionalPanel(condition = "input.fSource == 'web'",
             textInput("myURL", "Web address of data file"),
             actionButton("submitURL", "Submit")
           ),
 
           textOutput("ncols"),
           textOutput("nrows"),
-          uiOutput("d.radio"),
+          uiOutput("d.radio")
 
-        ),  # end sidbarPanel
+        ),  # end sidebarPanel
 
         mainPanel(
           tableOutput("d.table"),
-          tags$style(type="text/css", "#d.table {font-size: .95em;}")
+          tags$style(type = "text/css", "#d.table {font-size: .95em;}")
         )
 
-      )  # end sidbarLayout
+      )  # end sidebarLayout
     ),  # end tabPanel 1
 
 
@@ -79,77 +83,79 @@ tags$head(tags$link(rel="stylesheet", href="shiny_dir/styles.css")),
         titlePanel(""),
 
         sidebarPanel(
-          selectInput('x.col', 'x Variable', ""),
+          selectInput("x.col", "x Variable", ""),
 
-          checkboxInput("do_by", div("by variable", class="view"), FALSE),
-          conditionalPanel(condition="input.do_by == true",
-            selectInput('by.col', 'by Variable', "", selected=""),
+          checkboxInput("do_by", div("by variable", class = "view"), FALSE),
+          conditionalPanel(condition = "input.do_by == true",
+            selectInput("by.col", "by Variable", "", selected = ""),
             selectInput("myFill2", "fill",
-              choices=list("Qualitative"=clr.qual, "Sequential"=clr.seq)),
+              choices = list("Qualitative" = clr.qual, "Sequential" = clr.seq)),
             checkboxInput("myBeside", "beside", value = FALSE),
-            checkboxInput("my100", "stack100", value = FALSE),
+            checkboxInput("my100", "stack100", value = FALSE)
           ),
 
           tags$hr(),
-          checkboxInput("do_y", div("y variable", class="view"), FALSE),
-          conditionalPanel(condition="input.do_y == true",
-            selectInput('y.col', 'y Variable', "", selected=""),
+          checkboxInput("do_y", div("y variable", class = "view"), FALSE),
+          conditionalPanel(condition = "input.do_y == true",
+            selectInput("y.col", "y Variable", "", selected = ""),
             uiOutput("radio_stats")  # only if not a summary table
           ),
 
           tags$hr(),
-          checkboxInput("do_geom", div("Bars", class="view"), FALSE),
-          conditionalPanel(condition="input.do_geom == true",
-            conditionalPanel(condition="input.do_by == false",
+          checkboxInput("do_geom", div("Bars", class = "view"), FALSE),
+          conditionalPanel(condition = "input.do_geom == true",
+            conditionalPanel(condition = "input.do_by == false",
               selectInput("myFill", "fill",
-                choices=list("Qualitative"=clr.qual,
-                             "Constant"=clr.one, "Sequential"=clr.seq))),
-            selectInput("myColor", label="color", choices=clr.edge),
-            sliderInput("myTrans", label="transparency", min=0, max=1, value=0),
-            selectInput("mySort", "sort", choices=list("0", "+", "-")),
-            checkboxInput("myHoriz", "horiz", value=FALSE)
+                choices = list("Qualitative" = clr.qual,
+                               "Constant" = clr.one, "Sequential" = clr.seq))),
+            selectInput("myColor", label = "color", choices = clr.edge),
+            sliderInput("myTrans", label = "transparency", min = 0, max = 1,
+                        value = 0),
+            selectInput("mySort", "sort", choices = list("0", "+", "-")),
+            checkboxInput("myHoriz", "horiz", value = FALSE)
           ),
 
           tags$hr(),
-          checkboxInput("do_labels", div("Labels", class="view"), FALSE),
-          conditionalPanel(condition="input.do_labels == true",
-            selectInput("myLabels", "labels", choices=list("%","input","off")),
+          checkboxInput("do_labels", div("Labels", class = "view"), FALSE),
+          conditionalPanel(condition = "input.do_labels == true",
+            selectInput("myLabels", "labels",
+                        choices = list("%", "input", "off")),
             selectInput("myLabelsColor", "labels_color",
-               choices=list("white", "gray", "darkgray", "black",
-                            "red", "green3")),
-            conditionalPanel(condition="input.do_by == false",
+               choices = list("white", "gray", "darkgray", "black",
+                              "red", "green3")),
+            conditionalPanel(condition = "input.do_by == false",
               selectInput("myLabelsPos", "labels_position",
-                 choices=list("in", "out")),
+                 choices = list("in", "out"))
             ),
             sliderInput("myLabelsSize", "labels_size",
-                        min=0, max=2, value=0.9, step=0.1),
+                        min = 0, max = 2, value = 0.9, step = 0.1)
           ),
 
           tags$hr(),
-          checkboxInput("do_pdf", div("Save", class="view"), FALSE),
-          conditionalPanel(condition="input.do_pdf == true",
-            sliderInput("w", "width (inches):", min=3, max=20, value=8),
-            sliderInput("h", "height (inches):", min=3, max=20, value=6),
+          checkboxInput("do_pdf", div("Save", class = "view"), FALSE),
+          conditionalPanel(condition = "input.do_pdf == true",
+            sliderInput("w", "width (inches):", min = 3, max = 20, value = 8),
+            sliderInput("h", "height (inches):", min = 3, max = 20, value = 6),
             checkboxInput("do_cmt", "include comments in R file", TRUE),
-            actionButton(inputId="btn_pdf", "Save"),
+            actionButton(inputId = "btn_pdf", "Save"),
             tags$p(div("Save pdf file and R code file",
-                  style="margin-top:.25em; margin-bottom"))
+                  style = "margin-top:.25em; margin-bottom"))
           ),
 
           tags$hr(),
-          checkboxInput("do_help", div("Help", class="view"), FALSE),
+          checkboxInput("do_help", div("Help", class = "view"), FALSE)
 
         ),  # end sidebarPanel
 
-      mainPanel(
-        plotOutput('myPlot'),
-        verbatimTextOutput("summary"),
-        plotOutput("saved_plot"), 
-        textOutput("help")
-      )
+        mainPanel(
+          plotOutput("myPlot"),
+          verbatimTextOutput("summary"),
+          plotOutput("saved_plot"), 
+          textOutput("help")
+        )
 
-    )  # end pageWithSidebar
-  )  # end tabPanel 2
+      )  # end pageWithSidebar
+    )  # end tabPanel 2
   )  # end tabsetPanel
 )  # end fluidPage 
 
@@ -160,16 +166,16 @@ server <- function(input, output, session) {
 
   # select categorical variables from read data frame
   # unlike the other interactive apps, need to adapt to input summary table
-  the.vars <- function(data, cats=TRUE) {
+  the.vars <- function(data, cats = TRUE) {
 
     lu.x <- sapply(data, function(x) { length(unique(x)) }) 
-    is.cat <- logical(length=ncol(data))
+    is.cat <- logical(length = ncol(data))
     nr <- min(nrow(data), 500)
     for (i in 1:ncol(data)) {
-      is.cat[i] <- is.character(data[1:nr,i]) || is.factor(data[1:nr,i])
+      is.cat[i] <- is.character(data[1:nr, i]) || is.factor(data[1:nr, i])
       # numeric var is.cat if 10 or less unique values but not a summary tbl
-      if (is.numeric(data[1:nr,i]) && lu.x[i]<11)
-        if (nrow(data)>lu.x[i] && ncol(data)>2) is.cat[i] <- TRUE 
+      if (is.numeric(data[1:nr, i]) && lu.x[i] < 11)
+        if (nrow(data) > lu.x[i] && ncol(data) > 2) is.cat[i] <- TRUE 
     }
 
     if (all(!is.cat)) {
@@ -187,8 +193,8 @@ server <- function(input, output, session) {
   }
 
 
-# ------- Read and Display Data -----------
-# -----------------------------------------
+  # ------- Read and Display Data -----------
+  # -----------------------------------------
 
   # process the URL for reading from the web
   theURL <- eventReactive(input$submitURL, {
@@ -204,15 +210,15 @@ server <- function(input, output, session) {
     if (input$fSource == "web") {
       url <- theURL()
       if (!(grepl("http://", url)))
-        url <- paste("http://", url, sep="")
+        url <- paste("http://", url, sep = "")
       myPath <- url
-       theRead <- myPath
+      theRead <- myPath
     }
       
     shiny::req(myPath)
     if (input$fType == "Excel") { 
       library(openxlsx)
-      if (grepl(".xlsx", myPath, fixed=TRUE)) {
+      if (grepl(".xlsx", myPath, fixed = TRUE)) {
         d <- read.xlsx(myPath)
       }
       else {
@@ -220,21 +226,21 @@ server <- function(input, output, session) {
         stopApp()
       }
     }
-      if (input$fType == "Text") { 
-        if ((grepl(".csv", myPath, fixed=TRUE)) ||
-            (grepl(".txt", myPath, fixed=TRUE))) {
-            d <- read.csv(myPath, sep=input$sep, dec=input$decimal,
-                          na.strings="")  # default is NOT a blank char missing
-        }
-        else {
-          message("\n>>> Text file must have file type of .csv or .txt <<<\n\n")
-          stopApp()
-        }       
-      }  # end fType is "Text"
+    if (input$fType == "Text") { 
+      if ((grepl(".csv", myPath, fixed = TRUE)) ||
+          (grepl(".txt", myPath, fixed = TRUE))) {
+        d <- read.csv(myPath, sep = input$sep, dec = input$decimal,
+                      na.strings = "")  # default is NOT a blank char missing
+      }
+      else {
+        message("\n>>> Text file must have file type of .csv or .txt <<<\n\n")
+        stopApp()
+      }       
+    }  # end fType is "Text"
 
-    updateSelectInput(session, inputId="x.col", label="x variable",
-                      choices=c("Select a categorical variable" = "",
-                              the.vars(d, cats=TRUE)))
+    updateSelectInput(session, inputId = "x.col", label = "x variable",
+                      choices = c("Select a categorical variable" = "",
+                                  the.vars(d, cats = TRUE)))
     
     return(d)
   })  # end reactive()
@@ -242,84 +248,89 @@ server <- function(input, output, session) {
 
   output$d.radio <- renderUI({
     shiny::req(data())
-    output$nrows <- renderText({paste("Number of data rows:", nrow(data()))})
-    output$ncols <- renderText({paste("Number of variables:", ncol(data()))})
+    output$nrows <- renderText({ paste("Number of data rows:", nrow(data())) })
+    output$ncols <- renderText({ paste("Number of variables:", ncol(data())) })
     if (nrow(data()) > 10)
       radioButtons("d.radio", HTML("<h5 class='soft'>Rows to display</h5>"),
-                   c("First 10"="head", "Last 10"="tail", "Random 10"="random",
-                     "All"="all"))
+                   c("First 10" = "head", "Last 10" = "tail",
+                     "Random 10" = "random", "All" = "all"))
   })
 
   output$d.table <- renderTable({
-    if (is.null(input$d.radio)) 
+    if (is.null(input$d.radio)) {
       data()
+    }
     else {
       nr <- min(11, nrow(data()))
       if (nr == 11) {
         if (input$d.radio == "all")
           data()
         else if (input$d.radio == "head")
-          head(data(), n=10)
+          head(data(), n = 10)
         else if (input$d.radio == "tail")
-          tail(data(), n=10)
+          tail(data(), n = 10)
         else if (input$d.radio == "random") { 
           dd <- data()
           dd[.(random(10)), ]
         }
       }
     }
-  }, striped=TRUE)  # end renderTable
+  }, striped = TRUE)  # end renderTable
 
-# -----------------------------------------
+  # -----------------------------------------
 
 
   observeEvent(input$do_by, {
-    shiny::updateSelectInput(session, inputId="by.col", label="by variable",
-                             choices=c("Select a categorical variable" = "",
-                             the.vars(data(), cats=TRUE)))
+    shiny::updateSelectInput(
+      session, inputId = "by.col", label = "by variable",
+      choices = c("Select a categorical variable" = "",
+                  the.vars(data(), cats = TRUE))
+    )
   })
 
 
   observeEvent(input$do_y, {
-    shiny::updateSelectInput(session, inputId="y.col", label="y variable",
-                      choices=c("Select a numerical variable" = "",
-                              names(data())[sapply(data(), is.numeric)]))
+    shiny::updateSelectInput(
+      session, inputId = "y.col", label = "y variable",
+      choices = c("Select a numerical variable" = "",
+                  names(data())[sapply(data(), is.numeric)])
+    )
   })
 
-  output$radio_stats <- renderUI ({
+  output$radio_stats <- renderUI({
     shiny::req(input$do_y)
 
     x.name <- input$x.col
     shiny::req(x.name)
     x <- data()[, x.name]
     unq.x <- length(unique(x))
-    smry.tbl <- ifelse (unq.x==length(x) && ncol(data())==2, TRUE, FALSE)
+    smry.tbl <- ifelse(unq.x == length(x) && ncol(data()) == 2, TRUE, FALSE)
 
     shiny::req(!smry.tbl)  # stat makes no sense for summary table data
     radioButtons("statType", "stat", 
-               c("sum"="sum", "mean"="mean", "deviation"="deviation",
-                 "sd"="sd", "min"="min", "median"="median",
-                 "max"="max"), select="mean")
-    })
+                 c("sum" = "sum", "mean" = "mean", "deviation" = "deviation",
+                   "sd" = "sd", "min" = "min", "median" = "median",
+                   "max" = "max"), select = "mean")
+  })
 
-# ----------------------------------------
+  # ----------------------------------------
 
-  get.ax.nm <- function (nm, in.stat, smry.tbl) {
+  get.ax.nm <- function(nm, in.stat, smry.tbl) {
 
     a <- ""
     if (!is.null(in.stat)) {
-      if (in.stat == "sum") a <- "Sum"
+      if (in.stat == "sum")  a <- "Sum"
       if (in.stat == "mean") a <- "Mean"
-      if (in.stat == "sd") a <- "Standard Deviation"
-      if (in.stat == "dev") a <- "Mean Deviation"
-      if (in.stat == "min") a <- "Minimum"
+      if (in.stat == "sd")   a <- "Standard Deviation"
+      if (in.stat == "dev")  a <- "Mean Deviation"
+      if (in.stat == "min")  a <- "Minimum"
       if (in.stat == "median") a <- "Median"
-      if (in.stat == "max") a <- "Maximum"
+      if (in.stat == "max")  a <- "Maximum"
     }
 
     axis.name <- " "
     if (!smry.tbl) {
-      axis.name <- ifelse (nchar(a) > 0, paste(a, "of", nm), " ")
+      axis.name <- ifelse(nchar(a) > 0, paste(a, "of", nm), " ")
     }
     else
       axis.name <- nm  # summary table
@@ -328,8 +339,8 @@ server <- function(input, output, session) {
   }
 
 
-# ------------- The BarChart --------------
-# -----------------------------------------
+  # ------------- The BarChart --------------
+  # -----------------------------------------
 
   output$myPlot <- renderPlot({
 
@@ -337,7 +348,7 @@ server <- function(input, output, session) {
     shiny::req(x.name)
     x <- data()[, x.name]
     unq.x <- length(unique(x))
-    smry.tbl <- ifelse (unq.x==length(x) && ncol(data())==2, TRUE, FALSE)
+    smry.tbl <- ifelse(unq.x == length(x) && ncol(data()) == 2, TRUE, FALSE)
 
     y <- NULL
     in.stat <- NULL
@@ -357,7 +368,7 @@ server <- function(input, output, session) {
     in.fill <- input$myFill
     by.name <- ""
     by <- NULL
-    lt <- NULL  # legend_title
+    lt <- ""   # legend_title should not be NULL
     if (input$do_by) {  # a by variable
       by.name <- input$by.col
       shiny::req(by.name)
@@ -367,54 +378,140 @@ server <- function(input, output, session) {
     }
     v$by.name <- by.name
      
-    # analysis has variables in global env, not in a data frame
-    v$b <- BarChart(x, y, by=by, data=NULL, stat=in.stat,
-             fill=in.fill, color=input$myColor, transparency=input$myTrans,
-             sort=input$mySort, horiz=input$myHoriz,
-             stack100=input$my100, beside=input$myBeside,
-             labels=input$myLabels, labels_color=input$myLabelsColor,
-             labels_size=input$myLabelsSize, labels_position=input$myLabelsPos,
-             xlab=x.name, ylab=axis.name, legend_title=lt, quiet=TRUE)
+    ## ---- Call Chart() depending on y and by presence ----
 
-      p_fill <- in.fill == "hues"
-      p_color <- input$myColor == "off"
-      p_trans <- input$myTrans == 0
-      p_horiz <- input$myHoriz == FALSE
-      p_sort <- input$mySort == "0"
-      p_100 <- input$my100 == FALSE
-      p_beside <- input$myBeside == FALSE
-      p_labels <- input$myLabels == "%"
-      p_labels_color <- input$myLabelsColor == "white"
-      p_labels_position <- input$myLabelsPos == "in"
-      p_labels_size <- input$myLabelsSize == 0.9
-      p_stat <- is.null(in.stat)
+    if (input$do_y && input$do_by) {
+      # x, y, by
+      v$b <- Chart(
+        x, y, by = by, data = NULL,
+        type = "bar",
+        stat  = in.stat,
+        fill  = in.fill,
+        color = input$myColor,
+        transparency = input$myTrans,
+        sort  = input$mySort,
+        horiz = input$myHoriz,
+        stack100 = input$my100,
+        beside   = input$myBeside,
+        labels          = input$myLabels,
+        labels_color    = input$myLabelsColor,
+        labels_size     = input$myLabelsSize,
+        labels_position = input$myLabelsPos,
+        xlab = x.name,
+        ylab = axis.name,
+        legend_title = lt,
+        quiet = TRUE
+      )
+
+    } else if (input$do_y && !input$do_by) {
+      # x, y only
+      v$b <- Chart(
+        x, y, data = NULL,
+        type = "bar",
+        stat  = in.stat,
+        fill  = in.fill,
+        color = input$myColor,
+        transparency = input$myTrans,
+        sort  = input$mySort,
+        horiz = input$myHoriz,
+        stack100 = input$my100,
+        beside   = input$myBeside,
+        labels          = input$myLabels,
+        labels_color    = input$myLabelsColor,
+        labels_size     = input$myLabelsSize,
+        labels_position = input$myLabelsPos,
+        xlab = x.name,
+        ylab = axis.name,
+        legend_title = lt,
+        quiet = TRUE
+      )
+
+    } else if (!input$do_y && input$do_by) {
+      # x, by only (counts by group)
+      v$b <- Chart(
+        x, by = by, data = NULL,
+        type = "bar",
+        fill  = in.fill,
+        color = input$myColor,
+        transparency = input$myTrans,
+        sort  = input$mySort,
+        horiz = input$myHoriz,
+        stack100 = input$my100,
+        beside   = input$myBeside,
+        labels          = input$myLabels,
+        labels_color    = input$myLabelsColor,
+        labels_size     = input$myLabelsSize,
+        labels_position = input$myLabelsPos,
+        xlab = x.name,
+        ylab = axis.name,
+        legend_title = lt,
+        quiet = TRUE
+      )
+
+    } else {
+      # no y, no by (simple counts)
+      v$b <- Chart(
+        x, data = NULL,
+        type = "bar",
+        fill  = in.fill,
+        color = input$myColor,
+        transparency = input$myTrans,
+        sort  = input$mySort,
+        horiz = input$myHoriz,
+        stack100 = input$my100,
+        beside   = input$myBeside,
+        labels          = input$myLabels,
+        labels_color    = input$myLabelsColor,
+        labels_size     = input$myLabelsSize,
+        labels_position = input$myLabelsPos,
+        xlab = x.name,
+        ylab = axis.name,
+        legend_title = lt,
+        quiet = TRUE
+      )
+    }
+
+    ## ---- Build code string (user R code) ----
+
+    p_fill  <- in.fill == "hues"
+    p_color <- input$myColor == "off"
+    p_trans <- input$myTrans == 0
+    p_horiz <- input$myHoriz == FALSE
+    p_sort  <- input$mySort == "0"
+    p_100   <- input$my100 == FALSE
+    p_beside <- input$myBeside == FALSE
+    p_labels <- input$myLabels == "%"
+    p_labels_color <- input$myLabelsColor == "white"
+    p_labels_position <- input$myLabelsPos == "in"
+    p_labels_size <- input$myLabelsSize == 0.9
+    p_stat <- is.null(in.stat)
       
-      txt <- ifelse (input$do_y, ", y=", "")
-      out <- paste("BarChart(", x.name, txt, y.name, sep="")
+    txt <- ifelse(input$do_y, ", y=", "")
+    out <- paste("Chart(", x.name, txt, y.name, sep = "")
       
-      txt <- ifelse (input$do_by, ", by=", "")
-      out <- paste(out, txt, by.name, sep="")
+    txt <- ifelse(input$do_by, ", by=", "")
+    out <- paste(out, txt, by.name, sep = "")
 
-      if (!p_fill) out <- paste(out, ", fill=\"", in.fill, "\"", sep="")
-      if (!p_color) out <- paste(out, ", color=\"", input$myColor, "\"", sep="")
-      if (!p_trans) out <- paste(out, ", transparency=", input$myTrans, sep="")
-      if (!p_horiz) out <- paste(out, ", horiz=", input$myHoriz, sep="")
-      if (!p_sort) out <- paste(out, ", sort=\"", input$mySort, "\"", sep="")
-      if (!p_100) out <- paste(out, ", stack100=", input$my100, sep="")
-      if (!p_beside) out <- paste(out, ", beside=", input$myBeside, sep="")
-      if (!p_labels) out <- paste(out, ", labels=\"", input$myLabels, "\"",
-                                  sep="")
-      if (!p_labels_color) out <- paste(out, ", labels_color=\"", 
-                                        input$myLabelsColor, "\"", sep="")
-      if (!p_labels_position) out <- paste(out, ", labels_position=\"", 
-                                        input$myLabelsPos, "\"", sep="")
-      if (!p_labels_size) out <- paste(out, ", labels_size=", 
-                                       input$myLabelsSize, sep="")
-      if (!p_stat) out <- paste(out, ", stat=\"", in.stat, "\"", sep="")
+    if (!p_fill)  out <- paste(out, ", fill=\"", in.fill, "\"", sep = "")
+    if (!p_color) out <- paste(out, ", color=\"", input$myColor, "\"", sep = "")
+    if (!p_trans) out <- paste(out, ", transparency=", input$myTrans, sep = "")
+    if (!p_horiz) out <- paste(out, ", horiz=", input$myHoriz, sep = "")
+    if (!p_sort)  out <- paste(out, ", sort=\"", input$mySort, "\"", sep = "")
+    if (!p_100)   out <- paste(out, ", stack100=", input$my100, sep = "")
+    if (!p_beside) out <- paste(out, ", beside=", input$myBeside, sep = "")
+    if (!p_labels) out <- paste(out, ", labels=\"", input$myLabels, "\"", sep = "")
+    if (!p_labels_color) out <- paste(out, ", labels_color=\"", 
+                                      input$myLabelsColor, "\"", sep = "")
+    if (!p_labels_position) out <- paste(out, ", labels_position=\"", 
+                                         input$myLabelsPos, "\"", sep = "")
+    if (!p_labels_size) out <- paste(out, ", labels_size=", 
+                                     input$myLabelsSize, sep = "")
+    if (!p_stat && input$do_y) out <- paste(out, ", stat=\"", in.stat, "\"", sep = "")
 
-      out <- paste(out, ")", sep="")
-      cat(out)
-      v$code <- out  # save the code for a pdf file
+    # always explicit about type
+    out <- paste(out, ", type=\"bar\")", sep = "")
+    cat(out)
+    v$code <- out  # save the code for a pdf file
   })  # end renderPlot
 
   # print stats
@@ -426,7 +523,7 @@ server <- function(input, output, session) {
 
     x <- data()[, x.name]
     unq.x <- length(unique(x))
-    smry.tbl <- ifelse (unq.x==length(x) && ncol(data())==2, TRUE, FALSE)
+    smry.tbl <- ifelse(unq.x == length(x) && ncol(data()) == 2, TRUE, FALSE)
     shiny::req(!smry.tbl)  # otherwise a summary table, no stats to do
     
     b <- v$b
@@ -437,15 +534,21 @@ server <- function(input, output, session) {
     else {
       y.name <- input$y.col
       shiny::req(y.name)
-      cat("Summary Statistics\n", "------------------\n", sep="")
-      stats <- c("mean","sd","min","median","max")
-      pv <- do.call(pivot,
-        list(data=data(), compute=stats, variable=as.name(y.name),
-             by=as.name(x.name), quiet=TRUE)
+      cat("Summary Statistics\n", "------------------\n", sep = "")
+      stats <- c("mean", "sd", "min", "median", "max")
+      pv <- do.call(
+        pivot,
+        list(
+          data = data(),
+          compute = stats,
+          variable = as.name(y.name),
+          by = as.name(x.name),
+          quiet = TRUE
+        )
       )
       k <- 3L  # Keep cols 1:3 (Type, n, na), rename rest with just the stats
       names(pv)[seq_len(k + length(stats))] <- c(names(pv)[seq_len(k)], stats)
-      print(pv, print.gap=2)
+      print(pv, print.gap = 2)
       out2 <- b$out_y
     }
     cat("\n"); for (i in 1:length(out2)) cat(out2[i], "\n")
@@ -461,7 +564,7 @@ server <- function(input, output, session) {
     shiny::req(x.name)
     x <- data()[, x.name]
     unq.x <- length(unique(x))
-    smry.tbl <- ifelse (unq.x==length(x) && ncol(data())==2, TRUE, FALSE)
+    smry.tbl <- ifelse(unq.x == length(x) && ncol(data()) == 2, TRUE, FALSE)
 
     y <- NULL
     in.stat <- NULL
@@ -482,7 +585,7 @@ server <- function(input, output, session) {
     by.name <- ""
 
     by <- NULL
-    lt <- NULL  # legend_title
+    lt <- ""   # legend_title here too
     if (input$do_by) {  # a by variable
       by.name <- input$by.col
       shiny::req(by.name)
@@ -491,28 +594,119 @@ server <- function(input, output, session) {
       lt <- by.name
     }
 
-    pdf.fname <- paste("bc_", x.name, by.name, ".pdf", sep="")
+    pdf.fname <- paste("bc_", x.name, by.name, ".pdf", sep = "")
     pdf.path <- file.path(path.expand("~"), pdf.fname)
 
     # styles before re-set in interact() were saved
-    style(lab_cex=getOption("l.cex"))
-    style(axis_cex=getOption("l.axc"))
+    style(lab_cex = getOption("l.cex"))
+    style(axis_cex = getOption("l.axc"))
 
-    BarChart(x, y, by=by, data=NULL, stat=in.stat,
-            fill=in.fill, color=input$myColor, transparency=input$myTrans,
-            sort=input$mySort, horiz=input$myHoriz,
-            stack100=input$my100, beside=input$myBeside,
-            labels=input$myLabels, labels_color=input$myLabelsColor,
-            labels_size=input$myLabelsSize, labels_position=input$myLabelsPos,
-            xlab=x.name, ylab=axis.name, legend_title=lt, quiet=TRUE,
-            pdf_file=pdf.path,
-            width=as.numeric(input$w), height=as.numeric(input$h))
+    ## ---- Chart() call for saved plot, mirroring the four cases ----
+
+    if (input$do_y && input$do_by) {
+      Chart(
+        x, y, by = by, data = NULL,
+        type = "bar",
+        stat  = in.stat,
+        fill  = in.fill,
+        color = input$myColor,
+        transparency = input$myTrans,
+        sort  = input$mySort,
+        horiz = input$myHoriz,
+        stack100 = input$my100,
+        beside   = input$myBeside,
+        labels          = input$myLabels,
+        labels_color    = input$myLabelsColor,
+        labels_size     = input$myLabelsSize,
+        labels_position = input$myLabelsPos,
+        xlab = x.name,
+        ylab = axis.name,
+        legend_title = lt,
+        quiet = TRUE,
+        pdf_file = pdf.path,
+        width  = as.numeric(input$w),
+        height = as.numeric(input$h)
+      )
+
+    } else if (input$do_y && !input$do_by) {
+      Chart(
+        x, y, data = NULL,
+        type = "bar",
+        stat  = in.stat,
+        fill  = in.fill,
+        color = input$myColor,
+        transparency = input$myTrans,
+        sort  = input$mySort,
+        horiz = input$myHoriz,
+        stack100 = input$my100,
+        beside   = input$myBeside,
+        labels          = input$myLabels,
+        labels_color    = input$myLabelsColor,
+        labels_size     = input$myLabelsSize,
+        labels_position = input$myLabelsPos,
+        xlab = x.name,
+        ylab = axis.name,
+        legend_title = lt,
+        quiet = TRUE,
+        pdf_file = pdf.path,
+        width  = as.numeric(input$w),
+        height = as.numeric(input$h)
+      )
+
+    } else if (!input$do_y && input$do_by) {
+      Chart(
+        x, by = by, data = NULL,
+        type = "bar",
+        fill  = in.fill,
+        color = input$myColor,
+        transparency = input$myTrans,
+        sort  = input$mySort,
+        horiz = input$myHoriz,
+        stack100 = input$my100,
+        beside   = input$myBeside,
+        labels          = input$myLabels,
+        labels_color    = input$myLabelsColor,
+        labels_size     = input$myLabelsSize,
+        labels_position = input$myLabelsPos,
+        xlab = x.name,
+        ylab = axis.name,
+        legend_title = lt,
+        quiet = TRUE,
+        pdf_file = pdf.path,
+        width  = as.numeric(input$w),
+        height = as.numeric(input$h)
+      )
+
+    } else {
+      Chart(
+        x, data = NULL,
+        type = "bar",
+        fill  = in.fill,
+        color = input$myColor,
+        transparency = input$myTrans,
+        sort  = input$mySort,
+        horiz = input$myHoriz,
+        stack100 = input$my100,
+        beside   = input$myBeside,
+        labels          = input$myLabels,
+        labels_color    = input$myLabelsColor,
+        labels_size     = input$myLabelsSize,
+        labels_position = input$myLabelsPos,
+        xlab = x.name,
+        ylab = axis.name,
+        legend_title = lt,
+        quiet = TRUE,
+        pdf_file = pdf.path,
+        width  = as.numeric(input$w),
+        height = as.numeric(input$h)
+      )
+    }
 
     # reset back to shiny setting
-    style(lab_cex=1.201, axis_cex=1.011, suggest=FALSE)
+    style(lab_cex = 1.201, axis_cex = 1.011, suggest = FALSE)
 
     # R code
-    r.fname <- paste("bc_", x.name, by.name, ".r", sep="")
+    r.fname <- paste("bc_", x.name, by.name, ".r", sep = "")
     r.path <- file.path(path.expand("~"), r.fname)
     cat("\n")
     message("---------------------------------------------")
@@ -526,51 +720,52 @@ server <- function(input, output, session) {
     if (input$fSource == "web") {
       url <- theURL()
       if (!(grepl("http://", url)))
-        url <- paste("http://", url, sep="")
+        url <- paste("http://", url, sep = "")
     }
 
-    read.path <- ifelse (input$fSource == "local", input$myFile$name, url)
-    read.code <- paste("d <- Read(\"", read.path, "\")", sep="")
-    is.local <- !grepl("http://", read.path, fixed=TRUE)
+    read.path <- ifelse(input$fSource == "local", input$myFile$name, url)
+    read.code <- paste("d <- Read(\"", read.path, "\")", sep = "")
+    is.local <- !grepl("http://", read.path, fixed = TRUE)
 
     if (input$do_cmt)
       cat("# The # symbol indicates a comment rather than an R instruction\n\n",
           "# Begin the R session by loading the lessR functions ",
-          "from the library\n", sep="", file=r.path)
-      cat("library(\"lessR\")\n\n", file=r.path, append=TRUE)
+          "from the library\n", sep = "", file = r.path)
+    cat("library(\"lessR\")\n\n", file = r.path, append = TRUE)
 
     if (input$do_cmt) {
       cat("# Read your data into an R data table, the data frame, here d",
-          "\n", sep="", file=r.path, append=TRUE)
+          "\n", sep = "", file = r.path, append = TRUE)
       if (is.local)
         cat("# To browse for the data file, include nothing between the quotes",
-            "\n", sep="", file=r.path, append=TRUE)
+            "\n", sep = "", file = r.path, append = TRUE)
     }
     if (is.local && input$do_cmt)
-      cat("d <- Read(\"\")\n\n", file=r.path, append=TRUE)
+      cat("d <- Read(\"\")\n\n", file = r.path, append = TRUE)
 
     if (is.local && input$do_cmt) {
       cat("# For security, the path to your data file is not available\n",
           "# You can replace PATHtoFILE in the following with the path\n",
           "# Remove the # sign in the first column and delete the previous ",
-          "Read()\n", sep="", file=r.path, append=TRUE)
+          "Read()\n", sep = "", file = r.path, append = TRUE)
       read.path <- file.path("PATHtoFILE", read.path) 
-      read.code <- paste("# d <- Read(\"", read.path, "\")", sep="")
+      read.code <- paste("# d <- Read(\"", read.path, "\")", sep = "")
     }
-    cat(read.code, "\n\n", file=r.path, append=TRUE)
+    cat(read.code, "\n\n", file = r.path, append = TRUE)
 
     if (input$do_cmt)
       cat("# When you have your data table, do the bar chart analysis of a\n",
           "#   categorical variable in the data table\n",
           "# d is the default data frame name, so no need to specify\n",
-          sep="", file=r.path, append=TRUE)
-    cat(code, "\n\n", file=r.path, append=TRUE)
+          sep = "", file = r.path, append = TRUE)
+    cat(code, "\n\n", file = r.path, append = TRUE)
 
-    anlys <- "BarChart()"
+    anlys <- "Chart()"
     if (input$do_cmt)
       cat("# If accessing data with a name other than d, must add  data=NAME\n",
           paste("#   to the", anlys, "call, where NAME is the name of your",
-          "data frame"), "\n", sep="", file=r.path, append=TRUE)
+                "data frame"), "\n",
+          sep = "", file = r.path, append = TRUE)
   })
   output$saved_plot <- renderPlot({ plotInput() })
 
@@ -578,7 +773,7 @@ server <- function(input, output, session) {
   # access web page help file
   output$help <- eventReactive(input$do_help, {
     shiny::req(input$do_help)
-    fp <- system.file("shiny_apps/help/BarChart.html", package="lessR")
+    fp <- system.file("shiny_apps/help/BarChart.html", package = "lessR")
     browseURL(fp)
   })
 

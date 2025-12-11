@@ -1,5 +1,0 @@
-reord <-
-function(...)
-
-  corReorder(...)
-

@@ -51,7 +51,8 @@ function (R=mycor,
   ev.df = data.frame(ev)
   x.df <- data.frame(1:nrow(ev.df))
   .plt.main(x.df, ev.df, segments=TRUE, size=.9,
-            xlab="Index", ylab="Eigenvalues", main=main)
+            xlab="Index", ylab="Eigenvalues", main=main,
+            use_plotly=FALSE)
 
   # manage graphics
   # ---------------

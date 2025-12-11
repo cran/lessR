@@ -14,11 +14,11 @@ function (h, len.x, mx.dd, fun_call) {
       if (!grepl("bin_end", fncl))
         tx[length(tx)+1] <- "bin_end: set the end of the last bin"
       txt <- "  # smoothed curve + histogram"
-      tx[length(tx)+1] <- paste("Histogram(", getOption("xname"),
-         ", density=TRUE)", txt, sep="")
+      tx[length(tx)+1] <- paste("X(", getOption("xname"),
+         ", type=\"density\")", txt, sep="")
       txt <- "  # Violin/Box/Scatterplot (VBS) plot"
-      tx[length(tx)+1] <- paste("Plot(", getOption("xname"), ")", txt,
-         sep="")
+      tx[length(tx)+1] <- paste("X(", getOption("xname"),
+                                ", type=\"vbs\")", txt, sep="")
     }
     txsug <- tx
     if (length(txsug) == 0) txsug <- ""

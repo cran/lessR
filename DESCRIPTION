@@ -1,28 +1,41 @@
 Package: lessR
-Version: 4.4.5
-Date: 2025-08-21
-Title: Less Code, More Results
-Authors@R: c(
-    person(given = "David W.", 
-           family = "Gerbing", 
-           email = "gerbing@pdx.edu",
-           role = c("aut", "cre"),
-           comment = "ORCID: https://orcid.org/0000-0001-6998-8350; Affiliation: School of Business, Portland State University"))
+Version: 4.5
+Title: Less Code with More Comprehensive Results
+Authors@R: person(given = "David W.", family = "Gerbing", email = "gerbing@pdx.edu",
+  role = c("aut", "cre"),
+  comment = c(ORCID = "0000-0001-6998-8350",
+              Affiliation = "School of Business, Portland State University"))
+Description: Each function replaces multiple standard R functions. For example,
+    two function calls, Read() and CountAll(), generate summary statistics for
+    all variables in the data frame, plus histograms and bar charts. Other
+    functions provide data aggregation via pivot tables; comprehensive
+    regression, ANOVA, and t-test; visualizations including integrated
+    Violin/Box/Scatter plot for a numerical variable, bar chart, histogram,
+    box plot, density curves, calibrated power curve; reading multiple data
+    formats with the same call; variable labels; time series with aggregation
+    and forecasting; color themes; and Trellis (facet) graphics. Also includes
+    a confirmatory factor analysis of multiple-indicator measurement models,
+    pedagogical routines for data simulation (e.g., Central Limit Theorem),
+    generation and rendering of regression instructions for interpretative output,
+    and both interactive construction of visualizations and interactive
+    visualizations with plotly.
 Depends: R (>= 3.6.0)
 Imports: graphics, grDevices, stats, utils, methods, lattice,
         latticeExtra, robustbase, ellipse, leaps, openxlsx, colorspace,
-        shiny, knitr, kableExtra, xts, zoo, MASS
+        shiny, knitr, kableExtra, xts, zoo, MASS, conflicted, plotly
+        (>= 4.11.0), htmlwidgets, htmltools
 Suggests: KernSmooth, haven, readODS, triangle, arrow, rmarkdown,
-        wesanderson, tsibble, fable, fabletools, distributional
+        wesanderson, tsibble, fable, fabletools, distributional,
+        rstudioapi
 VignetteBuilder: knitr
-Description: Each function replaces multiple standard R functions. For example, two function calls, Read() and CountAll(), generate summary statistics for all variables in the data frame, plus histograms and bar charts as appropriate. Other functions provide for summary statistics via pivot tables, a comprehensive regression analysis, ANOVA and t-test, visualizations including the Violin/Box/Scatter plot for a numerical variable, bar chart, histogram, box plot, density curves, calibrated power curve, reading multiple data formats with the same function call, variable labels, time series with aggregation and forecasting, color themes, and Trellis (facet) graphics. Also includes a confirmatory factor analysis of multiple indicator measurement models, pedagogical routines for data simulation such as for the Central Limit Theorem, generation and rendering of regression instructions for interpretative output, and interactive visualizations.
 License: GPL (>= 2)
+Encoding: UTF-8
 LazyLoad: yes
-Packaged: 2025-08-21 13:26:05 UTC; davidgerbing
 NeedsCompilation: no
-Author: David W. Gerbing [aut, cre] (ORCID:
-    https://orcid.org/0000-0001-6998-8350; Affiliation: School of
-    Business, Portland State University)
+Packaged: 2025-12-10 16:45:05 UTC; davidgerbing
 Maintainer: David W. Gerbing <gerbing@pdx.edu>
+Author: David W. Gerbing [aut, cre] (ORCID:
+    <https://orcid.org/0000-0001-6998-8350>, Affiliation: School of
+    Business, Portland State University)
 Repository: CRAN
-Date/Publication: 2025-08-22 05:40:11 UTC
+Date/Publication: 2025-12-11 16:00:08 UTC

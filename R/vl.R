@@ -1,5 +1,0 @@
-vl <-
-function(...)
-
-  VariableLabels(...)
-

@@ -34,6 +34,8 @@ function(my_formula, data=d, filter=NULL,
          fun_call=NULL, ...) {
 
 
+  options(lessR.interactive = FALSE)
+
   if (!missing(n_cat)) {
     message(">>> Parameter  n_cat  will no longer work in the future.\n",
              "    Better to convert a categorical integer variable to ",
@@ -412,13 +414,18 @@ function(my_formula, data=d, filter=NULL,
     title_basic <- "\n  BASIC ANALYSIS"
     est <- .reg1modelBasic(lmo, digits_d, show_R)
 
-    if (!ancova)
+    n.y <- sum(!is.na(data[,nm[1]]))  # counts non-NA values
+    if (!ancova) {
       anv <- .reg1anvBasic(lmo, digits_d, show_R)
-    else
+      ss.tot <- anv$tot["ss"]  # already computed
+    }
+    else {
       anv <- .reg1ancova(lmo, d.ancova, digits_d, show_R)
+      ss.tot <- var(data[,nm[1]], na.rm = TRUE) * (n.y - 1)  # Type II ANVOVA
+    }
 
-    sy <- sd(data[,nm[1]], na.rm=TRUE)
-    fit <- .reg1fitBasic(lmo, anv$tot["ss"], sy, digits_d, show_R)
+    sy <- sqrt(ss.tot / (n.y-1))
+    fit <- .reg1fitBasic(lmo, ss.tot, sy, digits_d, show_R)
 
     txkfl <- ""
     title_kfold <- paste("\n  K-FOLD CROSS-VALIDATION", sep="")

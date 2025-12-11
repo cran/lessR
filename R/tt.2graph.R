@@ -54,15 +54,22 @@ function(YA, YB, bw1, bw2, Ynm, Xnm, X1nm, X2nm, y.lbl, digits_d, brief,
 
   plot.new()
   plot.window(xlim=c(min.x,max.x), ylim=c(0,max.y))
+
   ax <- .axes_dim()  # get axis value parameters
+  # hack because otherwise axis_cex at 0.75 default is too small
+  cx <- getOption("axis_cex")
+  options(axis_cex=1)
+
   adj <- .RSadj(axis_cex=ax$axis_x_cex); axis_x_cex <- adj$axis_cex * 1.2
   axT1 <- pretty(c(min.x, max.x))
   .axes(NULL, NULL, axT1, NULL)
-#       axis_fmt=axis_fmt, axis_x_pre=axis_x_pre, axis_y_pre=axis_y_pre,
-#       ...)
   box(col=getOption("panel_color"))
   if (nchar(y.lbl) > 50) y.lbl <- paste(substr(y.lbl,1,50), "...")
   title(xlab=x.lab, col.lab=col.tx, cex.lab=axis_x_cex*1.1)
+
+  # restore axis_cex for other routines
+  options(axis_cex=cx)
+  options(axis_x_cex=cx)
 
   xleft <- par("usr")[1]  # left side of graph
   xright <- par("usr")[2]  # right side of graph

@@ -82,7 +82,7 @@ function(x, y=NULL, by=NULL, digits_d=NULL, x.name, y.name=NULL, by.name=NULL,
       }
 
       else {  # write
-
+# NEED to adjust width of .fmt(x[ ] ... )
         mx.cx <- max(nchar(x.name), max(nchar(colnames(x))))
 
         tx[length(tx)+1] <- paste(
@@ -94,7 +94,8 @@ function(x, y=NULL, by=NULL, digits_d=NULL, x.name, y.name=NULL, by.name=NULL,
              tx[length(tx)+1] <- paste(
                 .fmtc(colnames(x)[i], w=mx.cx, j="left"), 
                 .fmtc(rownames(x)[j], w=max.c1, j="left"),
-                .fmt(x[j,i], d=digits_d, w=max.ln-3))
+#               .fmt(x[j,i], d=digits_d, w=10))  # need to narrow w
+                .fmt(x[j,i], d=digits_d, w=max.ln-3))  # max.ln too wide
           }
         }
       }  # end write

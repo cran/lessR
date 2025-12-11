@@ -1,5 +1,0 @@
-pc <-
-function(...)
-
-  PieChart(...)
-

@@ -1,5 +1,5 @@
 .plt.bck <-
-function(usr, axT1, axT2, do.v=TRUE, do.h=TRUE) {
+function(usr, gridT1, gridT2, do.v=TRUE, do.h=TRUE) {
 
   # background color
   rect(usr[1], usr[3], usr[2], usr[4],
@@ -22,10 +22,10 @@ function(usr, axT1, axT2, do.v=TRUE, do.h=TRUE) {
     getOption("grid_lty"), getOption("grid_y_lty"))
 
   if (do.h)
-    abline(h=axT2, col=grid_y_color, lwd=grid_y_lwd, lty=grid_y_lty)
+    abline(h=gridT2, col=grid_y_color, lwd=grid_y_lwd, lty=grid_y_lty)
 
   if (do.v)
-    abline(v=axT1, col=grid_x_color, lwd=grid_x_lwd, lty=grid_x_lty)
+    abline(v=gridT1, col=grid_x_color, lwd=grid_x_lwd, lty=grid_x_lty)
 
   # box around plot
   rect(usr[1], usr[3], usr[2], usr[4],

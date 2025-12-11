@@ -112,7 +112,8 @@ reg_brief(\dots, brief=TRUE)
   \item{show_R}{Display the R instructions that yielded the \code{lessR} output,
         albeit without the additional formatting of the results such as combining
         output of different functions into a table.}
-  \item{plot_errors}{For a one-predictor model, plot the line segment that
+  \item{plot_errors}{By default is \code{FALSE}. 
+        For a one-predictor model, plot the line segment that
         joins each point to the regression line, illustrating the size of the
         residuals.}\cr
 
@@ -215,7 +216,7 @@ reg_brief(\dots, brief=TRUE)
 
 \details{
 OVERVIEW\cr
-The purpose of \code{Regression} is to combine the following function calls into one, as well as provide ancillary analyses such as as graphics, organizing output into tables and sorting to assist interpretation of the output, as well as generate R Markdown to run through \code{knitr}, such as with \code{RStudio}, to provide extensive interpretative output.
+The purpose of \code{Regression} is to combine the following function calls into one, as well as provide ancillary analyses such as graphics, organizing output into tables and sorting to assist interpretation of the output, as well as generate R Markdown to run through \code{knitr}, such as with \code{RStudio}, to provide extensive interpretative output.
 
 The basic analysis successively invokes several standard R functions beginning with the standard R function for estimation of a linear model, \code{\link{lm}}. The output of the analysis of \code{\link{lm}} is stored in the object \code{lm.out}, available for further analysis in the R environment upon completion of the \code{Regression} function. By default \code{reg} automatically provides the analyses from the standard R functions, \code{\link{summary}}, \code{\link{confint}} and \code{\link{anova}}, with some of the standard output modified and enhanced. The correlation matrix of the model variables is obtained with \code{\link{cor}} function. The residual analysis invokes \code{\link{fitted}}, \code{\link{resid}}, \code{\link{rstudent}}, and \code{\link{cooks.distance}} functions.  The option for prediction intervals calls the standard R function \code{\link{predict}}, once with the argument \code{interval="confidence"} and once with \code{interval="prediction"}. The \code{lessR} \code{\link{Histogram}} function with \code{stat="density"} provides the histogram and density plots for the residuals and the \code{\link{ScatterPlot}} function provides the scatter plots of the residuals with the fitted values and of the data for the one-predictor model. The \code{pairs} function provides the scatterplot matrix of all the variables in the model. Thomas Lumley's \code{leaps} package contains the \code{leaps} function that provides the analysis of the fit of all possible model subsets.
 
@@ -227,7 +228,7 @@ The \code{filter} parameter subsets rows (cases) of the input data frame accordi
 TEXT OUTPUT\cr
 The output is produced in pieces by topic (see \code{values} below), automatically collated by default in the final output. But the pieces are available for later reference if the output of the function is directed toward an object, such as \code{r} in \code{r <- reg(Y ~ X)}. This is especially useful if the pieces are accessed within \code{knitr} or individual pieces are displayed at the console.
 
-The text output is organized to provide the most relevant information while at the same time minimizing the total amount of output, particularly for analyses with large numbers of observations (rows of data), the display of which is by default restricted to only the most interesting or representative observations in the analyses of the residuals and predicted values. Additional economy can be obtained by invoking the \code{brief=TRUE} option, or run \code{reg_brief}, which limits the analysis to just the basic analysis of the estimated coefficients and fit, and if \code{X1_new}, etc. are requested, the relevant rows of forecasted values:w
+The text output is organized to provide the most relevant information while at the same time minimizing the total amount of output, particularly for analyses with large numbers of observations (rows of data), the display of which is by default restricted to only the most interesting or representative observations in the analyses of the residuals and predicted values. Additional economy can be obtained by invoking the \code{brief=TRUE} option, or run \code{reg_brief}, which limits the analysis to just the basic analysis of the estimated coefficients and fit, and if \code{X1_new}, etc. are requested, the relevant rows of forecasted values.
 .
 
 R MARKDOWN\cr
@@ -235,7 +236,7 @@ An R~Markdown file ready for knitting and rendering into one of several formats 
 
 To access the same data file for the regression analysis from running \code{Regression} from the R console, and that accomplished by knitting the generated R~Markdown, first read the data into R with the lessR \code{\link{Read}} function. That function stores the name of the last data file read so that it can be accessed via R as the markdown is knit and then rendered into the specified format. The default rendering is to \code{HTML}, but other formats can be specified with \code{Rmd_format}. 
 
-The output from \code{Rmd} is conceptually partitioned into five parts:  results, explanations of the results, interpretations of the results, documentation o the code, and the code itself. By default all available output is generated but the flags \code{results}, \code{explain}, \code{interpret}, \code{document}, \code{code} can be set to \code{FALSE} to reduce the output. The options can be specified in a specific function all or set globally, such as with \code{options(explain=FALSE)}. Turning off all five flags leaves just the outline of the potential output and a bare minimum of results.
+The output from \code{Rmd} is conceptually partitioned into four parts:  results, explanations of the results, interpretations of the results, documentation of the code, and the code itself. By default, all available output is generated but the flags \code{results}, \code{explain}, \code{interpret}, \code{document}, \code{code} can be set to \code{FALSE} to reduce the output. The options can be specified in a specific function call or set globally, such as with \code{options(explain=FALSE)}. Turning off all the flags leaves just the outline of the potential output and a bare minimum of results.
 
 Both any existing variable labels and variable units are included in the output to the R~Markdown file. Any variable units set as a dollar, are set as USD dollars and cents in the output, displayed with a dollar sign.
 
@@ -259,10 +260,10 @@ Three default graphs are provided. When running \code{R} by itself, by default t
 3. For models with a single predictor variable, a scatterplot of the data is produced, which also includes the regression line and corresponding confidence and prediction intervals. As with the density histogram plot of the residuals and the scatterplot of the fitted values and residuals, the scatterplot includes a colored background with grid lines. For multiple regression models, a scatterplot matrix of the variables in the model with the \code{\link{lowess}} best-fit line of each constituent scatterplot is produced. If the \code{scatter_coef} option is invoked, each scatterplot in the upper-diagonal of the correlation matrix is replaced with its correlation coefficient.
 
 RESIDUAL ANALYSIS\cr
-By default the residual analysis lists the data and fitted value for each observation as well as the residual, Studentized residual, Cook's distance and dffits, with the first 20 observations listed and sorted by Cook's distance.  The \code{res_sort} option provides for sorting by the Studentized residuals or not sorting at all.  The \code{n_res_rows} option provides for listing these rows of data and computed statistics statistics for any specified number of observations (rows).  To turn off the analysis of residuals, specify \code{n_res_rows=0}.
+By default the residual analysis lists the data and fitted value for each observation as well as the residual, Studentized residual, Cook's distance and dffits, with the first 20 observations listed and sorted by Cook's distance.  The \code{res_sort} option provides for sorting by the Studentized residuals or not sorting at all.  The \code{n_res_rows} option provides for listing these rows of data and computed statistics for any specified number of observations (rows).  To turn off the analysis of residuals, specify \code{n_res_rows=0}.
 
 PREDICTION INTERVALS\cr
-The output for the confidence and prediction intervals includes a table with the data and fitted value for each observation, the lower and upper bounds for the confidence interval and the prediction interval, and the wide of the prediction interval.  The observations are sorted by the lower bound of each prediction interval.  If there are 25 or more observations then the information for only the first three, the middle three and the last three observations is displayed. To turn off the analysis of prediction intervals, specify \code{n_pred_rows=0}, which also removes the corresponding intervals from the scatterplot produced with a model with exactly one predictor variable, yielding just the scatterplot and the regression line.
+The output for the confidence and prediction intervals includes a table with the data and fitted value for each observation, the lower and upper bounds for the confidence interval and the prediction interval, and the width of the prediction interval.  The observations are sorted by the lower bound of each prediction interval.  If there are 25 or more observations then the information for only the first three, the middle three and the last three observations is displayed. To turn off the analysis of prediction intervals, specify \code{n_pred_rows=0}, which also removes the corresponding intervals from the scatterplot produced with a model with exactly one predictor variable, yielding just the scatterplot and the regression line.
 
 The data for the default analysis of the prediction intervals is for the values of the predictor variables for each observation, that is, for each row of the data. New values of the predictor variables can be specified for the calculation of the prediction intervals by providing values for the options \code{X1_new} for the values of the first listed predictor variable in the model, \code{X2_new} for the second listed predictor variable, and so forth for up to five predictor variables, and all predictor variables are numeric. To provide these values, use functions such as \code{\link{seq}} for specifying a sequence of values and \code{\link{c}} for specifying a vector of values. For multiple regression models, all combinations of the specified new values for all of the predictor variables are analyzed.
 
@@ -270,7 +271,7 @@ RELATIONS AMONG THE VARIABLES\cr
 By default the correlation matrix of all the variables in the model is displayed, and, for multiple regression models, collinearity analysis is provided. Also provided are the first 50 models with the largest R squared adjusted from each possible model from an analysis of all possible subsets of the predictor variables.  This all subsets analysis requires the \code{leaps} function from the \code{leaps} package. These contributed packages are automatically loaded if available.  To turn off the all possible sets option, set \code{subsets=FALSE}.
 
 RECODE PREDICTOR VARIABLES\cr
-The \code{new_scale} parameter provides for recoding the values of the predictor variables according to several different transformations:  \code{"z"}, \code{"center"}, \code{"0to1"}, or \code{"robust"}. The later is a robust version of classic standardization in which the mean is replaced by the median and the standard deviation by the IQR. All numeric predictor variables with more than two values are standardized. 
+The \code{new_scale} parameter provides for recoding the values of the predictor variables according to several different transformations:  \code{"z"}, \code{"center"}, \code{"0to1"}, or \code{"robust"}. The latter is a robust version of classic standardization in which the mean is replaced by the median and the standard deviation by the IQR. All numeric predictor variables with more than two values are standardized. 
 
 So any numeric variable with more than two values that is a categorical variable should be first converted to an R factor. If there are some numeric predictor variables that should not be standardized, such as an interaction term with centered variables that define the interaction, then the rescaling should be done separately, such as with base~R function \code{\link{scale}} or lessR  \code{\link{rescale}}. 
 
@@ -284,9 +285,9 @@ For two predictor models, one of the predictor variables can be entered into the
 
 For predictor variable, X, second predictor as a potential moderator, W, and response Y, enter the following R input.\cr
 \code{reg(Y ~ X + W, mod=W)}\cr
-From this, with now centered variables X and Y, the following multiple regression model is automatically defined.\cr
-\code{Y^ = b0 + bx(X) + bw(W) + bxw(XW)}\cr
-From that model, the functions sets the moderator variable W to each of the three constant values, \code{Wc}, and solves for the given value \code{Wc} to visually plot the potential interaction. 
+From this, with now centered variables X and W, the following multiple regression model is automatically defined.\cr
+\eqn{\hat{Y} = b_0 + b_x X + b_w W + b_{xw} XW}\cr
+From that model, the function sets the moderator variable W to each of the three constant values, \code{Wc}, and solves for the given value \code{Wc} to visually plot the potential interaction. 
 
 
 
@@ -294,7 +295,7 @@ INVOKED R OPTIONS\cr
 The \code{\link{options}} function is called to turn off the stars for different significance levels (show.signif.stars=FALSE), to turn off scientific notation for the output (scipen=30), and to set the width of the text output at the console to 120 characters. The later option can be re-specified with the \code{text_width} option.  After \code{Regression} is finished with a normal termination, the options are re-set to their values before the \code{Regression} function began executing.
 
 COLOR THEME\cr
-A color theme for all the colors can be chosen for a specific plot with the \code{colors} option. Or, the color theme can be changed for all subsequent graphical analysis with the \code{lessR} function \code{\link{style}}. The default color theme is \code{lightbronze}, but a gray scale is available by removing the bronze background, such as with \code{style(window_fill="white")} or with \code{"gray"}. Other themes are available as explained in \code{\link{style}}.
+A color theme for all the colors can be changed globally with \link{style}. Or, the color theme can be changed for all subsequent graphical analysis with the \code{lessR} function \code{\link{style}}. The default color theme is \code{lightbronze}, but a gray scale is available by removing the bronze background, such as with \code{style(window_fill="white")} or with \code{"gray"}. Other themes are available as explained in \code{\link{style}}.
 
 VARIABLE LABELS\cr
 If variable labels exist, then the corresponding variable label is by default listed as the label for the horizontal axis and on the text output. For more information, see \code{\link{Read}}.
@@ -318,7 +319,7 @@ TEXT OUTPUT\cr
 \code{out_plots}: list of plots generated if more than one\cr
 \code{out_suggest}: list of suggested other analyses\cr
 
-Separated from the rest of the text output are the major headings, which can not be included with custom collations of the output.
+Separated from the rest of the text output are the major headings, which cannot be included with custom collations of the output.
 \code{out_title_bck}: BACKGROUND\cr
 \code{out_title_basic}: BASIC ANALYSIS\cr
 \code{out_title_rel}: RELATIONS AMONG THE VARIABLES\cr

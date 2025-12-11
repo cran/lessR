@@ -1,5 +1,0 @@
-wrt <-
-function(...)
-
-  Write(...)
-

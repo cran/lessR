@@ -1,5 +1,0 @@
-reflect <-
-function(...)
-
-  corReflect(...)
-

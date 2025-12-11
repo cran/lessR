@@ -1,5 +1,0 @@
-vp <-
-function(...)
-
-  ViolinPlot(...)
-

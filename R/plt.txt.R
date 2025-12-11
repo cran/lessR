@@ -1,6 +1,6 @@
 .plt.txt <-
 function(x, y, stat, object, cat.x, cat.y, date.var,
-       xlab, ylab, fit, n.by, mse.ln, mse.nl, b0, b1, Rsq, 
+       xlab, ylab, fit, n.by, mse.ln, mse.nl, b0, b1, Rsq,
        fit_new, y.new, by.cat,
        center_line, run, show_runs, prop, size, radius, digits_d,
        fun_call=NULL) {
@@ -70,7 +70,7 @@ function(x, y, stat, object, cat.x, cat.y, date.var,
   # decimal digits
   if (is.null(digits_d)) {  # cat vars are only integers
     digits_d <- .max.dd(y[,1]) + 1
-    if (!cat.x && cat.y) digits_d <- .max.dd(x[,1]) + 1 
+    if (!cat.x && cat.y) digits_d <- .max.dd(x[,1]) + 1
   }
   if (digits_d < 3) digits_d <- 3
   options(digits_d=digits_d)
@@ -116,9 +116,9 @@ function(x, y, stat, object, cat.x, cat.y, date.var,
         txsug <- "\n>>> Suggestions  or  enter: style(suggest=FALSE)"
 
         if (x.name != y.name)
-          fc <- paste("Plot(", x.name, ", ", y.name, sep="")
+          fc <- paste("XY(", x.name, ", ", y.name, sep="")
         else
-          fc <- paste("Plot(", x.name, sep="")
+          fc <- paste("XY(", x.name, sep="")
 
         if (!grepl("ts_ahead", fncl)) {
           txt <- ", ts_ahead=4)"
@@ -185,7 +185,7 @@ function(x, y, stat, object, cat.x, cat.y, date.var,
           fc <- paste(fc, ", size=0", sep="")
         if (nzchar(fc)) {
           fc <- gsub(" = ", "=", fc)
-          fc <- paste(fncl, fc, ")   # just line segments, no points", sep="")
+          fc <- paste(fncl, fc, ")   # just line segments, no points ")
           txsug <- paste(txsug, "\n", fc, sep="")
         }
 
@@ -216,7 +216,6 @@ function(x, y, stat, object, cat.x, cat.y, date.var,
         txsug <- .rm.arg.2(" x=", txsug)
         txsug <- .rm.arg.2("(x=", txsug)
         txsug <- .rm.arg.2(" y=", txsug)
-#for(i in 1:length(txsug)) cat(txsug[i], "\n")  # even here blank lines at end
 
         class(txsug) <- "out"
         output <- list(out_suggest=txsug)
@@ -300,7 +299,7 @@ function(x, y, stat, object, cat.x, cat.y, date.var,
       if (getOption("suggest")) {
         txsug <- "\n>>> Suggestions  or  enter: style(suggest=FALSE)"
 
-        fc <- paste("Plot(", x.name, ", ", y.name, sep="")
+        fc <- paste("XY(", x.name, ", ", y.name, sep="")
 
         if (!grepl("enhance", fncl)) {
           txt <- ", enhance=TRUE)  # many options"
@@ -402,13 +401,13 @@ function(x, y, stat, object, cat.x, cat.y, date.var,
       # Create a y.new data frame with formatted numbers
       if (!is.null(y.new)) {
         if (.is.integer(fit_new))
-          x1 <- format(fit_new, trim=TRUE) 
+          x1 <- format(fit_new, trim=TRUE)
         else
-          x1 <- format(fit_new, nsmall=digits_d, trim=TRUE) 
+          x1 <- format(fit_new, nsmall=digits_d, trim=TRUE)
         x2 <- format(y.new, nsmall=digits_d, trim=TRUE)
         mx.x <- max(x[,1], na.rm=TRUE)
         txt <- "Prediction from beyond the data range"
-        x3 <- ifelse(fit_new > mx.x, txt, " ")   
+        x3 <- ifelse(fit_new > mx.x, txt, " ")
         tx <- data.frame(x1,x2,x3)
         names(tx) <- c(nm.x, paste(nm.y, "_Fit", sep=""), " ")
         dfnew <- tx
@@ -471,7 +470,7 @@ function(x, y, stat, object, cat.x, cat.y, date.var,
           if (!is.na(b1[i])) {  # linear function
             tx[i] <- paste(tx[i],
               "Line: b0 = ", b0.pn, "    b1 = ", b1.pn,
-              "    ", md.type,  " Model MSE = ", mse.out, sep="")
+              "\n  ", md.type,  " Model MSE = ", mse.out, sep="")
               rsqu <- ifelse (is.na(Rsq[i]), "", paste("   Rsq =", Rsq.pn))
               tx[i] <- paste(tx[i], rsqu, "\n", sep="")
           }
@@ -506,53 +505,53 @@ function(x, y, stat, object, cat.x, cat.y, date.var,
 
       # --------------------------------
       # categorical var with numeric var for means plot or bubble-1D plot
+      # now called from X(), not a XY() procedure
+      # need to rework suggestions for X(x=cont, by=cat)
 
       else if ((cat.x && !cat.y && !unique.x) ||
                (!cat.x && cat.y && !unique.y)) {
-
         if (!bubble1) {  # means plot
 
           txsug <- ""
           if (getOption("suggest")) {
-            txsug <- "\n>>> Suggestions  or  enter: style(suggest=FALSE)"
-
-            fc <- ""
-            if (!grepl("means", fncl))
-              fc <- paste(fc, ", means=FALSE", sep="")
-            if (nzchar(fc)) {
-              fc <- paste(fncl, fc, ") ", sep="")
-              txsug <- paste(txsug, "\n", fc, "  # do not plot means", sep="")
-            }
-
-            fc <- ""
-            if (!grepl("stat", fncl)) {
-              fc <- paste(fc, ", stat=\"mean\"", sep="")
-              if (grepl("means", fncl)) fncl <- .rm.arg.l("means", fncl)
-            }
-            if (nzchar(fc)) {
-              fc <- paste(fncl, fc, ") ", sep="")
-              txsug <- paste(txsug, "\n", fc, "  # only plot means", sep="")
-            }
-
-            if (cat.x) {
-              rv <- y.name
-              pv <- x.name
-              n.lvl <- length(unique(x))
-            }
-            else {
-              rv <- x.name
-              pv <- y.name
-              n.lvl <- length(unique(y))
-            }
-            fnct <- ifelse(n.lvl == 2, "ttest", "ANOVA")
-            fc <- paste("\n", fnct, "(", rv, " ~ ", pv,
-                        ")  # inferential analysis", sep="")
-            txsug <- paste(txsug, fc, sep="")
-
-            txsug <- .rm.arg.2(" x=", txsug)
-            txsug <- .rm.arg.2("(x=", txsug)
-            txsug <- .rm.arg.2(" y=", txsug)
-
+            # txsug <- "\n>>> Suggestions  or  enter: style(suggest=FALSE)"
+            #
+            # fc <- ""
+            # if (!grepl("means", fncl))
+            #   fc <- paste(fc, ", means=FALSE", sep="")
+            # if (nzchar(fc)) {
+            #   fc <- paste(fncl, fc, ") ", sep="")
+            #   txsug <- paste(txsug, "\n", fc, "  # do not plot means", sep="")
+            # }
+            #
+            # fc <- ""
+            # if (!grepl("stat", fncl)) {
+            #   fc <- paste(fc, ", stat=\"mean\"", sep="")
+            #   if (grepl("means", fncl)) fncl <- .rm.arg.l("means", fncl)
+            # }
+            # if (nzchar(fc)) {
+            #   fc <- paste(fncl, fc, ") ", sep="")
+            #   txsug <- paste(txsug, "\n", fc, "  # only plot means", sep="")
+            # }
+            #
+            # if (cat.x) {
+            #   rv <- y.name
+            #   pv <- x.name
+            #   n.lvl <- length(unique(x))
+            # }
+            # else {
+            #   rv <- x.name
+            #   pv <- y.name
+            #   n.lvl <- length(unique(y))
+            # }
+            # fnct <- ifelse(n.lvl == 2, "ttest", "ANOVA")
+            # fc <- paste("\n", fnct, "(", rv, " ~ ", pv,
+            #             ")  # inferential analysis", sep="")
+            # txsug <- paste(txsug, fc, sep="")
+            #
+            # txsug <- .rm.arg.2(" x=", txsug)
+            # txsug <- .rm.arg.2("(x=", txsug)
+            # txsug <- .rm.arg.2(" y=", txsug)
           }  # end suggest
 
           # get stats
@@ -582,24 +581,24 @@ function(x, y, stat, object, cat.x, cat.y, date.var,
 
           txsug <- ""
           if (getOption("suggest")) {
-            txsug <- "\n>>> Suggestions  or  enter: style(suggest=FALSE)"
-
-            fc <- ""
-            if (!grepl("color_low", fncl))
-              fc <- paste(fc, ", color_low=\"lemonchiffon2\"", sep="")
-            if (!grepl("color_hi", fncl))
-              fc <- paste(fc, ", color_hi=\"maroon3\"", sep="")
-            if (nzchar(fc)) {
-              fc <- paste(fncl, fc, ") ", sep="")
-              txsug <- paste(txsug, "\n", fc, sep="")
-            }
-
-            fc <- paste("Plot(", x.name,
-                   ", stat=\"count\")  # scatter plot of counts", sep="")
-            txsug <- paste(txsug, "\n", fc, sep="")
-
-            txsug <- .rm.arg.2(" x=", txsug)
-            txsug <- .rm.arg.2("(x=", txsug)
+            # txsug <- "\n>>> Suggestions  or  enter: style(suggest=FALSE)"
+            #
+            # fc <- ""
+            # if (!grepl("color_low", fncl))
+            #   fc <- paste(fc, ", color_low=\"lemonchiffon2\"", sep="")
+            # if (!grepl("color_hi", fncl))
+            #   fc <- paste(fc, ", color_hi=\"maroon3\"", sep="")
+            # if (nzchar(fc)) {
+            #   fc <- paste(fncl, fc, ") ", sep="")
+            #   txsug <- paste(txsug, "\n", fc, sep="")
+            # }
+            #
+            # fc <- paste("XY(", x.name,
+            #        ", stat=\"count\")  # scatter plot of counts", sep="")
+            # txsug <- paste(txsug, "\n", fc, sep="")
+            #
+            # txsug <- .rm.arg.2(" x=", txsug)
+            # txsug <- .rm.arg.2("(x=", txsug)
           }  # end suggest
 
           if (!is.null(x.lvl))
@@ -613,10 +612,12 @@ function(x, y, stat, object, cat.x, cat.y, date.var,
           counts <- stats$count
           chi <- stats$chi
 
+          txsug <- " "
           class(txsug) <- "out"
           class(txttl) <- "out"
           class(counts) <- "out"
           class(chi) <- "out"
+
           output <- list(out_suggest=txsug, out_title=txttl,
                          out_counts=counts, out_chi=chi)
           class(output) <- "out_all"
@@ -631,9 +632,9 @@ function(x, y, stat, object, cat.x, cat.y, date.var,
         if (getOption("suggest")) {
           txsug <- "\n>>> Suggestions  or  enter: style(suggest=FALSE)"
           fc <- ""
-          if (!grepl("sort_yx", fncl)) {
+          if (!grepl("sort", fncl)) {
             cmt <- "  # do not sort y-axis variable by x-axis variable"
-            fc <- paste(fncl, ", sort_yx=\"0\"", ")", cmt, "\n", sep="")
+            fc <- paste(fncl, ", sort=\"0\"", ")", cmt, "\n", sep="")
           }
           if (!grepl("segments_y", fncl)) {
             cmt <- "  # drop the line segments"

@@ -8,6 +8,8 @@ importFrom("colorspace", sequential_hcl, diverge_hcl,
 importFrom("knitr", engine_output, "kable")
 importFrom("kableExtra", kable_styling)
 importFrom("MASS", kde2d)
+importFrom(htmlwidgets, saveWidget, sizingPolicy)
+importFrom(htmltools, attachDependencies, htmlDependency)
 #importFrom("rlang", enquo, quo_is_missing, eval_tidy, as_label, caller_env, abort)
 #importFrom("xts", endpoints, period.apply)
 #importFrom("triangle", dtriangle, rtriangle)
@@ -23,7 +25,7 @@ importFrom("graphics", abline, arrows, axis, axis.Date, barplot, box, boxplot, g
 importFrom("grDevices", boxplot.stats, col2rgb, colorRampPalette, colors, dev.cur, dev.list, dev.new, dev.off, dev.set, gray, heat.colors, hcl, palette, pdf, rainbow, rgb, terrain.colors, as.graphicsAnnot, hcl.colors, palette.colors, gray.colors,
 convertColor)
 
-importFrom("stats", binom.test, confint.default, IQR, TukeyHSD, addmargins, anova, aov, as.formula, bw.nrd0, chisq.test, coef, complete.cases, confint, contrasts, cooks.distance, cor, cor.test, cov, density, dffits, dlnorm, dnorm, dt, dunif, factanal, fitted, frequency, glm, heatmap, interaction.plot, lm, lm.influence, loadings, loess, lowess, median, mahalanobis, na.omit, pf, pnorm, prop.test, power.t.test, predict, promax, pt, qnorm, qt, quantile, rbinom, replications, residuals, rlnorm, rnorm, reshape, rstandard, rstudent, runif, sd, setNames, shapiro.test, start, stl, t.test, terms.formula, update, var, varimax, is.ts, time,  weighted.mean, fivenum, as.dist, hclust, cutree, aggregate, DF2formula, model.matrix, HoltWinters, ts, vcov)
+importFrom("stats", approx, binom.test, confint.default, IQR, TukeyHSD, addmargins, anova, aov, as.formula, bw.nrd0, chisq.test, coef, complete.cases, confint, contrasts, cooks.distance, cor, cor.test, cov, density, dffits, dlnorm, dnorm, dt, dunif, factanal, fitted, frequency, glm, heatmap, interaction.plot, lm, lm.influence, loadings, loess, lowess, median, mahalanobis, na.omit, pf, pnorm, prop.test, power.t.test, predict, promax, pt, qnorm, qt, quantile, rbinom, replications, residuals, reformulate, rlnorm, rnorm, reshape, rstandard, rstudent, runif, sd, setNames, shapiro.test, start, stl, t.test, terms.formula, update, var, varimax, is.ts, time,  weighted.mean, fivenum, as.dist, hclust, cutree, aggregate, DF2formula, model.matrix, HoltWinters, ts, vcov, xtabs)
 
 importFrom("utils", capture.output, head, help, packageVersion, read.csv, read.delim, read.fwf, read.table, type.convert, write.csv, write.table, browseURL, tail)
 
@@ -48,8 +50,9 @@ S3method(print, out)
 export (
 
   ANOVA, av, av_brief,
-  BarChart, bc,
+  BarChart, 
   BoxPlot, bx,
+  Chart,
   Correlation, cr, cr_brief,
   CountAll, ca,
   corCFA, cfa, scales,
@@ -58,8 +61,10 @@ export (
   corReorder, reord, 
   corReflect, reflect, corProp, cp, corRead,
   corScree, scree, corEFA, efa,
+  Density,
   details, db,
   factors, 
+  Flows,
   getColors,
   Histogram, hs,
   interact,
@@ -81,7 +86,8 @@ export (
   Regression, reg, reg_brief, regPlot, 
   rename,
   reshape_long, reshape_wide,
-  set, showColors, showPalettes,
+  savePlotly,
+  showColors, showPalettes,
   simCImean, simCLT, simFlips, simMeans,
   ScatterPlot, sp, 
   see, skew,
@@ -97,6 +103,7 @@ export (
   values, VariableLabels, vl, 
   ViolinPlot, vp,
   Write, wrt, wrt_r, wrt_x,
+  X, XY,
   xAnd, xNum, xP, xRow, xU, xW,
   . 
 )

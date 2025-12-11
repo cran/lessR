@@ -99,9 +99,12 @@ function(
   add_lwd=getOption("add_lwd"),
   add_lty=getOption("add_lty"),
 
-  n_cat=getOption("n_cat"), suggest=getOption("suggest"),
+  n_cat=getOption("n_cat"),
+  suggest=getOption("suggest"),
   notes=getOption("notes"),
-  quiet=getOption("quiet"), brief=getOption("brief"),
+  quiet=getOption("quiet"),
+  brief=getOption("brief"),
+  lessR.use_plotly=getOption("lessR.use_plotly"),
 
   results=getOption("results"), explain=getOption("explain"),
   interpret=getOption("interpret"), document=getOption("document"),
@@ -269,6 +272,7 @@ function(
     notes <- set$notes
     quiet <- set$quiet
     brief <- set$brief
+    lessR.use_plotly <- set$lessR.use_plotly
 
     results <- set$output$results
     explain <- set$output$explain
@@ -287,7 +291,7 @@ function(
       theme <- match.arg(theme)
       options(theme=theme)
       options(trans_bar_fill=0.10)
-      options(trans_pt_fill=0.00)
+      options(trans_pt_fill=0.10)
     }
     else if (miss_set)
       theme <- getOption("theme")
@@ -524,6 +528,7 @@ function(
 
     options(quiet=quiet)
     options(brief=brief)
+    options(lessR.use_plotly=lessR.use_plotly)
     options(n_cat=n_cat)
     options(suggest=suggest)
     options(notes=notes)
@@ -575,7 +580,7 @@ function(
       pt_fill = rgb(50,78,92, maxColorValue=255)
       pt_color = rgb(50,78,92, maxColorValue=255)
       trans_bar_fill = 0.00
-      trans_pt_fill = 0.00
+      trans_pt_fill = 0.10
       box_fill = "#419BD2"  # getColors("hues", output=FALSE)
       violin_fill = "#7485975A"
       ellipse_fill = .maketrans(hcl(50,20,55), 40)
@@ -622,7 +627,7 @@ function(
       bar_color_discrete = "gray60"
       bar_color_cont = "gray60"
       pt_fill = "gray42"
-      trans_pt_fill = 0.00
+      trans_pt_fill = 0.10
       pt_color = "gray42"
       violin_fill=.maketrans("gray50", 40)
       violin_color = "gray15"
@@ -652,7 +657,7 @@ function(
       bar_color_discrete = "transparent"
       bar_color_cont = rgb(126,144,168, maxColorValue=255)
       pt_fill = rgb(70,80,90, maxColorValue=255)
-      trans_pt_fill = 0.00
+      trans_pt_fill = 0.10
       pt_color = rgb(70,80,90, maxColorValue=255)
       ellipse_color = "gray20"
       se_fill = .maketrans("gray10", 40)
@@ -759,7 +764,7 @@ function(
       panel_fill = "gray10"
       panel_color = "gray80"
       trans_bar_fill = 0.0
-      trans_pt_fill = 0.0
+      trans_pt_fill = 0.1
       bar_fill = .maketrans("gray58", .to256("trans_bar_fill"))
       bar_fill_discrete =
         .maketrans("gray58", .to256("trans_bar_fill"))
@@ -782,6 +787,7 @@ function(
       segment_color = "gray65"
       lab_color = "gray85"
       main_color = "gray85"
+      axis_color = "gray85"
       axis_x_color = "gray85"
       axis_y_color = "gray85"
       axis_text_color = "gray85"
@@ -945,6 +951,7 @@ function(
 
     options(quiet=quiet)
     options(brief=brief)
+    options(lessR.use_plotly=lessR.use_plotly)
     options(n_cat=n_cat)
     options(suggest=suggest)
     options(notes=notes)
@@ -1268,6 +1275,7 @@ function(
     notes = getOption("notes"),
     quiet = getOption("quiet"),
     brief = getOption("brief"),
+    lessR.use_plotly = getOption("lessR.use_plotly"),
 
     output = output
 

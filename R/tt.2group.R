@@ -429,7 +429,8 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
       .plt.main(x.df, YA.df, segments=TRUE, size=.85,
                 center_line="median", fill=getOption("pt_fill"),
                 xlab="Index", ylab=paste(Ynm,": ",X1nm, sep=""),
-                main=plt.title[plt.i])
+                main=plt.title[plt.i],
+                use_plotly=FALSE)
 
       if (!is.null(pdf_file)) {
         dev.off()
@@ -450,7 +451,7 @@ function(YA, YB, n1, n2, m1, m2, s1, s2, from.data,
       .plt.main(x.df, YB.df, segments=TRUE, size=.85,
                 center_line="median", fill=getOption("pt_fill"),
                 xlab="Index", ylab=paste(Ynm,": ",X2nm, sep=""),
-                main=plt.title[plt.i])
+                main=plt.title[plt.i], use_plotly=FALSE)
  
       if (!is.null(pdf_file)) {
         dev.off()

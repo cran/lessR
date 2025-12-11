@@ -31,7 +31,7 @@ addResourcePath("shiny_dir", system.file("shiny_apps", package="lessR"))
 
 
 ui <- fluidPage(
-tags$head(tags$link(rel="stylesheet", href="shiny_dir/styles.css")),
+  tags$head(tags$link(rel="stylesheet", href="shiny_dir/styles.css")),
 
   tabsetPanel(
 
@@ -52,11 +52,11 @@ tags$head(tags$link(rel="stylesheet", href="shiny_dir/styles.css")),
 
           radioButtons("fSource", HTML("<h5 class='soft'>Source</h5>"), 
                        c("Local"="local", "Web"="web")),
-          conditionalPanel(condition="input.fSource == 'local'",
+          conditionalPanel(condition="input$fSource == 'local'",
             fileInput("myFile", "Locate your data file",
                       accept=c(".csv", ".txt", ".xlsx", ".xlsm")),
           ),
-          conditionalPanel(condition="input.fSource == 'web'",
+          conditionalPanel(condition="input$fSource == 'web'",
             textInput("myURL", "Web address of data file"),
             actionButton("submitURL", "Submit")
           ),
@@ -172,15 +172,15 @@ tags$head(tags$link(rel="stylesheet", href="shiny_dir/styles.css")),
 
         ),  # end sidebarPanel
 
-      mainPanel(
-        plotOutput('myPlot'),
-        verbatimTextOutput("summary"),
-        plotOutput("saved_plot"), 
-        textOutput("help")
-      )
+        mainPanel(
+          plotOutput('myPlot'),
+          verbatimTextOutput("summary"),
+          plotOutput("saved_plot"), 
+          textOutput("help")
+        )
 
       )  # end pageWithSidebar
-  )  # end tabPanel 2
+    )  # end tabPanel 2
   )  # end tabsetPanel
 )  # end fluidPage 
 
@@ -191,8 +191,8 @@ server <- function(input, output, session) {
   v$add <- NULL
 
 
-# ------- Read and Display Data -----------
-# -----------------------------------------
+  # ------- Read and Display Data -----------
+  # -----------------------------------------
 
   # process the URL for reading from the web
   theURL <- eventReactive(input$submitURL, {
@@ -210,7 +210,7 @@ server <- function(input, output, session) {
       if (!(grepl("http://", url)))
         url <- paste("http://", url, sep="")
       myPath <- url
-       theRead <- myPath
+      theRead <- myPath
     }
       
     shiny::req(myPath)
@@ -224,17 +224,17 @@ server <- function(input, output, session) {
         stopApp()
       }
     }
-      if (input$fType == "Text") { 
-        if ((grepl(".csv", myPath, fixed=TRUE)) ||
-            (grepl(".txt", myPath, fixed=TRUE))) {
-            d <- read.csv(myPath, sep=input$sep, dec=input$decimal,
-                          na.strings="")  # default is NOT a blank char missing
-        }
-        else {
-          message("\n>>> Text file must have file type of .csv or .txt <<<\n\n")
-          stopApp()
-        }       
-      }  # end fType is "Text"
+    if (input$fType == "Text") { 
+      if ((grepl(".csv", myPath, fixed=TRUE)) ||
+          (grepl(".txt", myPath, fixed=TRUE))) {
+        d <- read.csv(myPath, sep=input$sep, dec=input$decimal,
+                      na.strings="")  # default is NOT a blank char missing
+      }
+      else {
+        message("\n>>> Text file must have file type of .csv or .txt <<<\n\n")
+        stopApp()
+      }       
+    }  # end fType is "Text"
 
     shiny::updateSelectInput(session, inputId="x.col", label="x variable",
                       choices=c("Select a variable"="", names(d)))
@@ -276,7 +276,7 @@ server <- function(input, output, session) {
     }
   }, striped=TRUE)  # end renderTable
 
-# -----------------------------------------
+  # -----------------------------------------
 
 
   observeEvent(input$do_by, {
@@ -284,7 +284,7 @@ server <- function(input, output, session) {
     d <- data()
     is.cat <- sapply(d, function(x) {
       lu.x <- length(unique(x))
-      x.char <- (is.character(x) || is.factor(x) || lu.x<11) && (lu.x<nrow(d))
+      (is.character(x) || is.factor(x) || lu.x < 11) && (lu.x < nrow(d))
     })
 
     if (all(!is.cat)) {
@@ -316,7 +316,7 @@ server <- function(input, output, session) {
     is.unique <- sapply(d, function(x) {
       l.x <- length(x)
       lu.x <- length(unique(x))
-      x.unique <- ifelse (l.x == lu.x, TRUE, FALSE)      
+      l.x == lu.x
     })
 
     if (all(!is.unique)) {
@@ -332,25 +332,25 @@ server <- function(input, output, session) {
   })
 
 
-# ------------ Enhance and Add ------------
-# -----------------------------------------
+  # ------------ Enhance and Add ------------
+  # -----------------------------------------
 
   observeEvent(input$myAddMeans, {
     if (input$myAddMeans)
-     v$add <- "means"
+      v$add <- "means"
     else
-     v$add <- NULL    
+      v$add <- NULL    
   })
 
 
   observeEvent(input$myEnhance, {
     if (input$myEnhance) {
-     v$add <- "means"
-     add.val <- TRUE
+      v$add <- "means"
+      add.val <- TRUE
     }
     else {
-     v$add <- NULL
-     add.val <- FALSE
+      v$add <- NULL
+      add.val <- FALSE
     }
     updateCheckboxInput(session, inputId="myAddMeans", "add=\"means\"",
         value=add.val)
@@ -372,8 +372,8 @@ server <- function(input, output, session) {
  
 
 
-# ------------ The Scatterplot ------------
-# -----------------------------------------
+  # ------------ The Scatterplot ------------
+  # -----------------------------------------
 
   output$myPlot <- renderPlot({
     x.name <- input$x.col
@@ -387,37 +387,37 @@ server <- function(input, output, session) {
     in.fill <- input$myFill
     in.shp  <- input$myShape
 
-    # shiny only plots shapes 21:25, everything else blank
-    # so if more than 5 levels, then shiny plots different shapes
     by <- NULL
     lt <- NULL  # legend_title
+
+    # by-variable logic + shape mapping
     if (input$do_by) {  # a by variable
       by.name <- input$by.col
       shiny::req(by.name)
       by <- data()[, by.name]
-      by.unq <- length(unique(by))
       in.fill <- input$myFill_by  # color range selection
-#     shapes <-  c(24,25,21,22,23,24,25,21,22,23,24,25,21,22,23)
-#     in.shp  <- shapes[1:by.unq]  # with shiny, input$myShape never missing 
-      if (in.shp == "circle") in.shp=21
-      if (in.shp == "square") in.shp=22
-      if (in.shp == "diamond") in.shp=23
-      if (in.shp == "triup") in.shp=24
-      if (in.shp == "tridown") in.shp=25
+
+      # still map to numeric, but we won't pass shape to XY() when by is present
+      if (in.shp == "circle") in.shp <- 21
+      if (in.shp == "square") in.shp <- 22
+      if (in.shp == "diamond") in.shp <- 23
+      if (in.shp == "triup")   in.shp <- 24
+      if (in.shp == "tridown") in.shp <- 25
+
       lt <- by.name
     }
 
     in.size <- input$mySize   # constant value of size from slider
-    if (input$do_size) {  # see if proceed with size is a variable
+    if (input$do_size) {  # size variable
       shiny::req(input$size.col)
       in.size <- data()[, input$size.col]
-      size.name <- input$size.col
     }
     if (!input$do_size) in.size <- 1.4 * in.size  # scale up, as with axes
 
     in.fit <- input$myFit
     in.elp <- input$myEllipse
     in.add <- v$add 
+
     if (input$do_by) {  # choose MD then by var
       in.MD <- 0
       in.ID <- row.names(data())
@@ -439,75 +439,129 @@ server <- function(input, output, session) {
         in.ID <- row.names(data())
     }
 
-     v$p <- Plot(x, y, data=NULL, by=by,
-          fill=in.fill, color=input$myColor, transparency=input$myTrans,
-          size=in.size, shape=in.shp, plot_errors=input$myErrors,
-          fit=in.fit, fit_color=input$myFitClr, fit_se=input$myFitSE, 
-          ellipse=in.elp, MD_cut=in.MD, ID=in.ID, add=in.add, 
-          enhance=input$myEnhance, jitter_x=input$myJitx, jitter_y=input$myJity,
-          rotate_x=input$myRttx, rotate_y=input$myRtty, offset=input$myOff,  
-          xlab=x.name, ylab=y.name, legend_title=lt, quiet=FALSE)
+    ## ---- Call XY() (scatter) depending on by presence ----
 
-      p_fill <- ifelse (nchar(input$by.col)==0, in.fill == "#324E5C",
-                                                in.fill == "hues") 
-      p_color <- input$myColor == "off"
-      p_trans <- input$myTrans == 0
-      p_by <- input$do_by == FALSE
-      p_size <- input$mySize==1.25 && length(in.size)==1
-      p_shape <- input$myShape == "circle"
-      p_errors <- input$myErrors == FALSE
-      p_fit <- in.fit == "off"
-      p_fitclr <- input$myFitClr == getOption("fit_color")
-      p_fitse <- input$myFitSE == 0.95
-      p_ellipse <- in.elp == 0
-      p_MDcut <- in.MD == 0
-      p_ID <- nchar(input$ID.col)==0 || input$ID.col=="row.name" || in.MD==0
-      p_jitx <- input$myJitx == 0
-      p_jity <- input$myJity == 0
-      p_add <- is.null(in.add)
+    if (input$do_by) {
+      v$p <- XY(
+        x, y, by = by, data = NULL,
+        type = "scatter",
+        fill  = in.fill,
+        # no color when by is present; XY will choose colors per group
+        transparency = input$myTrans,
+        size  = in.size,
+        # no shape when by is present; XY aligns shapes internally as needed
+        plot_errors = input$myErrors,
+        fit        = in.fit,
+        fit_color  = input$myFitClr,
+        fit_se     = input$myFitSE,
+        ellipse    = in.elp,
+        MD_cut     = in.MD,
+        ID         = in.ID,
+        add        = in.add,
+        enhance    = input$myEnhance,
+        jitter_x   = input$myJitx,
+        jitter_y   = input$myJity,
+        rotate_x   = input$myRttx,
+        rotate_y   = input$myRtty,
+        offset     = input$myOff,  
+        xlab = x.name,
+        ylab = y.name,
+        legend_title = lt,
+        quiet = FALSE
+      )
+    } else {
+      v$p <- XY(
+        x, y, data = NULL,
+        type = "scatter",
+        fill  = in.fill,
+        color = input$myColor,
+        transparency = input$myTrans,
+        size  = in.size,
+        shape = in.shp,
+        plot_errors = input$myErrors,
+        fit        = in.fit,
+        fit_color  = input$myFitClr,
+        fit_se     = input$myFitSE, 
+        ellipse    = in.elp,
+        MD_cut     = in.MD,
+        ID         = in.ID,
+        add        = in.add, 
+        enhance    = input$myEnhance,
+        jitter_x   = input$myJitx,
+        jitter_y   = input$myJity,
+        rotate_x   = input$myRttx,
+        rotate_y   = input$myRtty,
+        offset     = input$myOff,  
+        xlab = x.name,
+        ylab = y.name,
+        legend_title = lt,
+        quiet = FALSE
+      )
+    }
 
-      # all enhance default settings must be TRUE for enhance to be TRUE
-      p_enhance <- FALSE
-      if (input$myEnhance && in.MD > 0 && !is.null(v$add)) {
-        if (input$myFit=="lm" && input$myEllipse==0.95
-            && input$myMDcut==6 && v$add=="means")
-          p_enhance <- TRUE
-        else
-          p_enhance <- FALSE
-      }
+    # defaults for code string
+    p_fill <- ifelse (nchar(input$by.col)==0, in.fill == "#324E5C",
+                                              in.fill == "hues") 
+    p_color <- input$myColor == "off" || input$do_by
+    p_trans <- input$myTrans == 0
+    p_by <- input$do_by == FALSE
+    p_size <- input$mySize==1.25 && length(in.size)==1
+    p_shape <- input$myShape == "circle" || input$do_by  # no shape arg for by
+    p_errors <- input$myErrors == FALSE
+    p_fit <- in.fit == "off"
+    p_fitclr <- input$myFitClr == getOption("fit_color")
+    p_fitse <- input$myFitSE == 0.95
+    p_ellipse <- in.elp == 0
+    p_MDcut <- in.MD == 0
+    p_ID <- nchar(input$ID.col)==0 || input$ID.col=="row.name" || in.MD==0
+    p_jitx <- input$myJitx == 0
+    p_jity <- input$myJity == 0
+    p_add <- is.null(in.add)
 
-      out <- paste("Plot(", x.name, ", ", y.name, sep="")
-
-      if (!p_fill) out <- paste(out, ", fill=\"", in.fill, "\"", sep="")
-      if (!p_color) out <- paste(out, ", color=\"", input$myColor, "\"", sep="")
-      if (!p_trans) out <- paste(out, ", transparency=", input$myTrans, sep="")
-      if (!p_by) out <- paste(out, ", by=", by.name, sep="")
-      if (!p_size) {
-        sz.out <- ifelse (length(in.size)==1, input$mySize, input$size.col)
-        out <- paste(out, ", size=", sz.out, sep="")
-      }
-      if (!p_shape) out <- paste(out, ", shape=\"", input$myShape, "\"", sep="")
-      if (!p_errors) out <- paste(out, ", errors=", input$myErrors, sep="")
-      if (!p_fitclr) out <- paste(out, ", fit_color=\"", input$myFitClr,
-                                  "\"", sep="")
-      if (!p_fitse) out <- paste(out, ", fit_se=", input$myFitSE, sep="")
-      if (!p_jitx) out <- paste(out, ", jitter_x=", input$myJitx, sep="")
-      if (!p_jity) out <- paste(out, ", jitter_y=", input$myJity, sep="")
-
-      if (!p_enhance) {
-        if (!p_fit) out <- paste(out, ", fit=\"", in.fit, "\"", sep="")
-        if (!p_ellipse) out <- paste(out, ", ellipse=", in.elp, sep="")
-        if (!p_MDcut) out <- paste(out, ", MD_cut=", in.MD, sep="")
-        if (!p_add) out <- paste(out, ", add=\"", in.add, "\"", sep="")
-      }
+    # all enhance default settings must be TRUE for enhance to be TRUE
+    p_enhance <- FALSE
+    if (input$myEnhance && in.MD > 0 && !is.null(v$add)) {
+      if (input$myFit=="lm" && input$myEllipse==0.95
+          && input$myMDcut==6 && v$add=="means")
+        p_enhance <- TRUE
       else
-        out <- paste(out, ", enhance=", p_enhance, sep="")
+        p_enhance <- FALSE
+    }
 
-      if (!p_ID) out <- paste(out, ", ID=\"", input$ID.col, "\"", sep="")
+    out <- paste("XY(", x.name, ", ", y.name, sep="")
 
-      out <- paste(out, ")", sep="")
-      cat(out, "\n")
-      v$code <- out  # save the code for a pdf file
+    if (!p_fill) out <- paste(out, ", fill=\"", in.fill, "\"", sep="")
+    if (!p_color) out <- paste(out, ", color=\"", input$myColor, "\"", sep="")
+    if (!p_trans) out <- paste(out, ", transparency=", input$myTrans, sep="")
+    if (!p_by && input$do_by)
+      out <- paste(out, ", by=", by.name, sep="")
+    if (!p_size) {
+      sz.out <- ifelse (length(in.size)==1, input$mySize, input$size.col)
+      out <- paste(out, ", size=", sz.out, sep="")
+    }
+    if (!p_shape && !input$do_by)
+      out <- paste(out, ", shape=\"", input$myShape, "\"", sep="")
+    if (!p_errors) out <- paste(out, ", plot_errors=", input$myErrors, sep="")
+    if (!p_fitclr) out <- paste(out, ", fit_color=\"", input$myFitClr,
+                                "\"", sep="")
+    if (!p_fitse) out <- paste(out, ", fit_se=", input$myFitSE, sep="")
+    if (!p_jitx) out <- paste(out, ", jitter_x=", input$myJitx, sep="")
+    if (!p_jity) out <- paste(out, ", jitter_y=", input$myJity, sep="")
+
+    if (!p_enhance) {
+      if (!p_fit) out <- paste(out, ", fit=\"", in.fit, "\"", sep="")
+      if (!p_ellipse) out <- paste(out, ", ellipse=", in.elp, sep="")
+      if (!p_MDcut) out <- paste(out, ", MD_cut=", in.MD, sep="")
+      if (!p_add) out <- paste(out, ", add=\"", in.add, "\"", sep="")
+    }
+    else
+      out <- paste(out, ", enhance=", p_enhance, sep="")
+
+    if (!p_ID) out <- paste(out, ", ID=\"", input$ID.col, "\"", sep="")
+
+    out <- paste(out, ", type=\"scatter\")", sep="")
+    cat(out, "\n")
+    v$code <- out  # save the code for a pdf file
   })  # end renderPlot
 
 
@@ -580,16 +634,71 @@ server <- function(input, output, session) {
     style(lab_cex=getOption("l.cex"))
     style(axis_cex=getOption("l.axc"))
 
-    Plot(x, y, data=NULL, by=by,
-         fill=in.fill, color=input$myColor, transparency=input$myTrans,
-         size=in.size, shape=input$myShape, plot_errors=input$myErrors,
-         fit=in.fit, fit_color=input$myFitClr, fit_se=input$myFitSE, 
-         ellipse=in.elp, MD_cut=in.MD, ID=in.ID, add=in.add,
-         enhance=input$myEnhance, jitter_x=input$myJitx, jitter_y=input$myJity,
-         rotate_x=input$myRttx, rotate_y=input$myRtty, offset=input$myOff,  
-         xlab=x.name, ylab=y.name, legend_title=lt, quiet=TRUE,
-         pdf_file=pdf.path,
-         width=as.numeric(input$w), height=as.numeric(input$h))
+    ## ---- XY() call for saved plot ----
+
+    if (input$do_by) {
+      XY(
+        x, y, by = by, data = NULL,
+        type = "scatter",
+        fill  = in.fill,
+        # no color when by is present
+        transparency = input$myTrans,
+        size  = in.size,
+        # no shape when by is present
+        plot_errors = input$myErrors,
+        fit        = in.fit,
+        fit_color  = input$myFitClr,
+        fit_se     = input$myFitSE, 
+        ellipse    = in.elp,
+        MD_cut     = in.MD,
+        ID         = in.ID,
+        add        = in.add,
+        enhance    = input$myEnhance,
+        jitter_x   = input$myJitx,
+        jitter_y   = input$myJity,
+        rotate_x   = input$myRttx,
+        rotate_y   = input$myRtty,
+        offset     = input$myOff,  
+        xlab = x.name,
+        ylab = y.name,
+        legend_title = lt,
+        quiet = TRUE,
+        pdf_file = pdf.path,
+        width  = as.numeric(input$w),
+        height = as.numeric(input$h)
+      )
+    } else {
+      XY(
+        x, y, data = NULL,
+        type = "scatter",
+        fill  = in.fill,
+        color = input$myColor,
+        transparency = input$myTrans,
+        size  = in.size,
+        shape = input$myShape,
+        plot_errors = input$myErrors,
+        fit        = input$myFit,
+        fit_color  = input$myFitClr,
+        fit_se     = input$myFitSE, 
+        ellipse    = input$myEllipse,
+        MD_cut     = in.MD,
+        ID         = in.ID,
+        add        = in.add,
+        enhance    = input$myEnhance,
+        jitter_x   = input$myJitx,
+        jitter_y   = input$myJity,
+        rotate_x   = input$myRttx,
+        rotate_y   = input$myRtty,
+        offset     = input$myOff,  
+        xlab = x.name,
+        ylab = y.name,
+        legend_title = lt,
+        quiet = TRUE,
+        pdf_file = pdf.path,
+        width  = as.numeric(input$w),
+        height = as.numeric(input$h)
+      )
+    }
 
     # reset back to shiny setting
     style(lab_cex=1.201, axis_cex=1.011, suggest=FALSE)
@@ -620,7 +729,7 @@ server <- function(input, output, session) {
       cat("# The # symbol indicates a comment rather than an R instruction\n\n",
           "# Begin the R session by loading the lessR functions ",
           "from the library\n", sep="", file=r.path)
-      cat("library(\"lessR\")\n\n", file=r.path, append=TRUE)
+    cat("library(\"lessR\")\n\n", file=r.path, append=TRUE)
 
     if (input$do_cmt) {
       cat("# Read your data into an R data table, the data frame, here d",
@@ -649,7 +758,7 @@ server <- function(input, output, session) {
           sep="", file=r.path, append=TRUE)
     cat(code, "\n\n", file=r.path, append=TRUE)
 
-    anlys <- "ScatterPlot()"
+    anlys <- "XY()"
     if (input$do_cmt)
       cat("# If accessing data with a name other than d, must add  data=NAME\n",
           paste("#   to the", anlys, "call, where NAME is the name of your",

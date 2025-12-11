@@ -4,7 +4,7 @@ function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
          trans, size.pt, size.ln,
          xlab, ylab, main, shape, lab_cex, axis_cex,
          lvl=0, ellipse_color=NULL, ellipse_lwd=NULL,
-         fit="off", fit_power=1, fit_color=NULL, fit_lwd=NULL, fit_se,
+         fit.ln="off", fit_power=1, fit_color=NULL, fit_lwd=NULL, fit_se,
          plot_errors=FALSE, origin=NULL, jitter,
          violin, violin_fill, box, box_fill,
          bw, vbs_ratio, box_adj, a, b, k.iqr, fences, vbs_mean,
@@ -12,9 +12,12 @@ function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
          out_fill, out_color, out2_fill, out2_color,
          ID, out_cut, ID_color, ID_size,
          axis_fmt="K", axis_x_pre="", axis_y_pre="",
-         rotate_x, rotate_y, n_axis_x_skip, n_axis_y_skip,
+         rotate_x, rotate_y, x_n_axis_skip, y_n_axis_skip,
          width, height, pdf_file, T.type, quiet, ...) {
 
+  # Turn off warnings for this function ONLY
+  old_warn <- options(warn = -1)
+  on.exit(options(old_warn), add = TRUE)
 
   if (size.pt[1] == 0) object <- "line"
   size.ln <- size.ln + 0.5  # Trellis plot lines are narrower
@@ -140,9 +143,9 @@ function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
 
     # perhaps print fewer axis tick labels, perhaps re-format labels
     if (!is.null(x)) 
-      x.out <- .sparse.labels(x, ax="x", n_axis_x_skip, axis_fmt, axis_x_pre)
+      x.out <- .sparse.labels(x, ax="x", x_n_axis_skip, axis_fmt, axis_x_pre)
     if (!is.null(y)) 
-      y.out <- .sparse.labels(y, ax="y", n_axis_y_skip, axis_fmt, axis_y_pre)
+      y.out <- .sparse.labels(y, ax="y", y_n_axis_skip, axis_fmt, axis_y_pre)
 
     if (T.type == "cont_cont") {  # cont - cont
       # set 1 or 2 conditioning variables
@@ -219,7 +222,7 @@ function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
 
   else {  # x-variable is a Date
     if (!is.null(y)) 
-      y.out <- .sparse.labels(y, ax="y", n_axis_y_skip, axis_fmt, axis_y_pre)
+      y.out <- .sparse.labels(y, ax="y", y_n_axis_skip, axis_fmt, axis_y_pre)
 
     if (T.type == "cont_cont") {  # cont - cont
       # set 1 or 2 conditioning variables
@@ -317,7 +320,6 @@ function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
 
   size.mult <- ifelse (n.pnl > 3, 0.70, 0.833)
   size.pt <- size.pt * size.mult
-
   # separate panels with a border even if turned off when only one plot
   panel_color <- getOption("panel_color")
   panel_frame_color <- ifelse(panel_color == "transparent",
@@ -408,7 +410,7 @@ function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
     }  # n.groups > 1
 
     # need to get working
-    if (n.groups > 1 &&  fit != "off")  {
+    if (n.groups > 1 &&  fit.ln != "off")  {
       cat("\n"); stop(call.=FALSE, "\n","------\n",
         "If by parameter used, then currently no fitted lines by group.\n\n")
     }
@@ -435,9 +437,9 @@ function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
             panel.xyplot(x, y, type=tp, col=pt.color, fill=pt.fill,
                          lwd=size.ln, ...)
 
-            if (fit != "off"  &&  n.groups == 1) {
+            if (fit.ln != "off"  &&  n.groups == 1) {
 
-              pf <- .plt.fit (x, y, fit, fit_power, fit_new=NULL)
+              pf <- .plt.fit (x, y, fit.ln, fit_power, fit_new=NULL, sz.lv=1)
 
               x <- pf$x.lv  # x and y get reduced in .plt.fit if NA
               y <- pf$y.lv
@@ -468,7 +470,7 @@ function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
                   "Fit: MSE = ", mse.pn, "   Rsq = ", Rsq.pn,
                   sep="", "\n")
 
-              if (fit %in% c("exp", "log", "quad", "null"))
+              if (fit.ln %in% c("exp", "log", "quad", "null"))
                 fit_se[1] <- 0
 
               se_fill <- getOption("se_fill")
@@ -563,7 +565,6 @@ function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
 
             jitter_data <- ifelse (jitter > 0, TRUE, FALSE)
             size.pt <- size.pt * 1.2  # lattice adjustment
-
             num5 <- fivenum(x, na.rm=TRUE)
             q1 <- num5[2]
             q3 <- num5[4]
@@ -720,6 +721,10 @@ function(x, y, facet1, facet2, by, adj.bx.ht, object, n_row, n_col, asp,
     pdf(pdf_file, width=width, height=height, onefile=FALSE)
     print(p)
     dev.off()
+    if (!quiet) {
+      cat("\n")
+      .showfile(pdf_file, "vbs plot")
+    }
   }
   else {
     print(p)

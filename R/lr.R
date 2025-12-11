@@ -1,5 +1,0 @@
-lr <-
-function(...)
-
-  Logit(...)
-

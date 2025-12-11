@@ -1,20 +1,20 @@
 .dn.main <- 
-function(x, 
-         bw="nrd0", type="both",
-         histo=TRUE, bin_start=NULL, bin_width=NULL,
-         fill_hist, col.nrm, col.gen,
+function(x, by=NULL, by.name=NULL, n.by=1, 
+         bw="nrd0", kind="both",
+         histo=TRUE, theme=getOption("theme"), bin_start=NULL, bin_width=NULL,
+         fill.miss=FALSE, fill_hist, col.nrm, col.gen,
          fill_nrm, fill_gen, lwd=NULL,
          rotate_x=0, rotate_y=0, offset=0.5, 
          axis_fmt="K", axis_x_pre="", axis_y_pre="",
          x.pt=NULL, xlab=NULL, main=NULL, sub=NULL,
          y_axis=FALSE, x.min=NULL, x.max=NULL,
-         band=FALSE, color_rug="gray40", size_rug=0.5, quiet,
-         fncl=NULL, ...)  {
+         band=FALSE, color_rug="gray40", size_rug=0.5,
+         use_plotly=TRUE, quiet, fncl=NULL, ...)  {
   
 
   if (!is.null(x.pt)) {
     y_axis <- TRUE
-    type <- "general"
+    kind <- "general"
   }
 
 
@@ -93,6 +93,9 @@ function(x,
   x.name <- gl$xn; x.lbl <- gl$xl; x.lab <- gl$xb
   main.lab <- gl$mb
   sub.lab <- gl$sb
+
+if (n.by == 1) {
+
   # set margins
   if (band)  # rug, allow for more rug room
     y.min <- -0.02 * max(d.gen$y)  # make room for the rug
@@ -111,6 +114,7 @@ function(x,
 
   par(bg=getOption("window_fill"))
   par(mai=c(bm, lm, tm, rm))
+
   
   # set up coordinate space
   plot(h, border="transparent", freq=FALSE,
@@ -132,7 +136,7 @@ function(x,
           rotate_x=rotate_x, rotate_y=rotate_y, offset=offset,
           axis_fmt=axis_fmt, axis_x_pre=axis_x_pre, axis_y_pre="no", ...)
   else
-    .axes(x.lvl=NULL, y.lvl=NULL, axTicks(1), axTicks(2),
+    ax.info <- .axes(x.lvl=NULL, y.lvl=NULL, axTicks(1), axTicks(2),
           rotate_x=rotate_x, rotate_y=rotate_y, offset=offset,
           axis_fmt=axis_fmt, axis_x_pre=axis_x_pre, axis_y_pre=axis_y_pre, ...)
 
@@ -149,41 +153,45 @@ function(x,
 
 # plot the objects --------------------------------------------------------
 
-  # plot the previously computed histogram
-  if (histo)
-    plot(h, add=TRUE, freq=FALSE, col=fill_hist, border="transparent")
 
-  # plot the previously estimated normal curve
-  if (type == "normal" || type == "both") {
-    if (is.null(lwd)) lwd <- ifelse (fill_nrm == "transparent", 1.35, 1)
-    polygon(c(x.min,xx,x.max), c(0,d.nrm,0), col=fill_nrm, 
-            border=col.nrm, lwd=lwd)
-  }
+    # plot the previously computed histogram
+    if (histo)
+      plot(h, add=TRUE, freq=FALSE, col=fill_hist, border="transparent")
 
-  # plot the previously computed general curve
-  if (type == "general" || type == "both") {
-    if (is.null(lwd)) lwd <- ifelse (fill_gen == "transparent", 1.35, 1)
-    polygon(d.gen, col=fill_gen, border=col.gen, lwd=lwd)
-  }
+    # plot the previously estimated normal curve
+    if (kind == "normal" || kind == "both") {
+      if (is.null(lwd)) lwd <- ifelse (fill_nrm == "transparent", 1.35, 1)
+      polygon(c(x.min,xx,x.max), c(0,d.nrm,0), col=fill_nrm, 
+              border=col.nrm, lwd=lwd)
+    }
 
-  # plot the rug option
-  if (band) rug(x, col=color_rug, lwd=size_rug, ticksize=0.05)
- 
-  # plot the optional bar about a chosen point for general curve only
-  if (!is.null(x.pt)  &&  type == "general") {
-    d <- d.gen
-    y.pt <- d$y[which.min(abs(x.pt-d$x))]
-    xbeg <- x.pt - 0.5
-    xend <- x.pt + 0.5
-    xsub <- d$x[d$x > xbeg & d$x < xend]
-    ysub <- d$y[d$x > xbeg & d$x < xend]
-    txt <- paste("Density =", .fmt(y.pt,3), "at x =", .fmt(x.pt, 2))
-    title(main=txt)
-    polygon(c(xbeg, xsub, xend), c(0, ysub, 0), col="lightsteelblue")
-    if (min(x) > 0) left <- -2*min(x) else left <- 2*min(x) 
-    lines(c(left,x.pt), c(y.pt,y.pt), col="darkblue", lwd = 0.5)
-    lines(c(x.pt,x.pt), c(0,y.pt), col="darkblue", lwd = 0.5)
-  }
+    # plot the previously computed general curve
+    if (kind == "general" || kind == "both") {
+      if (is.null(lwd)) lwd <- ifelse (fill_gen == "transparent", 1.35, 1)
+      fill_gen <- .maketrans(fill_gen, 100)
+      polygon(d.gen, col=fill_gen, border=col.gen, lwd=lwd)
+    }
+
+    # plot the rug option
+    if (band) rug(x, col=color_rug, lwd=size_rug, ticksize=0.05)
+   
+    # plot the optional bar about a chosen point for general curve only
+    if (!is.null(x.pt)  &&  kind == "general") {
+      d <- d.gen
+      y.pt <- d$y[which.min(abs(x.pt-d$x))]
+      xbeg <- x.pt - 0.5
+      xend <- x.pt + 0.5
+      xsub <- d$x[d$x > xbeg & d$x < xend]
+      ysub <- d$y[d$x > xbeg & d$x < xend]
+      txt <- paste("Density =", .fmt(y.pt,3), "at x =", .fmt(x.pt, 2))
+      title(main=txt)
+      polygon(c(xbeg, xsub, xend), c(0, ysub, 0), col="lightsteelblue")
+      if (min(x) > 0) left <- -2*min(x) else left <- 2*min(x) 
+      lines(c(left,x.pt), c(y.pt,y.pt), col="darkblue", lwd = 0.5)
+      lines(c(x.pt,x.pt), c(0,y.pt), col="darkblue", lwd = 0.5)
+    }
+}  # end n.by=1
+
 
 
 # text output -------------------------------------------------------------
@@ -201,11 +209,11 @@ function(x,
     tx[length(tx)+1] <- ">>> Suggestions"
       tx[length(tx)+1] <- "bin_width: set the width of each bin"
     txt <- "  # histogram only"
-    tx[length(tx)+1] <- paste("Histogram(", getOption("xname"),
+    tx[length(tx)+1] <- paste("X(", getOption("xname"), ", type=\"histogram\"",
        ")", txt, sep="")      
     txt <- "  # Violin/Box/Scatterplot (VBS) plot"
-    tx[length(tx)+1] <- paste("Plot(", getOption("xname"), ")", txt,
-       sep="")      
+    tx[length(tx)+1] <- paste("X(", getOption("xname"), ", type=\"vbs\"", 
+                              ")", txt, sep="")      
   }
   txsug <- tx
   if (length(txsug) == 0) txsug <- ""
@@ -216,7 +224,7 @@ function(x,
          "     for general curve:", .fmt(d.gen$bw,4), "\n")
 
   W <- NA; p.val <- NA
-  if (type == "normal" || type == "both") {
+  if (kind == "normal" || kind == "both") {
     digits_d <- 3
     if (n > 2 && n < 5000) {
       nrm <- shapiro.test(x)
@@ -232,8 +240,72 @@ function(x,
                           " normality test.")
   }
 
-  return(list(tx=tx, txsug=txsug, 
-              bw=d.gen$bw, n=n, n.miss=n.miss, W=W, pvalue=p.val))
 
+# plotly ------------------------------------------------------------------
+
+  if (use_plotly) {
+
+    if (fill.miss) {  # this should already be determined
+      if (n.by == 1)
+        fill <- fill_gen
+      else 
+        fill <- .color_range(.get_fill(theme), n.by)
+    }
+    else  # evaluate if a pre-defined range such as "blues"
+      fill_gen <- .color_range(fill_gen,  n.by)
+
+#   rng.y <- range(d.gen$y)
+#   ax.info <- .axes(x.lvl=NULL, y.lvl=NULL, pretty(range(x)), pretty(rng.y),
+#         rotate_x=rotate_x, rotate_y=rotate_y, offset=offset,
+#         axis_fmt=axis_fmt, axis_x_pre=axis_x_pre, axis_y_pre=axis_y_pre, ...)
+#   axT1 <- pretty(range(x))
+#   axL1 <- .axis.format(axT1, axis_fmt, axis_x_pre, axis_y_pre="no")
+#   axT2 <- pretty(rng.y)
+#   axL2 <- .axis.format(axT2, axis_fmt, axis_x_pre="no", axis_y_pre)
+#   ax <- list(axT1=axT1, axL1=axL1, axT2=axT2, axL2=axL2)
+
+
+    # Drop groups with fewer than 2 finite observations
+    tbl <- table(by)
+    drop_groups <- names(tbl)[tbl < 2]
+
+    if (length(drop_groups)) {
+      message("Groups with fewer than 2 observations removed: ",
+              paste(drop_groups, collapse = ", "))
+      keep <- !(by %in% drop_groups)
+      x  <- x[keep]
+      by <- by[keep]
+    }
+
+    plt <- dn.plotly(
+      x       = x,
+      by      = by,
+      x.name  = x.name,
+      by.name = by.name,
+      fill    = fill_gen,
+#     border  = col.gen,
+      x.lab   = x.lab,
+      y.lab   = "Density",
+#     ax      = ax.info,  # need to get formatted x-axis labels, e.g., 100K
+      ax      = NULL,
+      gridT1  = NULL,
+      gridT2  = NULL,
+      bw      = bw 
+#     position = "overlay"
+    )
+
+    if (.allow.interactive()) print(plt)
+  }
+
+# --- final return from dn.main() --------------------------------------------
+return(list(
+  tx      = tx,
+  txsug   = txsug,
+  bw      = d.gen$bw,
+  n       = n,
+  n.miss  = n.miss,
+  W       = W,
+  pvalue  = p.val
+))
 
 } 

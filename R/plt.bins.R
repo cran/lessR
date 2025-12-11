@@ -75,8 +75,8 @@ function(x, y, nm.x, nm.y, stat, n_bins=6,
   }
   .plt.main(d.x, d.y, xlab=nm.x, ylab=paste(stat, "of", nm.y), 
             segments=segments, fill=fill, color=color, size=size, 
-            pts_trans=trans, scale_x=scale_x, scale_y=scale_y,
-            bubble.title=FALSE)  # processed as object="point", not .plt.bubble
+            pt.trans=trans, scale_x=scale_x, scale_y=scale_y,
+            use_plotly=FALSE)
 
 
   # -------- Output Tables

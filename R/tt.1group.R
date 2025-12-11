@@ -216,7 +216,8 @@ function(Y, Ynm, mu=NULL, n=NULL, m=NULL, s=NULL, brief, bw1,
       Y.df = data.frame(Y)
       x.df <- data.frame(1:nrow(Y.df))
       .plt.main(x.df, Y.df, segments=TRUE, size=.9,
-                xlab="Index", ylab=NULL, main=plt.title[plt.i])
+                xlab="Index", ylab=NULL, main=plt.title[plt.i],
+                use_plotly=FALSE)
 
       if (!is.null(pdf_file)) {
         dev.off()

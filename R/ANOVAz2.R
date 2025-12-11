@@ -320,7 +320,8 @@ function(av.out, y.values, x1.values, x2.values, nm, digits_d, brief,
       txt <- paste("Cell Means of", nm[1])
       .plt.main(m[,1,drop=FALSE], m[,3,drop=FALSE], by=m[,2], 
                 fill=pt_fill, color=pt_fill, segments=TRUE,
-                col.segment=pt_fill, cat.x=TRUE, xlab=nm[2], ylab=txt, size=1.5)
+                col.segment=pt_fill, cat.x=TRUE, xlab=nm[2], ylab=txt, size=1.5,
+                use_plotly=TRUE)
 
       if (pdf) {
         dev.off()
@@ -340,17 +341,17 @@ function(av.out, y.values, x1.values, x2.values, nm, digits_d, brief,
 
       # -----------
 
-  # if manage, set up graphics system for 2 windows default
-  if (!pdf) {
-    if (manage.gr) {
+    # if manage, set up graphics system for 2 windows default
+    if (!pdf) {
+      if (manage.gr) {
 #     .graphwin(2)
       dev.set(which=2)
+      }
     }
-  }
-  else { 
-    pdf_file <- "ANOVA_Data.pdf"
-    pdf(file=pdf_file, width=width, height=height)
-  }
+    else { 
+      pdf_file <- "ANOVA_Data.pdf"
+      pdf(file=pdf_file, width=width, height=height)
+    }
 
       plt.i <- plt.i + 1
       plt.title[plt.i] <- "Data Values"
@@ -368,22 +369,23 @@ function(av.out, y.values, x1.values, x2.values, nm, digits_d, brief,
 
       # -----------
 
-  if (!pdf) {
-    if (manage.gr) {
+    if (!pdf) {
+      if (manage.gr) {
 #     .graphwin(2)
-      dev.set(which=3)
+        dev.set(which=3)
+      }
     }
-  }
-  else { 
-    pdf_file <- "ANOVA_Fitted.pdf"
-    pdf(file=pdf_file, width=width, height=height)
-  }
+    else { 
+      pdf_file <- "ANOVA_Fitted.pdf"
+      pdf(file=pdf_file, width=width, height=height)
+    }
 
       plt.i <- plt.i + 1
       plt.title[plt.i] <- "Fitted Values"
 
       .plt.main(m[,2,drop=FALSE], m[,4,drop=FALSE], by=m[,3], segments=TRUE,
-              cat.x=TRUE, xlab=nm[2], ylab=nm[4])
+              cat.x=TRUE, xlab=nm[2], ylab=nm[4],
+              use_plotly=TRUE)
 
       # pdf
       if (pdf) {

@@ -1,3 +1,51 @@
+# lessR version 4.5, December 10, 2025
+
+## Major Updates
+
+* `Chart()`: New general function for visualizing one or two categorical variables in which each level or joint level corresponds to a numerical value. Supports the standard bar chart plus interactive Plotly visualizations according to the `type` parameter: .
+
+* `Chart()`: Parameter `type` determines the visualization form. Values include `"bar"`, `"pie"`, `"radar"`, `"treemap"`, and `"icicle"`. `"sunburst"` is also available, but pie charts with a `by` variable automatically operate as sunburst charts.
+
+* `X()`: New general function for visualizing the distribution of a continuous variable, optionally grouped by a categorical variable. Implements the standard histogram plus additional distribution displays according to the type parameter.
+
+* `XY()`: New general function for visualizing the joint distribution of two continuous variables or one continuous and one categorical variable, with optional subgrouping. Incorporates the standard scatterplot as the default plus additional visualizations selected via the `type` parameter.
+
+* `BarChart()` and `PieChart()`: These established `lessR` functions now serve as aliases to the unified `Chart()` function, preserving existing user scripts while providing access to the expanded visualization framework.
+
+* `Chart()`, `X()`, and `XY()`: New parameter `use_plotly` generates an interactive Plotly visualization in the RStudio Viewer window (sometimes in addition to the static plot in the Plots window). A core subset of Plotly features is supported, including grouping via `by`, optional fit lines (fit), confidence ellipses, bubble plots with a size variable, and full color customization.
+
+* savePlotly(): New function for saving the most recent Plotly visualization to an HTML file. Complements the RStudio Export interface and works for any Plotly visualization created during the session.
+
+* Flows(): New function for visualizing quantities flowing across two- or three-node structures as an interactive Plotly Sankey diagram. This name reflects the broader “data views” perspective adopted throughout lessR.
+
+
+## Updates
+
+* `PieChart()`: When used through the unified Chart() functionality, now supports the `by` parameter to generate grouped pie charts in interactive Plotly mode where results appear in the `Viewer` window.
+
+* `X()`: For univariate density estimation, the `type="density"` naming conflict with the new `type` parameter is resolved. The density form is now selected with `kind="general"` or also values of "normal" or "both".
+
+* `XY()`: For bubble plots, default level of `transparency` now set at 0.7 to better detect bubble overlap.
+
+* `XY()`: Default size of plotted points made a little larger. 
+
+* `facet1` and `facet2` parameters: Now become `facet` as a scalar or as a two variable vector.
+
+
+## Bug Fixes
+
+`style()`: When applying a color theme, default point transparency, 0.1, is now correctly retained.
+
+`PieChart()`: Parameter `label_colors` now works.
+
+`Plot()`: For `type="contour"`, fit line now works.
+
+`Plot()`: For facet (lattice) scatterplots, fit line now works.
+
+`Regression()`: ANCOVA Rsq_Press was not being computed. Now it is.
+
+
+
 # lessR version 4.4.5, August 21, 2025
 
 ## Major Update

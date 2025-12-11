@@ -1,5 +1,0 @@
-cr <-
-function(...)
-
-  Correlation(...)
-

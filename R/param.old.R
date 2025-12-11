@@ -120,7 +120,8 @@ function (...) {
           "option  sort_x  renamed  sort\n\n")
       }
       
-      if (grepl("colors", names(dots)[i], fixed=TRUE)) {
+      if (grepl("colors", names(dots)[i], fixed=TRUE) &&
+          names(dots[i]) != "labels_color") {
         cat("\n"); stop(call.=FALSE, "\n","------\n",
           "colors option removed because the fill parameter\n",
           "  and getColors function offer more functionality\n\n")

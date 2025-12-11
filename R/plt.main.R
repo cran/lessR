@@ -7,7 +7,7 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
          area_fill="transparent",
          color=getOption("pt_color"),
 
-         pts_trans=0, col.segment=getOption("segment_color"),
+         pt.trans=0, col.segment=getOption("segment_color"),
 
          xy_tics=TRUE,
          xlab=NULL, ylab=NULL, main=NULL, main_cex=NULL, sub=NULL,
@@ -17,7 +17,7 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
          size=NULL, ln.width=1, shape=21, means=TRUE,
          segments=FALSE, segments_y=FALSE, segments_x=FALSE,
 
-         type="regular", smooth_points=100, smooth_size=1,
+         type="scatter", smooth_points=100, smooth_size=1,
          smooth_power=0.25, smooth_bins=128,
          contour_n=8, contour_nbins=50, contour_points=FALSE,
 
@@ -47,7 +47,7 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
          tm.adj=0, rm.adj=0,
          scale_x=NULL, scale_y=NULL, pad_x=c(0,0), pad_y=c(0,0),
          axis_fmt="K", axis_x_pre="", axis_y_pre="",
-         legend_title=NULL,
+         legend_title=NULL, use_plotly=TRUE,
 
          add=NULL, x1=NULL, x2=NULL, y1=NULL, y2=NULL,
          add_cex=NULL, add_lwd=1, add_lty="solid",
@@ -55,25 +55,18 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
 
          quiet=FALSE, ...)  {
 
-
 # preliminaries -----------------------------------------------------------
 
   fill_bg <- getOption("panel_fill")
   date.var <- ifelse (.is.date(x[,1]), TRUE, FALSE)
   if (is.null(size)) size <- 1
-  size.pt <- size * .9  # size is set in Plot.R, reduce a bit for here
+  size.pt <- size  # size is set in Plot.R, reduce a bit for here
   theme <- getOption("theme")
-
-  # by.bub means that size is a variable to be plotted in by levels
-  if (length(size) > 1  &&  !is.null(by)) {
-    by.bub <- TRUE
-    object <- "point"  # change from bubble to plot to get to by code
-  }
-  else
-    by.bub <- FALSE
 
   want.labels <- TRUE
 
+  x.lv <- x[,1]
+  y.lv <- y[,1]
 
 # data structures dimensions ----------------------------------------------
 
@@ -87,7 +80,7 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
 
   unique.x <- ifelse (length(unique(x[,1])) == length(x[,1]), TRUE, FALSE)
   unique.y <- ifelse (length(unique(y[,1])) == length(y[,1]), TRUE, FALSE)
-  n.by <- ifelse (is.null(by), 0, nlevels(by))
+  n.by <- ifelse (is.null(by), 1, nlevels(by))
 
   do.ellipse <- ifelse (ellipse[1] > 0, TRUE, FALSE)
 
@@ -103,6 +96,7 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
   # size is a variable, these values passed to .plt.main
   # bubble.title=FALSE passed from .plt.bins to suppress title
   # bubble plot can be directly from object="point"
+
 # if (length(size) > 1  &&  bubble.title) {
 #   sz.nm <- getOption("sizename")
 #   main.lab <- bquote(paste(italic(.(sz.nm)), ": Bubble size from ",
@@ -171,7 +165,7 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
 
    }
   else {  # date.var
-    if (n.by == 0)
+    if (n.by == 1)
       x.dates <- x[,1]  # save actual dates for later
     else {  # x-axis tics just for one level of by
       cnt <- sum(by == levels(by)[1])
@@ -273,7 +267,7 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
                 axis_y_pre=axis_y_pre)
   mm <- margs$lm  # left margin, lm is linear model
   tm <- margs$tm
-  rm <- margs$rm
+  rm <- margs$rm 
   bm <- margs$bm
   n.lab_x.ln <- margs$n.lab_x.ln
   n.lab_y.ln <- margs$n.lab_y.ln
@@ -292,7 +286,9 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
     if (big.nm > 6) rm <- rm + (.05 * (big.nm - 6))
     if (n.ycol == 1) rm <- rm + .30  + (.65 * axis_y_cex)
     if (axis_y_cex > 1) if (!is.null(by)) rm <- rm + .1  # kludge
+    if (length(size) > 1) rm <- rm - .76  # by and bubbles = too much rm
   }
+    else rm <- rm - .06  # hack to reduce rm
 
   if (ts_ahead > 0)   # make room for vertical legend
     rm <- rm + getOption("axis_cex")  # default is 0.75
@@ -321,7 +317,7 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
 
   if (n.xcol>1  && !date.var  && !cleveland) {
     bm <- bm + 0.20  # allow for the bottom legend
-    rm <- rm - 0.80  # remove superfluous right margin
+    rm <- rm - 0.80  # kludge to remove superfluous right margin
   }
 
   if (type == "contour") {
@@ -349,6 +345,7 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
   # non-graphical parameters in ... Generate warnings when no plot
 
   # re-calibrate maximum of y-axis if stacking
+  # wide format needs conversion to Long format to work properly
   if (stack  &&  n.ycol > 1) {  # data in wide format, one col for each y
     y.tot <- apply(y, 1, sum, na.rm=TRUE)
     mx.y <- max(y.tot)
@@ -378,7 +375,7 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
   # more efficient to do all computations here, then plot fit line later
   # if multiple x or y variables, just first variable is checked
   if (fit.line!="off" && is.null(scale_y) && !cat.y && !date.var) {
-    pf <- .plt.fit(x[,1], y[,1], fit.line, fit_power, fit_new)  # fit line
+    pf <- .plt.fit(x[,1], y[,1], fit.line, fit_power, fit_new, size)  # fit line
     mn.yf <- min(pf$f.ln, na.rm=TRUE)  # f.ln are the fitted values
     mx.yf <- max(pf$f.ln, na.rm=TRUE)
     mn.y <- min(mn.y, mn.yf)
@@ -400,6 +397,7 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
     }
     if (stat != "data" && (!all(y == 0))) mx.y <- mx.y + (.08 * (mx.y-mn.y))
     region <- matrix(c(origin_x, mx.x, mn.y, mx.y), nrow=2, ncol=2)
+    ellipse.poly <- NULL
   }  # end no ellipse
 
   else {  # set plot with sufficient room for ellipse and data
@@ -419,8 +417,8 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
   # set y-axis origin for numeric variables
   if (!cat.y) {
     if (!is.null(origin_y)) {
-      if (all(y, na.rm=TRUE) > 0) mn.y <- origin_y
-      if (all(y, na.rm=TRUE) < 0) mx.y <- origin_y
+      if (min(y, na.rm = TRUE) > 0) mn.y <- origin_y
+      if (max(y, na.rm = TRUE) < 0) mx.y <- origin_y
     }
   }
 
@@ -448,7 +446,7 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
 # set-up the coordinate system --------------------------------------------
 
   if (type != "contour")  # filled.contour does its own plot window
-    plot(region, type="n", axes=FALSE, ann=FALSE, ...)
+    base::plot(region, type="n", axes=FALSE, ann=FALSE, ...)
   rm(region)
   usr <- par("usr")
 
@@ -492,7 +490,7 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
       axT2 <- axTicks(2, axp=scale_y)
   }
 
-  if (bubble1) {  # 1-D scatter plot of categorical variable
+  if (bubble1) {  # 1-D scatter plot of categorical variable, MOVE to Chart()
     axT2 <- NULL
     y.val <- NULL
     y.lab <- ""
@@ -512,7 +510,7 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
       adj <- .RSadj(axis_cex=ax$axis_x_cex); axis_x_cex <- adj$axis_cex
 
       if (!date.var) {  # call axis() for both axes
-        .axes(x.lvl, y.lvl, axT1, axT2,
+        ax.info <- .axes(x.lvl, y.lvl, axT1, axT2,
               rotate_x=rotate_x, rotate_y=rotate_y, offset=offset, 
               axis_fmt=axis_fmt, axis_x_pre=axis_x_pre, axis_y_pre=axis_y_pre,
               ...)
@@ -520,9 +518,11 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
     }  # end not contour
 
     if (date.var) {  # date.var, y-axis
-      .axes(NULL, y.val, NULL, axT2, rotate_x=rotate_x, rotate_y=rotate_y,
-            offset=offset, y.only=TRUE,  # y-axis
-            axis_fmt=axis_fmt, axis_x_pre="no", axis_y_pre=axis_y_pre, ...)
+      ax.info <- .axes(NULL, y.val, NULL, axT2,
+                       rotate_x=rotate_x, rotate_y=rotate_y, offset=offset,
+                       y.only=TRUE,  # y-axis
+                       axis_fmt=axis_fmt, axis_x_pre="no",
+                       axis_y_pre=axis_y_pre, ...)
 
       # date.var, x-axis
       len.xtics <- length(x.dates)
@@ -652,7 +652,6 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
   ltype <- character(length=n.clrs)
   for (i in seq_along(ltype)) ltype[i] <- "solid"
 
-
   if (object == "point") {  # is point even if size=0, plotting just lines
 
     if (n.xcol == 1  &&  n.ycol == 1) {
@@ -661,7 +660,7 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
         if (segments && ln.width>0)  # plot data line segments
             lines(x[,1], y[,1], col=color[1], lwd=ln.width, ...)
         if (area_fill[1] != "transparent") # fill area
-          polygon(c(x[1],x,x[length(x)]), c(mn.y,y[,1],mn.y),
+          polygon(c(x[1], x, x[length(x)]), c(mn.y,y[,1],mn.y),
                   col=area_fill, border="transparent")
 
 
@@ -703,7 +702,7 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
           lgn.clr <- c(color[1], trns.col, ln.f.col)
           lgn.nm <- ifelse (nchar(y.name) < 6, y.name, "data")
           .plt.by.legend(c(lgn.nm, "model\nfit", "fore-\ncast"),
-                         lgn.clr, lgn.clr, shp="lines", pts_trans, fill_bg,
+                         lgn.clr, lgn.clr, shp="lines", pt.trans, fill_bg,
                          usr, pt.size=size, legend_title=legend_title)
         }  # end forecast
       }  # n.by is 1
@@ -793,17 +792,19 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
                       colramp=clr.den, cex=smooth_size, add=TRUE)
       }
  
-      else if (type == "contour")
+      else if (type == "contour") {
         .plt.contour(x, y, 
            contour_n, contour_nbins, contour_points, size.pt[1],
            theme, scale_x, scale_y, pad_x, pad_y, x.lab, y.lab, 
-           ellipse, ellipse_color, ellipse_lwd, fit.line, fit_color, fit_lwd,
-           axis_x_pre, axis_y_pre, axis_fmt, xlab.adj, ylab.adj) 
+           ellipse, ellipse_color, ellipse_lwd,
+           fit.line, fit_color, fit_lwd,
+           axis_x_pre, axis_y_pre, axis_fmt, xlab.adj, ylab.adj)
+      }
+
 
 # plot points, segments, means with no by --------------------------------- 
 
       else if (size.pt[1] > 0) {
-
         # plot points
         if (n.xcol == 1  &&  n.ycol == 1) {  # one x and one y variable
           if (length(out_ind) == 0)  # no outliers
@@ -861,6 +862,7 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
         
 
 # plot means --------------------------------------------------------------
+
         if (means  &&  stat == "data") {
 
         # get colors
@@ -905,6 +907,7 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
 
 
 # plot center line --------------------------------------------------------
+
       if (center_line != "off") {
         if (center_line == "mean") {
           m.y <- mean(y[,1], na.rm=TRUE)
@@ -937,6 +940,8 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
                    lty="solid", lwd=ln.width, col=color[i])
         }
       }  # end segments
+      x.lv <- x[,1]
+      y.lv <- y[,1]
     }  # end is.null by
 
 
@@ -966,18 +971,9 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
       for (i in 1:n.by) {
         x.lv <- subset(x, by==levels(by)[i])
         y.lv <- subset(y, by==levels(by)[i])
-        if (!by.bub)  {
-          if (size.pt > 0)
-            points(x.lv, y.lv[,1], pch=shp[i], col=clr[i], bg=fill[i],
-                   cex=size.pt, lwd=0.75, ...)
-        }
-        else {  # size is a variable (not for BPFM, which does .dpmat() )
-          size.lv <- subset(size, by==levels(by)[i])
-          fill[i] <- .maketrans(fill[i], (1-pts_trans)*256)
-          # size is a var and a by var
-          .plt.bubble(x.lv, y.lv, size.lv, radius, power, fill[i], clr[i],
-                      size_cut, prop, bbl.txt.col, object)
-        }
+        if (size.pt > 0)
+          points(x.lv, y.lv[,1], pch=shp[i], col=clr[i], bg=fill[i],
+                 cex=size.pt, lwd=0.75, ...)
 
         # interaction means plot, ts without a date var and segments=TRUE
         if (segments && !stack && !date.var) {
@@ -992,17 +988,17 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
       }  # end 1:n.by
 
       # by legend
-      if (size == 0) shape <- "lines"
+      if (size[1] == 0) shape <- "lines"
       if (fill[1] == "transparent") fill <- color
       if (stack) {  # default pt.size is 0
         point.size <- ifelse (size > 0, 2.5 * axis_x_cex, 0)
-        .plt.by.legend(levels(by), color, area_fill, shp=shape[1], pts_trans,
+        .plt.by.legend(levels(by), color, area_fill, shp=shape[1], pt.trans,
                        fill_bg, usr, pt.size=point.size,  # 22 is a rectangle
                        legend_title=legend_title)
       }
       else {  # not stack
-        if (n.by > 1)
-          .plt.by.legend(levels(by), color, fill, shape, pts_trans,
+        if (n.by > 1  &&  length(size == 1))
+          .plt.by.legend(levels(by), color, fill, shape, pt.trans,
                          fill_bg, usr, legend_title=legend_title)
       }
     }  # end by
@@ -1020,7 +1016,7 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
       }
       else {  # vertical legend
         point.size <- 1.25 * size.pt
-        .plt.by.legend(colnames(x), color, fill, shp=shape[1], pts_trans,
+        .plt.by.legend(colnames(x), color, fill, shp=shape[1], pt.trans,
                        fill_bg, usr, pt.size=point.size,  # 22 is a rectangle
                        legend_title=legend_title)
       }
@@ -1042,15 +1038,12 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
 # bubble or sunflower plot  -----------------------------------------------
 
   else if ((object %in% c("bubble", "sunflower"))) {
-    if (!is.null(by)) {
-      cat("\n"); stop(call.=FALSE, "\n------\n",
-        "Parameter  by  not valid for bubble plot\n\n")
-    }
+#   if (!is.null(by)) {
+#     cat("\n"); stop(call.=FALSE, "\n------\n",
+#       "Parameter  by  not valid for bubble plot\n\n")
+#   }
 
-    if (length(size) > 1)  # custom legend for the bubble sizes
-      .plt.sym.legend(size, color, fill, shape, fill_bg, usr, radius, power)
-
-    n.clrs <- 1  # for fit.line
+#   n.clrs <- 1  # for fit.line
 
     # colors
     if (is.null(col.low) || is.null(col.hi) || !bubble1) {
@@ -1066,8 +1059,8 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
       clr.color <- "gray70"
     }
 
-    # no value for size specified, do counts
-    if (length(size) == 1) {
+    # size is not a variable, do counts
+    if (length(size) == 1) {  # MOVE to Chart()
       mytbl <- table(x, y)  # get the counts, all x-y combinations
       n.count <- nrow(mytbl) * ncol(mytbl)
       if (prop) {
@@ -1098,7 +1091,7 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
       # for categorical vars, size not a var
       if (object == "bubble") {
         .plt.bubble(xx, yy, count, radius, power, clr, clr.color,
-                    size_cut, prop, bbl.txt.col, object)
+                    size_cut, prop, bbl.txt.col, object, pt.trans)
       }
       else if (object == "sunflower") {
         cords <- data.frame(xx, yy, count, stringsAsFactors=TRUE)
@@ -1108,35 +1101,44 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
             col.axis=getOption("axis_x_color"), add=TRUE)
       }
 
-    }  # end length(size) == 1
+    }  # end length(size) == 1, counts
 
     # size is a variable (unless size is constant and bubble specified)
-    # no by var
     else {
-      .plt.bubble(x, y, size, radius, power, clr, clr.color,
-                  size_cut, prop, bbl.txt.col, object)
+      for (i in 1:n.by) {
+        if (is.null(by))
+          d.sub <- data.frame(x=x[,1], y=y[,1], ind=rep(NA, nrow(x)), size=size)
+        else
+          d.sub <- data.frame(x=x[,1], y=y[,1], ind=by, size=size)
+        if (!all(is.na(by))) d.sub <- d.sub[by==levels(by)[i], ]
+        fill[i] <- .maketrans(fill[i], (1-pt.trans)*256)
+        .plt.bubble(d.sub$x, d.sub$y, d.sub$size, radius, power, fill[i],
+                    color[i], size_cut, prop, bbl.txt.col, object, pt.trans)
+      }
+      fill.bub.lgd <- ifelse (all(is.na(by)), fill, "gray70")  # by -> neutral
+      .plt.sym.legend(size, fill=fill.bub.lgd, color="gray50", shape, usr,
+                      radius, power, pt.trans)
+      rm(d.sub)
     }
   }  # end bubble/sunflower
 
 
 # ellipse option ----------------------------------------------------------
+
   if (do.ellipse) {
+    ell_list <- setNames(vector("list", n.by), levels(by))  # for plt.plotly()
 
-    for (i in 1:n.clrs) {
-
-      if (n.clrs == 1) {  # one plot, all the data
+    for (i in 1:n.by) {
+      if (n.by == 1) {  # one plot, all the data
           x.lv <- x[,1]
           y.lv <- y[,1]
       }
-
       else {  # multiple, pull out subset
-
         if (!is.null(by)) {  # multiple by plots
           ind <- which(by == levels(by)[i])
           x.lv <- x[ind]
           y.lv <- y[ind]
         }
-
         if (n.col > 1) {  # multiple variable plots
           if (n.xcol > 1) {
             x.lv <- x[,i]
@@ -1147,9 +1149,7 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
             y.lv <- y[,i]
           }
         }
-
         clr <- ifelse (length(color) == 1, color, color[i])
-
       }  # end multiple
 
       # ellipse stats
@@ -1159,26 +1159,53 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
       s.x <- sd(x.lv, na.rm=TRUE)
       s.y <- sd(y.lv, na.rm=TRUE)
 
-      for (j in seq_along(ellipse)) { # for each ellipse for this by group
-        e <- ellipse::ellipse(cxy, scale=c(s.x, s.y), centre=c(m.x, m.y),
-                     level=ellipse[j])
-        ln.type <- "solid"
-        col.border <- ifelse (n.clrs == 1, ellipse_color, clr)
-        polygon(e, border=col.border, col=ellipse_fill,
-                lwd=ellipse_lwd, lty=ln.type)
-      }  # jth ellipse
-    }  # ith pattern
+      # build polygons for this slice (group or overall)
+      ell_per_nm <- vector("list", length(ellipse))
+
+      for (j in seq_along(ellipse)) {
+        el <- ellipse::ellipse(cxy, scale = c(s.x, s.y),
+                               centre = c(m.x, m.y), level = ellipse[j])
+        # base R drawing (if you still want it)
+        ln.type    <- "solid"
+        col.border <- ifelse(n.by == 1, ellipse_color, clr)
+        polygon(el, border=col.border, col=ellipse_fill,
+                    lwd=ellipse_lwd, lty=ln.type)
+
+        # close polygon for plotly and stash
+        el <- rbind(el, el[1, , drop = FALSE])
+        ell_per_nm[[j]] <- el
+      }
+
+      # single group (or no by): pass polygons directly
+      # groups with the named list assignment
+      if (is.null(by) || n.by <= 1L) {
+        ellipse_region <- if (length(ellipse) == 1L) ell_per_nm[[1]]
+                          else ell_per_nm
+      }
+      else {
+        nm <- as.character(levels(by)[i])
+        ell_list[[nm]] <- ell_per_nm
+        ellipse_region <- ell_list
+      }
+    }  # ith group
   }  # do.ellipse
+
+  else {
+    ell_list <- NULL
+    ellipse_region  <- NULL
+    ellipse_lwd <- NULL
+  }
 
 
 # fit line option ---------------------------------------------------------
 
+  f.ln <- double(0)
   if (fit.line != "off") {
 
     # if outliers noted then also do line w/o outliers
     fit.remove <- ifelse (length(out_ind) > 0, TRUE, FALSE)
     do.remove <- FALSE
-    n.loops <- ifelse (n.clrs > 1, 1, as.numeric(fit.remove)+1)
+    n.loops <- ifelse (n.by > 1, 1, as.numeric(fit.remove)+1)
     for (i.remv in 1:n.loops) {
       if (fit.remove) {
         fit_se[1] <- 0  # for line w/o outliers, no se band
@@ -1186,47 +1213,61 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
         if (i.remv == 2) do.remove <- TRUE  # 2nd pass
       }
 
-      mse.ln <- double(length=n.clrs)  # .ln is linear
-      mse.nl <- double(length=n.clrs)  # .nl is nonlinear
-      b0 <- double(length=n.clrs)
-      b1 <- double(length=n.clrs)
-      Rsq <- double(length=n.clrs)
-      by.cat <- character(length=n.clrs)
+      mse.ln <- double(length=n.by)  # .ln is linear
+      mse.nl <- double(length=n.by)  # .nl is nonlinear
+      b0 <- double(length=n.by)
+      b1 <- double(length=n.by)
+      Rsq <- double(length=n.by)
+      by.cat <- character(length=n.by)
+      ind <- integer(0)
 
-      for (i.clr in 1:n.clrs) {  # double looping with i.remv and i
+      for (i.by in 1:n.by) {  # double looping with i.remv and i
 
-        if (n.clrs == 1) {  # one plot, all the data
+        if (n.by == 1) {  # one plot, all the data
           if (!date.var) {
             x.lv <- x[,1]
+
             y.lv <- y[,1]
           }
           else {  # date.var
             x.lv <- as.numeric(x.val)
-            y.lv <- as.numeric(y[,i.clr])
+            y.lv <- as.numeric(y[,i.by])
           }
           clr <- fit_color
-        }  # end n.clrs == 1
 
-        else {  # multiple clrs, pull out subset
+          if (length(size) > 1)
+            sz.lv <- size
+          else
+            sz.lv <- rep(size, length(x.lv))
+
+        }  # end n.by = 1
+
+        else {  # multiple by levels, pull out subset
 
           if (!is.null(by)) {  # multiple by plots
-            x.lv <- subset(x, by==levels(by)[i.clr])
-            y.lv <- subset(y, by==levels(by)[i.clr])
+            x.lv <- subset(x, by==levels(by)[i.by])
+            y.lv <- subset(y, by==levels(by)[i.by])
+            ind <- c(ind, rep(levels(by)[i.by], length(x.lv)))
           }
+
+          if (length(size) > 1)
+            sz.lv <- size[which(by==levels(by)[i.by])]
+          else
+            sz.lv <- rep(size, length(x.lv))
 
           if (n.col > 1) {  # multiple variable plots
             if (n.xcol > 1) {
-              x.lv <- x[,i.clr]
+              x.lv <- x[,i.by]
               y.lv <- y[,1]
             }
             else {
               x.lv <- x[,1]
-              y.lv <- y[,i.clr]
+              y.lv <- y[,i.by]
             }
           }
 
-          clr <- ifelse (length(color) == 1, color, color[i.clr])
-        }  # end multiple
+          clr <- ifelse (length(color) == 1, color, color[i.by])
+        }  # end multiple groups
 
         ln.type <- "solid"
 
@@ -1236,68 +1277,90 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
           ln.type <- ifelse (ln.type != "dashed", "dashed", "solid")
         }
 
-        col.ln <- ifelse (n.clrs==1, fit_color, fill[i.clr])
+        col.ln <- ifelse (n.clrs==1, fit_color, fill[i.by])
 
-        pf <- .plt.fit(x.lv, y.lv, fit.line, fit_power, fit_new)  # fit line
+        pf <- .plt.fit(x.lv, y.lv, fit.line, fit_power, fit_new, sz.lv)  # fit
 
         x.lv <- pf$x.lv  # x and y get reduced in .plt.fit if NA
         y.lv <- pf$y.lv
-        f.ln <- pf$f.ln  # fitted
+        fi.ln <- pf$f.ln  # fitted
         l.ln <- pf$l.ln  # linearized
-        y.new <- pf$y.new  # computed from fitted function 
+        y.new <- pf$y.new  # computed from fitted function
+        sz.lv <- pf$sz.lv 
+
+        f.ln <- c(f.ln, fi.ln)
 
         if (i.remv == 1) {  # if outlier removal, only outlier line reported
-          mse.ln[i.clr] <- pf$mse.ln
-          mse.nl[i.clr] <- pf$mse.nl
-          b0[i.clr] <- pf$b0
-          b1[i.clr] <- pf$b1
-          Rsq[i.clr] <- pf$Rsq
+          mse.ln[i.by] <- pf$mse.ln
+          mse.nl[i.by] <- pf$mse.nl
+          b0[i.by] <- pf$b0
+          b1[i.by] <- pf$b1
+          Rsq[i.by] <- pf$Rsq
         }
 
-        if (n.by > 0)
-          by.cat[i.clr] <- levels(by)[i.clr]
-
-        if (fit.line %in% c("exp", "quad", "log", "null"))
-          fit_se[1] <- 0
+        if (n.by > 1)
+          by.cat[i.by] <- levels(by)[i.by]
 
         # se bands about each eligible fit line
-        if (fit_se[1] != 0) {
-          for (j in seq_along(fit_se)) {
-            p.ln <- predict(l.ln, se=TRUE)
+        if (!fit.line %in% c("exp", "quad", "log", "null")) {
+          se.poly <- vector("list", length(fit_se))  # for plt.plotly()
+          p.ln <- predict(l.ln, se=TRUE)
+          nrows <- length(y.lv)
+          sefit <- p.ln$se.fit
+          for (j in seq_along(fit_se)) { # one or more prediction intervals 
             prb <- (1 - fit_se[j]) / 2
-            nrows <- length(y.lv)
-            up.ln <- f.ln + (qt(prb,nrows-1) * p.ln$se.fit)
-            dn.ln <- f.ln - (qt(prb,nrows-1) * p.ln$se.fit)
-            polygon(c(x.lv, rev(x.lv)), c(up.ln, rev(dn.ln)),
-                    col=se_fill, border="transparent")
-
+            up.ln <- fi.ln + (qt(prb,nrows-1) * sefit)
+            dn.ln <- fi.ln - (qt(prb,nrows-1) * sefit)
+            band <- cbind(c(x.lv, rev(x.lv)), c(up.ln, rev(dn.ln)))
+            polygon(band, col=se_fill, border="transparent")
+            se.poly[[j]] <- band  # for plt.plotly()
           }  # end for each se plot
         }
+        else
+          se.poly <- NULL
 
         # plot fit line(s) on top of se bands
         if (!("transparent" %in% clr)) {
           if (n.clrs ==2  &&  (color[1] == color[2]))
             ln.type <- ifelse (i == 2, "dashed", "solid")
-          lines(x.lv, f.ln, col=clr, lwd=fit_lwd, lty=ln.type)
+          lines(x.lv, fi.ln, col=clr, lwd=fit_lwd, lty=ln.type)
+
+          if (all(is.na(by)))
+            g.temp <- data.frame(x.lv, y.lv, fi.ln,
+              ind=rep(NA, length(x.lv)), sz.lv)
+          else
+            g.temp <- data.frame(x.lv, y.lv, fi.ln, levels(by)[i.by], sz.lv)
+          names(g.temp)[3:5] <- c("f.ln", "ind", "size")
+          if (i.by == 1)
+            g <-  g.temp
+          else
+            g <- rbind(g, g.temp)
         }
-        else {
-          lines(x.lv, f.ln, col=col.ln, lwd=fit_lwd, lty=ln.type)
-        }
+        else
+          lines(x.lv, fi.ln, col=col.ln, lwd=fit_lwd, lty=ln.type)
 
         # plot residuals option
         if (plot_errors) {
           red <- rgb(130,40,35, maxColorValue=255)
           pe.clr <- ifelse (theme %in% c("gray", "white"), "gray58", red)
-          segments(y0=f.ln, y1=y.lv, x0=x.lv, x1=x.lv,
+          segments(y0=fi.ln, y1=y.lv, x0=x.lv, x1=x.lv,
                    col=pe.clr, lwd=1)
         }
-      }  # ith pattern (clr)
+      }  # ith group (clr)
     }  # fit.remove
-
     if (!quiet) cat ("\n")
   }  # end fit.line
-  else
+
+  else {  # no fit.line
+    se.poly <- NULL
+    col.ln <- fit_color
     y.new <- NULL
+    f.ln <- rep(NA, nrow(x))  # for plt.plotly()
+    if (!is.null(by))
+      ind <- by 
+    else
+      ind <- rep(NA, nrow(x)) 
+  }
 
 
 # annotations -------------------------------------------------------------
@@ -1335,6 +1398,80 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
     }
   }  # end annotations
   
+
+# interactive to plt.plotly() ----------------------------------------------
+
+  if (type != "contour"  &&  length(shape) == 1) { # only consider eligible
+    digits_d <- .max.dd(y[,1])
+
+    if (use_plotly  &&  type=="scatter") {
+
+      if (fit.line == "off") {  # data not sorted
+        if (length(x.lv) < nrow(x)) x.lv <- x[,1]
+        if (length(y.lv) < nrow(y)) y.lv <- y[,1]
+        g <- data.frame(x=x.lv, y=y.lv, f=f.ln, ind, size)
+      }
+      else {  # fit line, g already constructed
+        names(g)[1:3] <- c("x", "y", "f")
+        size <- g$size
+      }
+
+      if (date.var) {  # time series
+        connect <- TRUE
+        ax.info$axT1 <- as.numeric(x.dates[indices])
+
+        .format_date_labels <- function(dates, ts_unit) {
+          # ts_unit is unknown if x is a time series to begin with
+          ts_unit <- match.arg(ts_unit, c("years","quarters","months","weeks", 
+                                          "days","days7", "unknown"))
+          switch(ts_unit,
+            years    = format(dates, "%Y"),
+            quarters = paste0(format(dates, "%Y"), " ", quarters(dates)),
+            months   = format(dates, "%b %Y"),
+            weeks    = format(dates, "%d %b %Y"),
+            days     = format(dates, "%d %b %Y"),
+            days7    = format(dates, "%d %b %Y")
+          )
+        }
+
+        ax.info$axL1 <- .format_date_labels(x.dates[indices], ts_unit)
+      }
+      else  # not time series
+        connect <- FALSE
+
+      if (run) connect <- TRUE
+      if (segments) connect <- TRUE
+
+      gridT1 <- ax.info$axT1
+      gridT2 <- ax.info$axT2
+
+      if (pt.trans == 0.1) pt.trans <- 0.05  # change default
+
+      plt <- plt.plotly(
+        g=g,
+        by.name=by.name, n.by=n.by,
+        fill=fill, border=color, shape=shape, pt.size=size.pt,
+        x.lab=x.lab, y.lab=y.lab,
+        ax=ax.info, gridT1=gridT1, gridT2=gridT2,
+        digits_d=digits_d,
+        fit_color=fit_color, fit_lwd=fit_lwd, ln.type=1,
+        connect=connect,
+        power=power, radius.in=0.12, size.name=getOption("sizename"),
+        ellipse_region = ellipse_region, ellipse_fill = ellipse_fill,
+        ellipse_color = if (n.by <= 1L) ellipse_color else NULL,
+        ellipse_lwd = ellipse_lwd,
+        se.poly = se.poly, se_fill = se_fill,
+        pt_opacity = 1 - pt.trans
+      )
+
+    if (.allow.interactive())
+      .viewer_notice_once(plot_name = "scatter", window_target = "Both")
+
+      if (.allow.interactive()) print(plt)  # show in Viewer
+    }  # end use_plotly
+
+  }  # end not eligible
+
 
 # end, return -------------------------------------------------------------
 

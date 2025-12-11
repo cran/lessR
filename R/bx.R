@@ -1,5 +1,0 @@
-bx <-
-function(...)
-
-  BoxPlot(...)
-

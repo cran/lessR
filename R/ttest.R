@@ -413,7 +413,8 @@ function(x, y=NULL, ...) {
     .plt.main(data.frame(x.call, stringsAsFactors=TRUE),
               data.frame(y.call, stringsAsFactors=TRUE), cat.y=TRUE,
               fill=pt_fill, color=pt_color,
-              shape=21, size=pt_size, ylab="", segments_y=TRUE)
+              shape=21, size=pt_size, ylab="", segments_y=TRUE,
+              use_plotly=FALSE)
 
     if (!is.null(pdf_file)) {
       dev.off()

@@ -1,5 +1,5 @@
 .plt.fit <- 
-function(x.lv, y.lv, fit.line, fit_power, fit_new) {
+function(x.lv, y.lv, fit.line, fit_power, fit_new, sz.lv) {
 
 # Need to implement  xlog  and xylog
 
@@ -15,6 +15,8 @@ function(x.lv, y.lv, fit.line, fit_power, fit_new) {
     od <- order(x.lv)
     x.lv <- x.lv[od]
     y.lv <- y.lv[od]
+    if (length(sz.lv) > 1) sz.lv <- sz.lv[od]
+    
 
     # fit line
     # ---------------------------------------
@@ -135,6 +137,6 @@ function(x.lv, y.lv, fit.line, fit_power, fit_new) {
 
   return(list(x.lv=x.lv, y.lv=y.lv, f.ln=f.ln, l.ln=l.ln,
               mse.ln=mse.ln, mse.nl=mse.nl, b0=b0, b1=b1, Rsq=Rsq,
-              y.new=y.new))
+              y.new=y.new, sz.lv=sz.lv))
 }
 

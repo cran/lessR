@@ -102,7 +102,12 @@ function(lm.out, d.ancova, digits_d=NULL, show_R=FALSE) {
   rsd <- c(smc[nt1,1], smc[nt1,2], smc[nt1,3])
   names(rsd) <- c("df", "ss", "ms")
 
-  # Total
+  # Total SS is not meaningful for Type II ANOVA
+  # Type II SS are partial sums of squares - each effect is calculated after
+  #   adjusting for all other effects at the same level or lower in the
+  #   hierarchy, but not for higher-order interactions involving that effect.
+  # Each Type II SS represents variation explained by that effect after
+  #   accounting for the other effects.
   tot <- NA
 
   return(list(out_anova=tx, mdl="", rsd=rsd, tot=tot, MSW=MSW))

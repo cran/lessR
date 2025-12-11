@@ -1,15 +1,30 @@
-## R package reference generated from DESCRIPTION metadata
-citation(auto = meta)
+citHeader("To cite lessR in publications use:")
 
-## Journal article
-bibentry(bibtype = "Article",
-         title = "Enhancement of the Command-Line Environment for use in the Introductory Statistics Course and Beyond",
-         author = c(person(c("David", "W."), "Gerbing")),
-         journal = "Journal of Statistics and Data Science Education",
-         year = "2021", 
-         volume = "29",
-         number = "3",
-         pages = "251--256",
-         publisher = "Taylor & Francis", 
-         address = "New York",
-         doi = "10.1080/26939169.2021.1999871")
+## Cite the package itself as a manual
+bibentry(
+  bibtype  = "Manual",
+  title    = "lessR: Less Code, More Results",
+  author   = person(given = "David W.", family = "Gerbing", role = c("aut", "cre")),
+  year     = "2025",
+  note     = "R package version 4.4.9",
+  doi      = "10.32614/CRAN.package.lessR",
+  url      = "https://CRAN.R-project.org/package=lessR"
+)
+
+## Cite the associated journal article
+bibentry(
+  key      = "Gerbing2021CommandLine",
+  bibtype  = "Article",
+  title    = "Enhancement of the Command-Line Environment for Use in the Introductory Statistics Course and Beyond",
+  author   = person(given = "David W.", family = "Gerbing"),
+  journal  = "Journal of Statistics and Data Science Education",
+  volume   = "29",
+  number   = "3",
+  pages    = "251--266",
+  year     = "2021",
+  publisher= "Taylor & Francis",
+  doi      = "10.1080/26939169.2021.1999871",
+  url      = "https://doi.org/10.1080/26939169.2021.1999871"
+)
+
+citFooter("A BibTeX entry for LaTeX users can be obtained via toBibtex(citation('lessR')).")

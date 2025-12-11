@@ -1,10 +1,11 @@
 .dpmat.main <-   # BPFM (even for just 1 row)
-function(x, l, sort_yx,  # no y variable
+function(x, l, sort_type,  # no y variable
          fill, color, col.bg,
          trans, shape_pts, col.box, 
          col.low, col.hi,
          xy_ticks, xlab, ylab, main, sub, cex,
-         radius, size_cut, txt_color="black", power,
+
+         radius, power, size_cut, txt_color="black",
          bm.adj, lm.adj, tm.adj, rm.adj,
          value_labels, rotate_x, rotate_y, offset, quiet,
          do_plot, fun_call=NULL, ...)  {
@@ -39,7 +40,7 @@ function(x, l, sort_yx,  # no y variable
   x.resp <- NULL
   if (suppressWarnings(all(!is.na(as.numeric(as.character(resp)))))) {
     x.resp <- as.numeric(as.character(resp))
-    x.resp <- sort(x.resp)
+    x.resp <- base::sort(x.resp)
     resp <- as.character(x.resp)
   }
 
@@ -70,8 +71,8 @@ function(x, l, sort_yx,  # no y variable
     w <- 1:n.resp
   m <- integer(length=n.var)
   for (i in 1:n.var) m[i] <- round(weighted.mean(w, mytbl[i,]), 3)
-  if (sort_yx != "0") {
-    srt.dwn <- ifelse (sort_yx == "-", TRUE, FALSE)
+  if (sort_type != "0") {
+    srt.dwn <- ifelse (sort_type == "-", TRUE, FALSE)
     m.o <- order(m, decreasing=srt.dwn)
     mytbl <- mytbl[m.o,]
     m <- m[m.o]
@@ -214,12 +215,12 @@ function(x, l, sort_yx,  # no y variable
       if (!grepl("radius", fncl))
         fc <- paste(fc, ", radius=0.3", sep="")
       if (nzchar(fc)) {
-        fc <- paste(fncl, fc, ") ", sep="")
+        fc <- paste(fncl,  fc, ") ", sep="")
         txsug <- paste(txsug,"\n", fc, sep="")
       }
             
       txsug <- .rm.arg.2(" x=", txsug) 
-      txsug <- .rm.arg.2("(x=", txsug) 
+#     txsug <- .rm.arg.2("(x=", txsug) 
     }
 
     # display variable labels

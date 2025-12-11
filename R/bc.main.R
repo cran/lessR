@@ -14,8 +14,9 @@ function(x, y, by, stack100,
          pad_y_min, pad_y_max,
          legend_title, legend_position, legend_labels,
          legend_horiz, legend_size, legend_abbrev, legend_adj,
-         add, x1, x2, y1, y2, out_size, digits_d, do_plot, quiet,
-         shiny, ...) {
+         add, x1, x2, y1, y2, out_size, do_plot, use_plotly, quiet,
+         shiny, digits_d, ...) {
+
 
   multi <- ifelse (is.data.frame(x), TRUE, FALSE)
   is.ord <- ifelse (is.ordered(x) || is.ordered(by), TRUE, FALSE)
@@ -198,27 +199,36 @@ function(x, y, by, stack100,
       }
     }
 
-    else {  # a by variable
-      x.temp <- x
-      unq.x <- na.omit(unique(x))
-      unq.by <- na.omit(unique(by))
+    else {  # a by variable, y already aggregated
 
-      do.row <- ifelse (x[1] == x[2], FALSE, TRUE)  # x is outer loop
-      m <- matrix(y, nrow=length(unique(by)), byrow=do.row)
-      colnames(m) <- unq.x
-      rownames(m) <- unq.by
-      m <- as.table(m, dnn=c(by.name, x.name))
-      names(dimnames(m)) <- c(by.name, x.name)
-      x <- m
-      if (stack100) {
-        x.count <- x  # save table of counts for possible bar display
-        x <- prop.table(x, 2)  #  100% within bar chart
+      ## drop rows with any NA in x, by, or y
+      keep <- !is.na(x) & !is.na(by) & !is.na(y)
+      x_use  <- x[keep]
+      by_use <- by[keep]
+      y_use  <- y[keep]
+
+      ## use factors so we get consistent, ordered levels
+      x_fac  <- factor(x_use)
+      by_fac <- factor(by_use)
+
+      ## build a 2D table of aggregated values: rows = by, cols = x
+      tab <- xtabs(y_use ~ by_fac + x_fac, drop.unused.levels = FALSE)
+
+      # ensure dimnames reflect a specific level ordering)
+      unq.x  <- levels(x_fac)
+      unq.by <- levels(by_fac)
+      tab <- tab[unq.by, unq.x, drop = FALSE]
+
+      names(dimnames(tab)) <- c(by.name, x.name)
+      x <- tab
+
+      if (stack100) {  # x = tabulate for counts
+        x.count <- x  # save the table for possible bar display
+        x <- prop.table(x, 2)  # 100% within each x (column)
       }
     }
   }  # end y is present
 
-
-  # x = tabulate for counts
 
   if (!entered) {  # so tabulate
     if (!is.data.frame(x)) { # a single x variable
@@ -604,25 +614,30 @@ function(x, y, by, stack100,
 
   ax.num <- ifelse (horiz, 1, 2)  # location of numerical axis
   y.coords <- axTicks(ax.num, axp=scale_y)
+  gridT <- axTicks(ax.num, axp=scale_y)  # axis ticks, grid lines are identical
+  y.name <- getOption("yname")
 
 
   ## ----
   ## PLOT
   ## does stacked bar charts automatically if x is a 2-D matrix
 
-   usr <- par("usr")  # used elsewhere as well
+   usr <- par("usr")  # used elsewhere as well; just use 1 y.coords next
   .plt.bck(usr, y.coords, y.coords, do.v=horiz, do.h=!horiz)
 
   # the bars
   # here plot only the bars and the background; x is the y-numbers here
+
+
   if (new.scale == 0)
-    x.coords <- barplot(x, add=TRUE, col=fill, beside=beside, horiz=horiz,
-          axes=FALSE, ann=FALSE, border=color, las=las.value,
+    x.coords <- barplot(x, add=TRUE, col=fill, border=color,
+          beside=beside, horiz=horiz, axes=FALSE, ann=FALSE, las=las.value,
           space=gap, axisnames=FALSE, ...)
   else
-    x.coords <- barplot(x, add=TRUE, col=fill, beside=beside, horiz=horiz,
-          axes=FALSE, ann=FALSE, border=color, las=las.value,
+    x.coords <- barplot(x, add=TRUE, col=fill, border=color, beside=beside,
+          horiz=horiz, axes=FALSE, ann=FALSE, las=las.value,
           space=gap, width=width.bars, xlim=c(0,1), axisnames=FALSE, ...)
+
 
   # display text labels of y-values on or above the bars
   # ----------------------------------------------------
@@ -671,7 +686,7 @@ function(x, y, by, stack100,
           x.txt <- .fmt(x, labels_decimals)   # as.char not accurate for dec dig
         else if (labels == "%")
           x.txt <- paste(.fmt(x.prop * 100, labels_decimals), "%", sep="")
-        else if (labels == "proportion")
+        else if (labels == "prop")
           x.txt <- .fmt(x.prop, labels_decimals)
 
         if (is.matrix(x))
@@ -815,12 +830,12 @@ function(x, y, by, stack100,
 
     # numerical axis
     if(!horiz)
-        .axes(NULL, NULL, NULL, axT2=y.coords,
+        ax.info <- .axes(NULL, NULL, NULL, axT2=y.coords,
               rotate_x=rotate_x, offset=offset,
               axis_fmt=axis_fmt, axis_x_pre="no", axis_y_pre=axis_y_pre, ...)
 
     else
-        .axes(NULL, NULL, axT1=y.coords, NULL,
+        ax.info <- .axes(NULL, NULL, axT1=y.coords, NULL,
               rotate_x=rotate_x, offset=offset,
               axis_fmt=axis_fmt, axis_x_pre=axis_x_pre, axis_y_pre="no", ...)
 
@@ -956,9 +971,7 @@ function(x, y, by, stack100,
   }  # end do_plot
 
 
-  # -----------------------------------------------------------------------
-  # -----------------------------------------------------------------------
-  # text output
+# text output -------------------------------------------------------------
 
   if (prop) {
     if (is.null(y)) {
@@ -974,8 +987,6 @@ function(x, y, by, stack100,
   stats <- ""
 
   if (multi) {
-
-    txsug <- ""
 
     # display variable labels
     txlbl <- ""
@@ -1033,16 +1044,10 @@ function(x, y, by, stack100,
                                    "response categories from 1 to", n.var)
     }
 
-    class(txsug) <- "out"
     class(txtbl) <- "out"
     class(txttl) <- "out"
-
-    if (nzchar(txsug))
-      output <- list(out_suggest=txsug,
-                     out_text=txlbl, out_title=txttl, out_text=txtbl)
-    else
-      output <- list(out_text=txlbl,
-                     out_title=txttl, out_text=txtbl)
+    output <- list(out_text=txlbl,
+                   out_title=txttl, out_text=txtbl)
 
     class(output) <- "out_all"
     if (!quiet) print(output)
@@ -1055,24 +1060,6 @@ function(x, y, by, stack100,
   else if (n_dim == 1) {
     if (.is.integer(x)  &&  all(x >= 0)) {  # x is table of count-like values
 
-      txsug <- ""
-      if (getOption("suggest")) {
-        txsug <- ">>> Suggestions"
-        fc <- paste("BarChart(", x.name,
-                    ", horiz=TRUE)  # horizontal bar chart", sep="")
-        txsug <- paste(txsug, "\n", fc, sep="")
-        fc <- paste("BarChart(", x.name,
-                 ", fill=\"reds\")  # red bars of varying lightness", sep="")
-        txsug <- paste(txsug, "\n", fc, sep="")
-        fc <- paste("PieChart(", x.name, ")  # doughnut (ring) chart", sep="")
-        txsug <- paste(txsug, "\n", fc, sep="")
-        fc <- paste("Plot(", x.name, ")  # bubble plot", sep="")
-        txsug <- paste(txsug, "\n", fc, sep="")
-        fc <- paste("Plot(", x.name,
-                    ", stat=\"count\")  # lollipop plot", sep="")
-        txsug <- paste(txsug, "\n", fc, sep="")
-      }
-
       stats <- .ss.factor(x, by=NULL, brief=TRUE, digits_d=dd,
                           x.name, by.name, x.lbl, y.lbl, label_max,
                           x.miss, by.miss, out_size)
@@ -1083,13 +1070,12 @@ function(x, y, by, stack100,
         chi <- stats$chi
         lbl <- stats$lbl
 
-        class(txsug) <- "out"
         class(txttl) <- "out"
         class(counts) <- "out"
         class(miss) <- "out"
         class(chi) <- "out"
         class(lbl) <- "out"
-        output <- list(out_suggest=txsug, out_title=txttl, out_miss=miss,
+        output <- list(out_title=txttl, out_miss=miss,
                        out_lbl=lbl, out_counts=counts, out_chi=chi)
         class(output) <- "out_all"
         if (!quiet) print(output)
@@ -1107,20 +1093,11 @@ function(x, y, by, stack100,
 
     else {  # x (table from y) not count-like: not integer or values < 0
 
-      txsug <- ""
-      if (getOption("suggest")) {
-        y.name <- getOption("yname")
-        txsug <- ">>> Suggestions"
-        fc <- paste("Plot(", y.name, ", ", x.name, ") # lollipop plot", sep="")
-        txsug <- paste(txsug, "\n", fc, sep="")
-      }
-
       stats <- .ss.real(x, by, digits_d=dd,
                    x.name, getOption("yname"), by.name, x.lbl, y.lbl, label_max)
       txtbl <- stats$txtbl
-      class(txsug) <- "out"
       class(txtbl) <- "out"
-      output <- list(out_suggest=txsug, out_txt=txtbl, values=stats$values)
+      output <- list(out_txt=txtbl, values=stats$values)
 
       class(output) <- "out_all"
       if (!quiet) print(output)
@@ -1130,22 +1107,8 @@ function(x, y, by, stack100,
 
   }  # end if (n_dim == 1)
 
-  # -------------
   # a by variable
   else {
-
-    txsug <- ""
-    if (getOption("suggest")) {
-      txsug <- ">>> Suggestions"
-      fc <- paste("Plot(", x.name, ", ", by.name, ")  # bubble plot", sep="")
-      txsug <- paste(txsug, "\n", fc, sep="")
-      fc <- paste("BarChart(", x.name, ", by=", by.name,
-                  ", horiz=TRUE)  # horizontal bar chart", sep="")
-      txsug <- paste(txsug, "\n", fc, sep="")
-      fc <- paste("BarChart(", x.name,
-                  ", fill=\"steelblue\")  # steelblue bars", sep="")
-      txsug <- paste(txsug, "\n", fc, sep="")
-    }
 
     if (is.null(y) && .is.integer(x)) {
 
@@ -1157,20 +1120,19 @@ function(x, y, by, stack100,
       txXV <- stats$txXV
       txlbl <- stats$txlbl
 
-      class(txsug) <- "out"
       class(txttl) <- "out"
       class(txfrq) <- "out"
       class(txXV) <- "out"
       class(txlbl) <- "out"
-      if (!prop)
-        output <- list(out_suggest=txsug, out_title=txttl, out_lbl=txlbl,
+#     if (!prop)  # NOT working, props come out 0 or 1 from .ss.factor()
+        output <- list(out_title=txttl, out_lbl=txlbl,
                        out_text=txfrq, out_XV=txXV)
-      else {
-        txrow <- stats$txrow
-        class(txrow) <- "out"
-        output <- list(out_suggest=txsug, out_title=txttl, out_text=txfrq,
-                       out_XV=txXV, out_row=txrow)
-      }
+#     else {
+#       txrow <- stats$txrow
+#       class(txrow) <- "out"
+#       output <- list(out_title=txttl, out_text=txfrq,
+#                      out_XV=txXV, out_row=txrow)
+#     }
       class(output) <- "out_all"
       if (!quiet) print(output)
 
@@ -1183,22 +1145,55 @@ function(x, y, by, stack100,
 
     else {  # y is present
       stats <- .ss.real(x, y, by, digits_d=dd, x.name,
-                        getOption("yname"), by.name, x.lbl, y.lbl, label_max)
-      txtbl <- stats$txtbl
-      class(txtbl) <- "out"
-      output <- list(out_txt=txtbl)
-
-      class(output) <- "out_all"
-      if (!quiet) print(output)
+                        y.name, by.name, x.lbl, y.lbl, label_max)
 
       names(stats) <- c("n_dim", "out_y")
       stats <- c(stats[2], stats[1])
     }
-
   }  # end a by variable
 
-  cat("\n")
-  return(stats)
+
+# use_plotly --------------------------------------------------------------
+
+  if (use_plotly) {
+    y.name <- getOption("yname")
+    if (y.name == "NULL") y.name <- "Count"
+
+    # --- normalize shape for plotly ------------------------------------
+    # 1-D: leave as-is
+    if (length(dim(x)) == 2L) {
+      # we want: rows = by.levels, cols = x.levels
+      rn <- rownames(x)
+      cn <- colnames(x)
+
+      # if row/col names are missing, rebuild from by.name/x.name
+      if (is.null(rn)) rn <- paste0(by.name, "_", seq_len(nrow(x)))
+      if (is.null(cn)) cn <- paste0(x.name,  "_", seq_len(ncol(x)))
+
+      x <- as.table(x)
+      dimnames(x) <- list(rn, cn)
+      names(dimnames(x)) <- c(by.name, x.name)
+    }
+
+    plt <- .bc.plotly(
+      x, x.name, y.name, by.name, x.lab, y.lab,
+      fill, color, opacity = NULL,
+      beside, horiz,
+      ax.info, gridT,
+      digits_d,
+      labels = labels,
+      labels_size = labels_size,
+      labels_color = labels_color
+    )
+
+    if (.allow.interactive())
+      .viewer_notice_once(plot_name = "bar chart", window_target = "Both")
+    if (.allow.interactive())
+      print(plt)
+  }  #end use_plotly
+
+cat("\n")
+return(stats)
 
 }
 

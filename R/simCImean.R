@@ -5,22 +5,8 @@ function(ns, n, mu=0, sigma=1, cl=0.95, seed=NULL,
          grid="grey90", ylim_bound=NULL, pause=FALSE,
          main=NULL, pdf_file=NULL, width=5, height=5, ...) {
 
-
-  # a dot in a parameter name to an underscore
-  dots <- list(...)
-  if (!is.null(dots)) if (length(dots) > 0) {
-    change <- c("ylim.bound", "show.data", "show.title", "miss.only",
-                "color.hit", "color.miss", "pdf.file")
-    for (i in 1:length(dots)) {
-      if (names(dots)[i] %in% change) {
-        nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
-        assign(nm, dots[[i]])
-        get(nm)
-      }
-    }
-  }
-
   if (missing(ns)) {
+
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "Specify the number of samples, each of a given size, with:  ns\n\n")
   }
@@ -33,17 +19,6 @@ function(ns, n, mu=0, sigma=1, cl=0.95, seed=NULL,
   if (sigma < 0) { 
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "Standard deviation, sigma, cannot be negative.\n\n")
-  }
-
-  dots <- list(...)  # check for deprecated parameters
-  if (length(dots) > 0) {
-    for (i in 1:length(dots)) {
-      if (substr(names(dots)[i], 1, 4) == "col.") {
-        cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "options that began with the abbreviation  col  now begin with  ",
-          "color \n\n")
-      }
-    }
   }
 
 
@@ -102,8 +77,8 @@ function(ns, n, mu=0, sigma=1, cl=0.95, seed=NULL,
   orig.params <- par(no.readonly=TRUE)
   par(mar=c(2,2,1.75,2), mgp=c(1,.5,0))
 
-  plot(lb, type = "n", ylim = c(l,u), xlab = "", ylab = "", cex.main=.95,
-       cex.axis=.8)
+  base::plot(lb, type = "n", ylim = c(l,u), xlab = "", ylab = "",
+             cex.main=.95, cex.axis=.8)
   if (show_title) title(main = bquote(paste(mu, "=", .(mu), "  ", sigma, "=",
      .(sigma), "  ", "cl=", .(clpct), "%  n=", .(n))), cex.main=1)
 

@@ -1,14 +1,16 @@
 .hst.main <-
-function(x, fill=NULL, color=NULL, trans=NULL, col.reg=NULL,
+function(x, by=NULL, by.name=NULL, n.by=1,
+       fill=NULL, color=NULL, trans=NULL, col.reg=NULL,
        rotate_x=NULL, rotate_y=NULL, offset=NULL,
        breaks, bin_start, bin_width, bin_end,
-       prop, values=NULL, cumulate="off",
+       prop, counts=NULL, cumulate="off",
        xlab=NULL, ylab=NULL, main=NULL, sub=NULL,
        xlab_adj=NULL, ylab_adj=NULL,
        bm.adj=NULL, lm.adj=NULL, tm.adj=NULL, rm.adj=NULL,
        add=NULL, x1=NULL, x2=NULL, y1=NULL, y2=NULL,
        scale_x=NULL, axis_fmt="K", axis_x_pre="", axis_y_pre="",
-       quiet=FALSE, do_plot=TRUE, fun_call=NULL, ...) {
+       use_plotly=TRUE, digits_d=NULL, quiet=FALSE,
+       do_plot=TRUE, fun_call=NULL, ...) {
 
 
   # get variable labels if exist plus axes labels
@@ -113,7 +115,9 @@ function(x, fill=NULL, color=NULL, trans=NULL, col.reg=NULL,
 
   # calculate but do not plot the histogram
   # arguments in ... for plotting instructions generate warnings with no plot
-  h <- suppressWarnings(hist(x, plot=FALSE, breaks, labels=values, ...))
+  # input: breaks are Sturgis, etc. or numeric
+  # output: h$breaks for the actual bins and h$counts for the y-values
+  h <- suppressWarnings(hist(x, plot=FALSE, breaks, labels=counts, ...))
 
   # relative frequency histogram option
   if (prop) h$counts <- h$counts/length(x)
@@ -124,130 +128,182 @@ function(x, fill=NULL, color=NULL, trans=NULL, col.reg=NULL,
     h$counts <- cumsum(h$counts)
   }
 
-  if (do_plot) {
+  if (do_plot){
+    if(n.by == 1) {
 
-    # set margins
-    max.width <- strwidth(as.character(max(pretty(h$counts))), units="inches")
+      # set margins
+      max.width <- strwidth(as.character(max(pretty(h$counts))), units="inches")
 
-    margs <- .plt.marg(max.width, y.lab, x.lab, main.lab, sub.lab, rotate_x)
-    lm <- margs$lm
-    tm <- margs$tm
-    rm <- margs$rm
-    bm <- margs$bm
-    n.lab_x.ln <- margs$n.lab_x.ln
-    n.lab_y.ln <- margs$n.lab_y.ln
+      margs <- .plt.marg(max.width, y.lab, x.lab, main.lab, sub.lab, rotate_x)
+      lm <- margs$lm
+      tm <- margs$tm
+      rm <- margs$rm
+      bm <- margs$bm
+      n.lab_x.ln <- margs$n.lab_x.ln
+      n.lab_y.ln <- margs$n.lab_y.ln
 
-    if (lab_x_cex > 1.1) bm <- bm + (.10*lab_x_cex)  # kludge
-    if (lab_y_cex > 1.1) lm <- lm + (.10*lab_y_cex)
+      if (lab_x_cex > 1.1) bm <- bm + (.10*lab_x_cex)  # kludge
+      if (lab_y_cex > 1.1) lm <- lm + (.10*lab_y_cex)
 
-    if (offset > 0.5) bm <- bm + (-0.05 + 0.2 * offset)  # offset kludge
+      if (offset > 0.5) bm <- bm + (-0.05 + 0.2 * offset)  # offset kludge
 
-    # user manual adjustment here
-    bm <- bm + bm.adj
-    lm <- lm + lm.adj
-    tm <- tm + tm.adj
-    rm <- rm + rm.adj
+      # user manual adjustment here
+      bm <- bm + bm.adj
+      lm <- lm + lm.adj
+      tm <- tm + tm.adj
+      rm <- rm + rm.adj
 
-    orig.params <- par(no.readonly=TRUE)
-    on.exit(par(orig.params))
-    par(bg=getOption("window_fill"))
-    par(mai=c(bm, lm, tm, rm))
-    par(tcl=-0.28)  # axis tick length
+      orig.params <- par(no.readonly=TRUE)
+      on.exit(par(orig.params))
+      par(bg=getOption("window_fill"))
+      par(mai=c(bm, lm, tm, rm))
+      par(tcl=-0.28)  # axis tick length
 
-    # set up plot
-    plot(h, freq=TRUE, axes=FALSE, ann=FALSE, ...)
+      # set up plot
+      plot(h, freq=TRUE, axes=FALSE, ann=FALSE, ...)
 
-    # get axT1 and axT2 - axis tick marks
+      # get gridT1 and gridT2 - to draw grid lines
+      if (is.null(scale_x))
+        vx <- h$breaks
+      else {
+        if (length(scale_x) == 2) scale_x[3] <- par("xaxp")[3]
+        vx <- axTicks(1, axp=scale_x)
+      }
+      gridT1 <- seq(vx[1], vx[length(vx)], vx[2]-vx[1])
+
+      vy <- pretty(h$counts)
+      gridT2 <- seq(vy[1], vy[length(vy)], vy[2]-vy[1])
+
+      # plot background, axT1 and axT2 for grid lines
+      .plt.bck(par("usr"), gridT1, gridT2)
+
+      # adjust axis label from tick with mgp[2]
+      # mgp does not work with rotate_x, see .axes()
+      my.mgp <- par("mgp")  # save to restore
+      ax <- .axes_dim()  # get axis value parameters
+      mgp2 <- -0.350 + (0.9 * ax$axis_x_cex)
+      par(mgp = c(my.mgp[1], mgp2, my.mgp[3]))  # labels closer to axis
+      adj <- .RSadj(axis_cex=ax$axis_x_cex); axis_x_cex <- adj$axis_cex
+
+      # axis, axis ticks (different from grid lines)
+      ax.info <- .axes(x.lvl=NULL, y.lvl=NULL,
+            axTicks(1, axp=scale_x), axTicks(2),
+            rotate_x=rotate_x, rotate_y=rotate_y, offset=offset,
+            axis_fmt=axis_fmt, axis_x_pre=axis_x_pre, axis_y_pre=axis_y_pre,
+            ...)
+
+      # axis labels
+      .axlabs(x.lab, y.lab, main.lab, sub.lab,
+              xy_ticks=TRUE, offset=offset,
+              lab_x_cex=lab_x_cex, lab_y_cex=lab_y_cex, main_cex=NULL,
+              n.lab_x.ln=n.lab_x.ln, n.lab_y.ln=n.lab_y.ln,
+              xlab_adj=xlab_adj, ylab_adj=ylab_adj, ...)
+
+      # see if apply a pre-defined color range
+      n.bins <- length(h$counts)
+  #   fill.clr <- NULL
+  #   fill.clr <- .color_range(fill, n.bins)  # not working for static now
+
+      # fill.clr is for the static histogram, fill is for the plotly histogram
+      if (n.by == 1)
+        fill.clr <- fill  # user provided the colors
+      else
+        fill.clr <- ifelse (is.null(getOption("bar_fill_cont")),
+                        getOption("bar_fill"), getOption("bar_fill_cont"))
+
+      # bar transparency
+      if (!is.null(trans)) if (trans > 0)
+        for (i in 1:length(fill.clr))
+          fill.clr[i] <- .maketrans(fill.clr[i], (1-trans)*256)
+
+      # plot the histogram
+      plot(h, add=TRUE, col=fill.clr, border=color, freq=TRUE,
+           labels=counts, ...)
+      if (cumulate == "both") {
+        h$counts <- old.counts
+        plot(h, add=TRUE, col=col.reg, freq=TRUE)
+      }
+
+      # annotations
+      if (!is.null(add)) {
+
+        add_cex <- getOption("add_cex")
+        add_lwd <- getOption("add_lwd")
+        add_lty <- getOption("add_lty")
+        add_color <- getOption("add_color")
+        add_fill <- getOption("add_fill")
+        add_trans <- getOption("add_trans")
+
+        .plt.add (add, x1, x2, y1, y2,
+                  add_cex, add_lwd, add_lty, add_color, add_fill, add_trans)
+      }
+    }  # end n.by is 1
+  }  # end do.plot
+ 
+
+#------------
+# text output
+#------------
+
+  mx.dd <- .max.dd(x)
+  stats <- .hst.stats(h, length(x), mx.dd, fun_call)
+
+  txsug=stats$txsug
+  tx=stats$tx
+  bin_width=stats$bin_width
+  n.bins=stats$n.bins
+  prop=stats$prop
+  cum.c=stats$countscum
+  cum.p=stats$prop_cum
+
+
+# plotly ------------------------------------------------------------------
+
+  if (use_plotly) {
+
+    axT1 <- pretty(range(x))
+    axL1 <- .axis.format(axT1, axis_fmt, axis_x_pre, axis_y_pre="no")
+    axT2 <- pretty(c(0, max(h$counts)))
+    axL2 <- .axis.format(axT2, axis_fmt, axis_x_pre="no", axis_y_pre)
+    ax <- list(axT1=axT1, axL1=axL1, axT2=axT2, axL2=axL2)
+
+    # get gridT1 and gridT2 - to draw grid lines
     if (is.null(scale_x))
       vx <- h$breaks
     else {
       if (length(scale_x) == 2) scale_x[3] <- par("xaxp")[3]
       vx <- axTicks(1, axp=scale_x)
     }
-    axT1 <- seq(vx[1], vx[length(vx)], vx[2]-vx[1])
-
+    gridT1 <- seq(vx[1], vx[length(vx)], vx[2]-vx[1])
     vy <- pretty(h$counts)
-    axT2 <- seq(vy[1], vy[length(vy)], vy[2]-vy[1])
+    gridT2 <- seq(vy[1], vy[length(vy)], vy[2]-vy[1])
 
-    # plot background, axT1 and axT2 for grid lines
-    .plt.bck(par("usr"), axT1, axT2)
+    plt <- hs.plotly(
+      x       = x,
+      by      = by,        # may be NULL
+      x.name  = x.name,
+      by.name = by.name,   # may be NULL
+      breaks  = h$breaks,
+      freq    = TRUE,
+      fill    = fill,
+      border  = color,
+      x.lab   = x.lab,
+      y.lab   = y.lab,
+      ax      = ax,
+      gridT1  = gridT1,
+      gridT2  = gridT2,
+      position = "overlay"
+    )
 
-    # adjust axis label from tick with mgp[2]
-    # mgp does not work with rotate_x, see .axes()
-    my.mgp <- par("mgp")  # save to restore
-    ax <- .axes_dim()  # get axis value parameters
-    mgp2 <- -0.350 + (0.9 * ax$axis_x_cex)
-    par(mgp = c(my.mgp[1], mgp2, my.mgp[3]))  # labels closer to axis
-    adj <- .RSadj(axis_cex=ax$axis_x_cex); axis_x_cex <- adj$axis_cex
+    if (.allow.interactive()) {
+      .viewer_notice_once(plot_name = "histogram", window_target = "Both")
 
-    # axis, axis ticks
-    .axes(x.lvl=NULL, y.lvl=NULL,
-          axTicks(1, axp=scale_x), axTicks(2),
-          rotate_x=rotate_x, rotate_y=rotate_y, offset=offset,
-          axis_fmt=axis_fmt, axis_x_pre=axis_x_pre, axis_y_pre=axis_y_pre, ...)
-
-    # axis labels
-    .axlabs(x.lab, y.lab, main.lab, sub.lab,
-            xy_ticks=TRUE, offset=offset,
-            lab_x_cex=lab_x_cex, lab_y_cex=lab_y_cex, main_cex=NULL,
-            n.lab_x.ln=n.lab_x.ln, n.lab_y.ln=n.lab_y.ln,
-            xlab_adj=xlab_adj, ylab_adj=ylab_adj, ...)
-
-    # see if apply a pre-defined color range
-    n.bins <- length(h$counts)
-    clr <- NULL
-    clr <- .color_range(fill, n.bins)
-
-    # not a color range such as "hues" or "blues", so assign clr here
-    if (is.null(clr))
-        clr <- fill  # user provided the colors
-
-    # bar transparency
-    if (!is.null(trans)) if (trans > 0)
-      for (i in 1:length(clr)) clr[i] <- .maketrans(clr[i], (1-trans)*256)
-
-    # plot the histogram
-    plot(h, add=TRUE, col=clr, border=color, freq=TRUE,
-         labels=values, ...)
-    if (cumulate == "both") {
-      h$counts <- old.counts
-      plot(h, add=TRUE, col=col.reg, freq=TRUE)
+      print(plt)
     }
+  }  # end use_plotly
 
-
-    # annotations
-    if (!is.null(add)) {
-
-      add_cex <- getOption("add_cex")
-      add_lwd <- getOption("add_lwd")
-      add_lty <- getOption("add_lty")
-      add_color <- getOption("add_color")
-      add_fill <- getOption("add_fill")
-      add_trans <- getOption("add_trans")
-
-      .plt.add (add, x1, x2, y1, y2,
-                add_cex, add_lwd, add_lty, add_color, add_fill, add_trans)
-    }
-  }  # end do plot
-
-
-#------------
-# text output
-#------------
-
-    mx.dd <- .max.dd(x)
-    stats <- .hst.stats(h, length(x), mx.dd, fun_call)
-
-    txsug=stats$txsug
-    tx=stats$tx
-    bin_width=stats$bin_width
-    n.bins=stats$n.bins
-    prop=stats$prop
-    cum.c=stats$counts_cum
-    cum.p=stats$prop_cum
-
-    return(list(txsug=txsug, ttx=tx, bin_width=bin_width, n.bins=n.bins,
-      breaks=h$breaks, mids=h$mids, counts=h$counts, prop=prop,
-      counts_cum=cum.c, prop_cum=cum.p))
+  return(list(txsug=txsug, ttx=tx, bin_width=bin_width, n.bins=n.bins,
+    breaks=h$breaks, mids=h$mids, counts=h$counts, prop=prop,
+    counts_cum=cum.c, prop_cum=cum.p))
 
 }

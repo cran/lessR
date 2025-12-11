@@ -5,33 +5,9 @@ function(n, prob=.5, seed=NULL,
          main=NULL, pdf_file=NULL, width=5, height=5, ...) {
 
 
-  # a dot in a parameter name to an underscore
-  dots <- list(...)
-  if (!is.null(dots)) if (length(dots) > 0) {
-    change <- c("show.title", "show,flips", "pdf.file")
-    for (i in 1:length(dots)) {
-      if (names(dots)[i] %in% change) {
-        nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
-        assign(nm, dots[[i]])
-        get(nm)
-      }
-    }
-  }
-
   if (missing(n)) {
     cat("\n"); stop(call.=FALSE, "\n","------\n",
       "Specify the number of flips with:  n\n\n")
-  }
-
-  dots <- list(...)  # check for deprecated parameters
-  if (length(dots) > 0) {
-    for (i in 1:length(dots)) {
-      if (substr(names(dots)[i], 1, 4) == "col.") {
-        cat("\n"); stop(call.=FALSE, "\n","------\n",
-          "options that began with the abbreviation  col  now begin with  ",
-          "color \n\n")
-      }
-    }
   }
 
   if (!is.null(pdf_file))
@@ -47,7 +23,7 @@ function(n, prob=.5, seed=NULL,
   orig.params <- par(no.readonly=TRUE)
   par(mar=c(3,3,1.5,3.5), mgp=c(1.75,.5,0))
 
-  plot(0, type="n", xlim=c(1,n), ylim=c(0,1), xlab="Number of Flips", 
+  base::plot(0, type="n", xlim=c(1,n), ylim=c(0,1), xlab="Number of Flips", 
        ylab="Estimate", cex.lab=0.8, cex.axis=0.7)
 
   # color the plot region between the axes

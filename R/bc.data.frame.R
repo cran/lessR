@@ -14,7 +14,9 @@ function(x, stack100,
          pad_y_min, pad_y_max,
          legend_title, legend_position, legend_labels,
          legend_horiz, legend_size, legend_abbrev, legend_adj,
-         out_size, do_plot, quiet, width, height, pdf_file, shiny, ...)  {
+         out_size, do_plot, use_plotly=FALSE, quiet,
+         digits_d, shiny, pdf_file, width, height, ...)  {
+
 
   sug.keep <- getOption("suggest")
   options(suggest = FALSE)
@@ -82,7 +84,7 @@ function(x, stack100,
           legend_title, legend_position, legend_labels,
           legend_horiz, legend_size, legend_abbrev, legend_adj,
           add=NULL, x1=NULL, x2=NULL, y1=NULL, y2=NULL, out_size,
-          digits_d=3, do_plot, quiet, shiny, ...)
+          digits_d=3, do_plot, use_plotly=FALSE, quiet, shiny, ...)
 
         if (!is.null(pdf_file)) {
           dev.off()

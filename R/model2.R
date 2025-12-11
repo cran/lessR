@@ -1,5 +1,0 @@
-model <-
-function(...)
-
-  Model(...)
-

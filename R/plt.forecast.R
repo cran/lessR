@@ -123,14 +123,16 @@ function(x, y, by=NULL, exog.df=NULL, ts_new_x=NULL,
           tsbl, ets = do.call(fable::ETS, list(as.name(y.name)))
         )
         fml <- paste(y.name, " [with no specifications]")  # for display only
-      } else {
+      }
+      else {
         fml <- stats::as.formula(
           paste(y.name, "~", paste(rhs_terms, collapse = " + "))
         )
         fit <- fabletools::model(tsbl, ets = fable::ETS(fml))
       }
 
-    } else if (ts_method == "lm") {
+    }
+    else if (ts_method == "lm") {
       # ----- TSLM -----
       if (empty_rhs) {
         fml <- stats::as.formula(paste(y.name, "~ 1"))
@@ -142,14 +144,16 @@ function(x, y, by=NULL, exog.df=NULL, ts_new_x=NULL,
       fit <- fabletools::model(tsbl, tslm = fable::TSLM(fml))
     }
 
-    # extract the model object to check for a NULL model fit
-    model_obj <- fit$ets[[1]]
-    model_str <- capture.output(print(model_obj$model))
-    if (any(grepl("null_mdl", model_str))) {
-      stop(paste(
-        'Model fitting failed. Simplify the model such as,\n',
-        '      ts_trend="N" and ts_season="N", or use more data.\n\n'
-      ), call. = FALSE)
+    # extract the ets model object to check for a NULL model fit
+    if (ts_method == "es") {
+      model_obj <- fit$ets[[1]]
+      model_str <- capture.output(print(model_obj$model))
+      if (any(grepl("null_mdl", model_str))) {
+        stop(paste(
+          'Model fitting failed. Simplify the model such as,\n',
+          '      ts_trend="N" and ts_season="N", or use more data.\n\n'
+        ), call. = FALSE)
+      }
     }
 
     # display specified and estimated models
