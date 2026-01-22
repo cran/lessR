@@ -34,7 +34,7 @@ Flows(
 
   \item{title}{Optional chart title. If \code{NULL}, a title is constructed from the provided stage names.}
   \item{fill}{Optional color range name or vector used for \emph{source} categories. If \code{NULL} (default), the range is inherited from the current theme via \code{.color_range(.get_fill(getOption("theme")), n.x)}, where \code{n.x} is the number of unique \code{stage1} categories.}
-  \item{link_alpha}{Numeric in \([0,1]\). Transparency for flows (links). Default \code{0.55}.}
+  \item{link_alpha}{Numeric from 0 to 1. Transparency for flows (links). Default \code{0.55}.}
   \item{nodes_gray}{Logical. If \code{FALSE} (default), left/source nodes are colored (matching their flows) and all other nodes are neutral gray. If \code{TRUE}, all nodes are neutral gray.}
   \item{neutral_gray}{Color for gray node fills. Defaults to \code{"gray80"}.}
   \item{border_gray}{Color for node borders. Defaults to \code{"gray60"}.}
@@ -74,19 +74,19 @@ SupplyChain <- data.frame(
   Volume      = c(320,180,150,220,130,200,100,170,140)
 )
 
-# 3-stage: Source -> Port -> Destination (unquoted names)
-Flows(Volume, Source, Port, Destination, data = SupplyChain)
+# 3-stage: Source -> Port -> Destination
+Flows(Volume, Source, Port, Destination, data=SupplyChain)
 
-# 2-stage: Source -> Port (sources colored; ports gray)
-Flows(Volume, Source, Port, data = SupplyChain)
+# 2-stage: Source -> Destination, ignore Port
+Flows(Volume, Source, Desination, data=SupplyChain)
 
-# All nodes neutral gray (flows still color by source)
-Flows(Volume, Source, Port, Destination, data = SupplyChain,
-       nodes_gray = TRUE, link_alpha = 0.6)
+# All nodes neutral gray
+Flows(Volume, Source, Port, Destination, data=SupplyChain,
+       nodes_gray=TRUE, link_alpha=0.6)
 
 # Supply a specific range (overrides theme), show one decimal in hover
-Flows(Volume, Source, Port, Destination, data = SupplyChain,
-       fill = "blues", digits_d = 1)
+Flows(Volume, Source, Port, Destination, data=SupplyChain,
+       fill="blues", digits_d=1)
 \dontshow{\} }
 }
 

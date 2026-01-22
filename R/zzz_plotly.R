@@ -339,7 +339,9 @@ if (!exists(".lessR_deprec_env", inherits = FALSE)) {
   }
 }
 
-.hover.fmt <- function(x, y, x.lab, y.lab, horiz = FALSE, digits_d = 2) {
+.hover.fmt <- function(x, y, x.lab, y.lab, horiz=FALSE,
+                       digits_d=2, ts_unit=NULL) {
+
   fmtx <- .get.tick.fmt(x, digits_d)
   fmty <- .get.tick.fmt(y, digits_d)
 
@@ -350,11 +352,12 @@ if (!exists(".lessR_deprec_env", inherits = FALSE)) {
   if (!horiz) {
     # vertical scatter: first line shows X name + value
     paste0(
-      x.lab, ": ", addfmt("x", fmtx),
+      x.lab, ": ", if(is.null(ts_unit)) addfmt("x", fmtx) else x,
       "<br>", y.lab, ": ", addfmt("y", fmty),
       "<extra></extra>"
     )
-  } else {
+  }
+  else {
     # horizontal scatter: first line shows Y name + value
     paste0(
       y.lab, ": ", addfmt("y", fmty),
@@ -1002,19 +1005,20 @@ force_viewer_reload <- function(plt, delays = c(16, 90, 250, 600, 1200)) {
   # --- COUNT titles (no y or no stat) ---
   if (is.null(y.name) || is.null(stat)) {
     ttl <- paste("Count of", x.name)
-  } else {
+  }
+  else {
     S <- cap_stat(stat)
     if (y_has_stat(y.name)) {
       # y.name already includes the stat (e.g., "Mean of Salary")
       ttl <- paste(y.name, "by", x.name)
-    } else {
-      ttl <- paste(S, "of", y.name, "by", x.name)
     }
+     else
+      ttl <- paste(S, "of", y.name, "by", x.name)
   }
 
-  if (!is.null(by.name)    && nzchar(by.name))    ttl <- paste(ttl, "by",     by.name)
-  if (!is.null(facet.name) && nzchar(facet.name)) ttl <- paste(ttl, "across", facet.name)
-
+  if (!is.null(by.name) && nzchar(by.name)) ttl <- paste(ttl, "by", by.name)
+  if (!is.null(facet.name) && nzchar(facet.name))
+     ttl <- paste(ttl, "across", facet.name)
   ttl
 }
 
@@ -1034,23 +1038,20 @@ force_viewer_reload <- function(plt, delays = c(16, 90, 250, 600, 1200)) {
   to_group_df <- function(obj, prefix = "g") {
     if (is.null(obj)) return(NULL)
 
-    if (is.data.frame(obj)) {
+    if (is.data.frame(obj))
       df <- obj
-    } else if (is.matrix(obj)) {
+    else if (is.matrix(obj))
       df <- as.data.frame(obj)
-    } else if (is.list(obj) && !is.atomic(obj)) {
-      # list of equal-length vectors
+    else if (is.list(obj) && !is.atomic(obj)) # list of equal-length vectors
       df <- as.data.frame(obj)
-    } else {
-      # single vector
+    else   # single vector
       df <- data.frame(obj)
-    }
 
-    if (is.null(colnames(df))) {
+    if (is.null(colnames(df)))
       colnames(df) <- paste0(prefix, seq_len(ncol(df)))
-    }
+
     df
-  }
+  }  # end to_group_df()
 
   ## ------------------------------------------------------------
   ## 1) RAW DATA: build table from x / y / groupings
@@ -1061,53 +1062,52 @@ force_viewer_reload <- function(plt, delays = c(16, 90, 250, 600, 1200)) {
     facet_df <- to_group_df(facet, prefix = "facet")
 
     # combine all grouping columns (by + facet); may be NULL
-    if (is.null(by_df) && is.null(facet_df)) {
+    if (is.null(by_df) && is.null(facet_df))
       group_df <- NULL
-    } else if (is.null(by_df)) {
+    else if (is.null(by_df))
       group_df <- facet_df
-    } else if (is.null(facet_df)) {
+    else if (is.null(facet_df))
       group_df <- by_df
-    } else {
+    else
       group_df <- cbind(by_df, facet_df)
-    }
 
-    if (is.null(y)) {
-      ## --- COUNTS -------------------------------------------------------
+    if (is.null(y)) {  # counts
       if (is.null(group_df)) {
         # simple one-way table of x
         x.tbl <- xtabs(~ x, drop.unused.levels = FALSE)
-      } else {
+      }
+      else {
         # multi-way table over all grouping columns + x
         df <- data.frame(group_df, x = x)
         form <- reformulate(c(names(group_df), "x"))
         x.tbl <- xtabs(form, data = df, drop.unused.levels = FALSE)
       }
 
-    } else {
-      ## --- NUMERIC SUMMARY ----------------------------------------------
-      if (is.null(group_df)) {
-        # numeric y summarized by x only
+    }
+    else {  # numeric summary
+      if (is.null(group_df))  # numeric y summarized by x only
         x.tbl <- xtabs(y ~ x, drop.unused.levels = FALSE)
-      } else {
+      else {
         df <- data.frame(group_df, x = x, y = y)
         # y ~ g1 + g2 + ... + x
         form <- reformulate(c(names(group_df), "x"), response = "y")
         x.tbl <- xtabs(form, data = df, drop.unused.levels = FALSE)
       }
     }
+  }  # end !is.agg
 
-  } else {
+  else {
     ## ------------------------------------------------------------
     ## 2) ALREADY AGGREGATED DATA: treat x as table / vector
     ## ------------------------------------------------------------
     if (is.null(y)) {
       # x is (or should be) already in table-like form
-      if (is.table(x)) {
+      if (is.table(x))
         x.tbl <- x
-      } else {
+      else
         x.tbl <- as.table(x)
-      }
-    } else {
+    }
+    else {
       # aggregated y supplied explicitly; restore to table form
       # here we assume caller has already shaped x/y/by/facet as needed
       by_df    <- to_group_df(by,    prefix = "by")
@@ -1115,14 +1115,16 @@ force_viewer_reload <- function(plt, delays = c(16, 90, 250, 600, 1200)) {
 
       if (is.null(by_df) && is.null(facet_df)) {
         x.tbl <- xtabs(y ~ x, drop.unused.levels = FALSE)
-      } else {
+      }
+      else {
         if (is.null(by_df) && !is.null(facet_df)) {
           group_df <- facet_df
-        } else if (!is.null(by_df) && is.null(facet_df)) {
-          group_df <- by_df
-        } else {
-          group_df <- cbind(by_df, facet_df)
         }
+        else if (!is.null(by_df) && is.null(facet_df)) {
+          group_df <- by_df
+        }
+        else
+          group_df <- cbind(by_df, facet_df)
         df <- data.frame(group_df, x = x, y = y)
         form <- reformulate(c(names(group_df), "x"), response = "y")
         x.tbl <- xtabs(form, data = df, drop.unused.levels = FALSE)
@@ -1136,7 +1138,7 @@ force_viewer_reload <- function(plt, delays = c(16, 90, 250, 600, 1200)) {
 
 # display input table at the console --------------------------------------
 
-.print_table <- function(x.tbl, x.name, x.lbl,
+.print_table <- function(x.tbl, x.name, x.lbl=NULL,
                          by.name = NULL, y.name = NULL,
                          stat = NULL, digits_d = 2) {
 
@@ -1155,7 +1157,8 @@ force_viewer_reload <- function(plt, delays = c(16, 90, 250, 600, 1200)) {
                               dimnames  = dn))
       names(dimnames(x.tbl)) <- "x"
       nd <- 1L
-    } else {
+    }
+    else {
       # Already has dims: if first dim has no name, call it "x"
       dn_names <- names(dimnames(x.tbl))
       if (is.null(dn_names) || !nzchar(dn_names[1L])) {
@@ -1172,7 +1175,7 @@ force_viewer_reload <- function(plt, delays = c(16, 90, 250, 600, 1200)) {
         by    = NULL,
         brief = TRUE,
         digits_d = digits_d,
-        x.name, by.name, x.lbl, y.lbl = NULL
+        x.name, by.name, x.lbl=NULL, y.lbl = NULL
       )
 
       ## >>> changed logic here: key off nd, not by.name <<<
@@ -1200,9 +1203,10 @@ force_viewer_reload <- function(plt, delays = c(16, 90, 250, 600, 1200)) {
       )
       class(output) <- "out_all"
       print(output)
-    } else {
+    }
+    else {
       # 3+ dimensional count table: just print the multiway table
-      cat("\nMulti-way count table (facets and/or multiple grouping variables):\n\n")
+      cat("\nMulti-way count table:\n\n")
       print(x.tbl)
     }
 
@@ -1225,9 +1229,10 @@ force_viewer_reload <- function(plt, delays = c(16, 90, 250, 600, 1200)) {
       if (!is.null(names(dimnames(x.t)))) names(dimnames(x.t)) <- NULL
 
       print(x.t)  # a table
-    } else {
+    }
+    else {
       # 3+ dimensional numeric table: print as-is
-      cat("\nMulti-way numeric summary table (facets and/or multiple grouping variables):\n\n")
+      cat("\nMulti-way numeric summary table:\n\n")
       print(x.tbl)
     }
   }

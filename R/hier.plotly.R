@@ -5,7 +5,7 @@
   stat = "sum",
   fill = NULL,
   border = NULL,
-  digits_d = 2,
+  digits_d = NULL,
   facet_gap_x = 0.04, facet_gap_y = 0.11,
   facet_size = 1.00, facet_title_y_base = -0.018,
   facet_title_row_shift = -0.003,
@@ -18,103 +18,66 @@
   ...
 ) {
 
+
   `%||%` <- function(a, b) if (is.null(a) || length(a) == 0L) b else a
 
-  labels          <- match.arg(labels)
-  labels_position <- match.arg(labels_position)
 
-  # final flag that controls text on/off for nodes
-  show_text <- isTRUE(show_labels) && !identical(labels, "off")
+# add trace function ------------------------------------------------------
 
-  # simple font scaling (same base as other lessR plotlys)
-  base_font   <- 12
-  label_fsize <- base_font * labels_size
+  make_trace <- function(p, nd, domain_xy) {
+#   digits  <- max(0L, as.integer(digits_d))
+    if (!is.null(stat) && digits_d==0) digits_d <- digits_d + 2  # mean, etc.
+    txtinfo <- if (isTRUE(show_labels)) "label" else "none"
 
-  # ---- route pie+by -> sunburst conceptually ---------------------------
-  type_hier <- if (identical(type, "pie") && !is.null(by.call)) "sunburst" else type
-  if (!type_hier %in% c("pie", "sunburst", "treemap", "icicle"))
-    stop("Unsupported hierarchical type: ", type_hier)
+    digits <- max(0L, as.integer(digits_d))
 
-  # ---- build path table ------------------------------------------------
-  mk_char <- function(v) as.character(if (is.factor(v)) v else v)
-
-  if (is.null(by.call)) {
-    path_df   <- data.frame(x = mk_char(x.call),
-                            stringsAsFactors = FALSE, check.names = FALSE)
-    lvl_names <- c(x.name)
-  } else if (is.data.frame(by.call)) {
-    tmp <- as.data.frame(lapply(by.call, mk_char),
-                         stringsAsFactors = FALSE, check.names = FALSE)
-    path_df   <- data.frame(x = mk_char(x.call), tmp,
-                            stringsAsFactors = FALSE, check.names = FALSE)
-    lvl_names <- c(x.name, names(tmp))
-  } else {
-    path_df   <- data.frame(x = mk_char(x.call), by = mk_char(by.call),
-                            stringsAsFactors = FALSE, check.names = FALSE)
-    lvl_names <- c(x.name, by.name %||% "by")
-  }
-
-  path_cols <- names(path_df)
-  n_levels  <- length(path_cols)
-
-  # ---- base numeric vector from y (or 1s for counts) -------------------
-  base_vals <- if (is.null(y.call)) rep(1, nrow(path_df)) else {
-    z <- suppressWarnings(as.numeric(y.call))
-    z[!is.finite(z)] <- NA_real_
-    z
-  }
-
-  # ---- stat function & label -------------------------------------------
-  STAT <- tolower(stat %||% if (is.null(y.call)) "sum" else "sum")
-
-  stat_fun <- switch(
-    STAT,
-    mean   = function(z) mean(z, na.rm = TRUE),
-    sum    = function(z) sum(z,  na.rm = TRUE),
-    median = function(z) stats::median(z, na.rm = TRUE),
-    min    = function(z) min(z, na.rm = TRUE),
-    max    = function(z) max(z, na.rm = TRUE),
-    sd     = function(z) stats::sd(z,  na.rm = TRUE),
-    function(z) sum(z,   na.rm = TRUE)
-  )
-
-  non_additive <- !identical(stat_fun, sum)
-
-  # For sizing we ALWAYS need an additive aggregator
-  size_fun <- function(z) sum(z, na.rm = TRUE)
-
-  stat_label <- if (is.null(y.call)) "Count" else {
-    Stat <- switch(
-      STAT,
-      mean   = "Mean",
-      sum    = "Sum",
-      median = "Median",
-      min    = "Min",
-      max    = "Max",
-      sd     = "SD",
-      toupper(STAT)
+    stat_line <- paste0(
+      stat_label, ": %{customdata.stat:,.", digits, "f}"
     )
-    paste(Stat, y.name %||% "Value")
-  }
 
-  # ---- color setup based on top-level categories -----------------------
-  # top-level categories are in the first path column
-  top_raw <- mk_char(path_df[[1L]])
-  top_levels <- if (!is.null(levels(path_df[[1L]]))) levels(path_df[[1L]]) else unique(top_raw)
+    pct_parent_line <- if (non_additive) ""
+                       else "% of parent: %{percentParent:.2%}"
 
-  # fill palette for top-level categories
-  if (is.null(fill)) {
-    base_cols <- .plotly_base_colors()
-    fill_vec  <- base_cols[seq_len(length(top_levels))]
-  } else {
-    # allow user ranges like "blues" or named vectors; use existing lessR helper
-    fill_vec  <- .color_range(fill, length(top_levels))
-  }
+    hover_lines <- c(
+      "%{customdata.meta}",
+      stat_line,
+      paste0("n: %{customdata.n}"),
+      pct_parent_line,
+      "% of total: %{percentRoot:.2%}"
+    )
 
-  # border color (one color for all nodes; consistent with prior behavior)
-  border_hex <- .to_hex(if (is.null(border)) "white" else border[1L])
+    hover <- paste(hover_lines[nzchar(hover_lines)], collapse = "<br>")
+    hover <- paste0(hover, "<extra></extra>")
 
-  # ---- node builder (per facet subset) ---------------------------------
+    # map top-level category -> color, then inherit down the tree
+    col_map   <- setNames(as.character(fill_vec), top_levels)
+    node_cols <- col_map[as.character(nd$root)]
+    node_cols[is.na(node_cols)] <- col_map[1L]  # fallback if any NA
+
+    marker <- list(
+      colors = node_cols,
+      line   = list(color = border_hex, width = 1)
+    )
+
+    plotly::add_trace(
+      p,
+      type         = type,
+      ids          = nd$ids,
+      labels       = nd$labels,
+      parents      = nd$parents,
+      values       = nd$values,
+      customdata   = nd$customdata,
+      domain       = list(x = domain_xy$x, y = domain_xy$y),
+      branchvalues = "total",
+      textinfo     = txtinfo,
+      hovertemplate = hover,
+      marker       = marker
+    )
+  }  # end make_trace()
+
+
+  # ---- node builder function --------------------------------------------
+
   build_nodes <- function(idx, facet_label = NULL) {
     if (length(idx) == 0L) {
       return(data.frame(
@@ -123,12 +86,11 @@
         parents = character(),
         values  = numeric(),
         custom  = list(),
-        root    = character(),
-        stringsAsFactors = FALSE
+        root    = character()
       ))
     }
 
-    df  <- path_df[idx, , drop = FALSE]
+    df  <- path_df[idx, , drop=FALSE]
     val <- base_vals[idx]
 
     out_ids     <- character(0)
@@ -140,26 +102,46 @@
 
     for (lvl in seq_len(n_levels)) {
       cols <- path_cols[1:lvl]
+      # ---- compute size + stat for this level (slice-by-slice) ----
 
-      # sizing aggregation (always sum for branchvalues="total")
-      agg_size <- stats::aggregate(val, by = df[, cols, drop = FALSE], FUN = size_fun)
-      names(agg_size)[ncol(agg_size)] <- "size"
+      if (non_additive && identical(STAT, "mean")) {
 
-      # stat aggregation (statistic shown in hover)
-      if (non_additive) {
-        agg_stat <- stats::aggregate(val, by = df[, cols, drop = FALSE], FUN = stat_fun)
-        names(agg_stat)[ncol(agg_stat)] <- "stat"
+        # compute sum(y) and n together to guarantee row alignment
+        agg_tmp <- stats::aggregate(
+          cbind(
+            sumy = ifelse(is.na(val), 0, val),
+            n    = ifelse(is.na(val), 0, 1)
+          ),
+          by = df[, cols, drop=FALSE],
+          FUN = sum
+        )
 
-        # align rows by key (defensive)
-        k_size <- do.call(paste, c(agg_size[, cols, drop = FALSE], sep = "\r"))
-        k_stat <- do.call(paste, c(agg_stat[, cols, drop = FALSE], sep = "\r"))
-        m <- match(k_size, k_stat)
-        agg_stat <- agg_stat[m, , drop = FALSE]
-      } else {
-        # additive stat: stat equals size
-        agg_stat <- agg_size
-        names(agg_stat)[ncol(agg_stat)] <- "stat"
-        agg_stat$stat <- agg_size$size
+        # sizing must be additive for branchvalues="total"; use counts for mean
+        agg_size <- agg_tmp[, cols, drop=FALSE]
+        agg_size$size <- agg_tmp$n
+
+        # hover stat: standard (weighted) mean = sum(y) / n
+        agg_stat <- agg_tmp[, cols, drop=FALSE]
+        agg_stat$stat <- agg_tmp$sumy / agg_tmp$n
+
+      }
+       else {
+
+        # sizing aggregation, always sum for branchvalues="total"
+        agg_size <- stats::aggregate(val, by = df[, cols, drop=FALSE],
+                                     FUN = size_fun)
+        names(agg_size)[ncol(agg_size)] <- "size"
+
+        # default: additive stat, stat equals size, no extra aggregation
+        if (!non_additive) {  # additive stat: stat equals size
+          agg_stat <- agg_size
+          names(agg_stat)[ncol(agg_stat)] <- "stat"
+        }
+        else {  # non-additive stat: compute stat separately
+          agg_stat <- stats::aggregate(val, by = df[, cols, drop=FALSE],
+                                       FUN = stat_fun)
+          names(agg_stat)[ncol(agg_stat)] <- "stat"
+        }
       }
 
       cur_labels <- mk_char(agg_size[[cols[lvl]]])
@@ -169,8 +151,9 @@
       if (lvl == 1L) {
         parents <- rep("", nrow(agg_size))
         ids     <- paste0("I_", cur_labels)
-      } else {
-        parent_df <- agg_size[, cols[-length(cols)], drop = FALSE]
+      }
+      else {
+        parent_df <- agg_size[, cols[-length(cols)], drop=FALSE]
         parents   <- apply(parent_df, 1, function(r)
           paste0("I_", paste(mk_char(r), collapse = "_")))
         ids       <- paste0(parents, "_", cur_labels)
@@ -186,12 +169,25 @@
         if (!is.null(facet_label))
           parts <- c(parts, paste0(facet.name, ": ", facet_label))
         paste(parts, collapse = "<br>")
-      }, seq_len(nrow(agg_size)), SIMPLIFY = TRUE, USE.NAMES = FALSE)
+      }, seq_len(nrow(agg_size)), SIMPLIFY = TRUE, USE.NAMES=FALSE)
+
+      # node counts (n), aligned to agg_size row order
+      if (is.null(y.call)) {
+        node_n <- agg_size$size
+      }
+      else {
+        agg_n <- stats::aggregate(ifelse(is.na(val), 0, 1),
+                                 by = df[, cols, drop=FALSE], FUN = sum)
+        names(agg_n)[ncol(agg_n)] <- "n"
+        key_size <- do.call(paste, c(agg_size[, cols, drop=FALSE], sep="\r"))
+        key_n    <- do.call(paste, c(agg_n[, cols, drop=FALSE], sep="\r"))
+        node_n   <- agg_n$n[match(key_size, key_n)]
+      }
 
       custom <- Map(
-        function(meta_txt, stat_v)
-          list(meta = meta_txt, stat = stat_v, level = lvl),
-        meta_lines, agg_stat$stat
+        function(meta_txt, stat_v, n_v)
+          list(meta = meta_txt, stat = stat_v, n = n_v, level=lvl),
+        meta_lines, agg_stat$stat, node_n
       )
 
       out_ids     <- c(out_ids, ids)
@@ -200,64 +196,110 @@
       out_values  <- c(out_values, agg_size$size)
       out_custom  <- c(out_custom, custom)
       out_root    <- c(out_root, root_vals)
-    }
+    }  # end: for (lvl in seq_len(n_levels))
 
     nd <- data.frame(
       ids     = out_ids,
       labels  = out_labels,
       parents = out_parents,
       values  = out_values,
-      root    = factor(out_root, levels = top_levels),
-      stringsAsFactors = FALSE
+      root    = factor(out_root, levels = top_levels)
     )
     nd$customdata <- I(out_custom)
-    nd
+    nd  #return
+  }  # end build_nodes()
+
+
+# begin analysis ----------------------------------------------------------
+
+  labels          <- match.arg(labels)
+  labels_position <- match.arg(labels_position)
+
+  # final flag that controls text on/off for nodes
+  show_text <- isTRUE(show_labels) && !identical(labels, "off")
+
+  # simple font scaling (same base as other lessR plotlys)
+  base_font   <- 12
+  label_fsize <- base_font * labels_size
+
+
+# build path table ------------------------------------------------------------ 
+
+  mk_char <- function(v) as.character(if (is.factor(v)) v else v)
+
+  if (is.null(by.call)) {
+    path_df   <- data.frame(x = mk_char(x.call), check.names=FALSE)
+    lvl_names <- c(x.name)
+  }
+  else if (is.data.frame(by.call)) {
+    tmp <- as.data.frame(lapply(by.call, mk_char), check.names=FALSE)
+    path_df   <- data.frame(x = mk_char(x.call), tmp, check.names=FALSE)
+    lvl_names <- c(x.name, names(tmp))
+  }
+  else {
+    path_df   <- data.frame(x = mk_char(x.call), by = mk_char(by.call),
+                            check.names=FALSE)
+    lvl_names <- c(x.name, by.name %||% "by")
   }
 
-  # ---- trace adder ------------------------------------------------------
-  make_trace <- function(p, nd, domain_xy) {
-    digits  <- max(0L, as.integer(digits_d))
-    txtinfo <- if (isTRUE(show_labels)) "label" else "none"
+  path_cols <- names(path_df)
+  n_levels  <- length(path_cols)
 
-    hover <- paste0(
-      "%{customdata.meta}<br>",
-      stat_label, ": %{customdata.stat:,.", digits, "f}",
-      if (non_additive) "" else
-        "<br>% of parent: %{percentParent:.2%}<br>% of total: %{percentRoot:.2%}",
-      "<extra></extra>"
-    )
-
-    # map top-level category -> color, then inherit down the tree
-    col_map   <- setNames(as.character(fill_vec), top_levels)
-    node_cols <- col_map[as.character(nd$root)]
-    node_cols[is.na(node_cols)] <- col_map[1L]  # fallback if any NA
-
-    marker <- list(
-      colors = node_cols,
-      line   = list(color = border_hex, width = 1)
-    )
-
-    plotly::add_trace(
-      p,
-      type         = type_hier,
-      ids          = nd$ids,
-      labels       = nd$labels,
-      parents      = nd$parents,
-      values       = nd$values,
-      customdata   = nd$customdata,
-      domain       = list(x = domain_xy$x, y = domain_xy$y),
-      branchvalues = "total",
-      textinfo     = txtinfo,
-      hovertemplate = hover,
-      marker       = marker
-    )
+  # ---- base numeric vector from y (or 1s for counts) -------------------
+  base_vals <- if (is.null(y.call)) rep(1, nrow(path_df)) else {
+    z <- suppressWarnings(as.numeric(y.call))
+    z[!is.finite(z)] <- NA_real_
+    z
   }
 
-  # ---- start plot & set base colorway (still used by Plotly defaults) ---
+  # ---- set the stat function & label ------------------------------------
+  STAT <- tolower(stat %||% if (is.null(y.call)) "sum" else "sum")
+  stat_fun <- switch(
+    STAT,
+    mean   = function(z) mean(z, na.rm=TRUE),
+    sum    = function(z) sum(z,  na.rm=TRUE),
+    median = function(z) stats::median(z, na.rm=TRUE),
+    min    = function(z) min(z, na.rm=TRUE),
+    max    = function(z) max(z, na.rm=TRUE),
+    sd     = function(z) stats::sd(z,  na.rm=TRUE),
+    function(z) sum(z, na.rm=TRUE)
+  )
+
+  non_additive <- !identical(STAT, "sum")
+
+  # For sizing always apply an additive aggregator
+  size_fun <- function(z) sum(z, na.rm=TRUE)
+
+  stat_label <- y.name
+
+
+# assign colors, setup based on top-level categories ----------------------
+
+  # top-level categories are in the first path column
+  top_raw <- mk_char(path_df[[1L]])
+  top_levels <- if (!is.null(levels(path_df[[1L]]))) levels(path_df[[1L]])
+                else unique(top_raw)
+
+  if (is.null(fill)) {  # fill palette for top-level categories
+    base_cols <- .plotly_base_colors()
+    fill_vec  <- base_cols[seq_len(length(top_levels))]
+  }
+  else {  # allow ranges like "blues" or named vectors
+    fill_vec  <- .color_range(fill, length(top_levels))
+  }
+
+  # border color, one color for all nodes; consistent with prior behavior
+  border_hex <- .to_hex(if (is.null(border)) "white" else border[1L])
+
+
+# start plot & set base colorway (still used by Plotly defaults) ----------
+
   p <- plotly::plot_ly()
   p <- plotly::layout(p, colorway = fill_vec)
 
-  # ---- non-faceted ------------------------------------------------------
+
+# non-faceted -------------------------------------------------------------
+
   if (is.null(facet.call)) {
     nd <- build_nodes(seq_len(nrow(path_df)), facet_label = NULL)
     p  <- make_trace(p, nd, list(x = c(0, 1), y = c(0, 1)))
@@ -275,7 +317,9 @@
     ))
   }
 
-  # ---- faceted ----------------------------------------------------------
+
+# faceted -----------------------------------------------------------------
+
   fac_levels <- if (!is.null(levels(facet.call))) levels(facet.call)
                 else unique(mk_char(facet.call))
   n_fac <- length(fac_levels)
@@ -293,14 +337,15 @@
   )
   domains <- grid$domains
 
-  # --- Type-specific vertical adjustments for facets ---------------------
-  # Only in the faceted case. We alter the panel domains to free room
+
+# Type-specific vertical adjustments for facets ---------------------------
+
   # for titles and reduce overlap with the main title.
-  if (type_hier == "treemap") {
+  if (type == "treemap") {
     domains <- lapply(domains, function(d) {
       y0   <- d$y[1]; y1 <- d$y[2]
       span <- y1 - y0
-      shift <- 0.04          # move panel downward a bit
+      shift <- 0.04
       new_y0 <- max(0, y0 - shift)
       new_y1 <- new_y0 + span
       if (new_y1 > 1) {
@@ -309,7 +354,8 @@
       }
       list(x = d$x, y = c(new_y0, new_y1))
     })
-  } else if (type_hier == "icicle") {
+  }
+  else if (type == "icicle") {
     domains <- lapply(domains, function(d) {
       y0   <- d$y[1]; y1 <- d$y[2]
       span <- y1 - y0
@@ -324,10 +370,10 @@
       }
       list(x = d$x, y = c(new_y0, new_y1))
     })
-  } else if (type_hier == "sunburst") {
+  }
+  else if (type == "sunburst") {
     # For faceted sunbursts, drop the panels slightly downward
-    # to create more space between facet titles and the rings,
-    # using some of the empty space at the bottom.
+    # to create more space between facet titles and the rings
     shift <- 0.06  # about 6% of full figure height
 
     domains <- lapply(domains, function(d) {
@@ -345,7 +391,9 @@
     })
   }
 
-  # ---- add traces for each facet ---------------------------------------
+
+# add traces for each facet -----------------------------------------------
+
   for (i in seq_along(fac_levels)) {
     fac_lab <- fac_levels[i]
     idx     <- which(mk_char(facet.call) == fac_lab)
@@ -360,7 +408,9 @@
     stat   = if (is.null(y.call)) NULL else STAT
   )
 
-  # ---- facet title annotations -----------------------------------------
+
+# facet title annotations -------------------------------------------------
+
   ann <- .plotly_facet_annotations(
     domains,
     facet_levels = fac_levels,
@@ -369,43 +419,34 @@
     y_row_shift  = facet_title_row_shift
   )
 
-  # park facet titles just above the top of each domain.
-  # ---- facet title annotations -----------------------------------------
-  ann <- .plotly_facet_annotations(
-    domains,
-    facet_levels = fac_levels,
-    facet_name   = facet.name,
-    y_base       = facet_title_y_base,
-    y_row_shift  = facet_title_row_shift
-  )
-
-  # park facet titles just above the top of each domain.
-  if (type_hier == "sunburst") {
+  if (type == "sunburst") {
     for (i in seq_along(ann)) {
       top_y <- domains[[i]]$y[2]
       ann[[i]]$y <- min(top_y + 0.03, 0.98)
     }
-  } else if (type_hier == "treemap") {
+  } else if (type == "treemap") {
     for (i in seq_along(ann)) {
       top_y <- domains[[i]]$y[2]
       ann[[i]]$y <- min(top_y + 0.03, 0.98)
     }
-  } else if (type_hier == "icicle") {
+  } else if (type == "icicle") {
     for (i in seq_along(ann)) {
       top_y <- domains[[i]]$y[2]
-
-      # Force icicle facet titles to use full-figure coordinates,
-      # then give them a generous gap above the panel.
+      # Icicle facet titles use full-figure coordinates, with gap the panel
       ann[[i]]$yref    <- "paper"
       ann[[i]]$yanchor <- "bottom"
       ann[[i]]$y       <- min(top_y + 0.10, 0.99)
     }
   }
 
+
+# Plot --------------------------------------------------------------------
+
   plotly::layout(
     p,
     annotations = ann,
-    margin = list(t = 50, b = 8, l = 20, r = 20),
-    title  = list(text = ttl_text, font = list(size = 16))
+    margin=list(t=50, b=8, l=20, r=20),
+    title  = list(text = ttl_text, font = list(size=16))
   )
+
 }

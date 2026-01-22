@@ -27,7 +27,7 @@ Depending on the combination of variable types supplied to \code{x} and
 Cleveland-style dot or lollipop plots.
 
 When running in RStudio, static graphics are drawn in the \code{Plots}
-window. When the default \code{use_plotly=TRUE}, an additional interactive
+window. When the default \code{use_plotly=TRUE}, the interactive
 \pkg{plotly} version of the scatterplot (including time series) display is also drawn in the \code{Viewer} window.
 
 A scatterplot displays the joint values of one or more variables as points
@@ -107,11 +107,6 @@ XY(
     # Run chart (indicate with .Index for the name of the x-variable)
     show_runs=FALSE, center_line=c("off", "mean", "median", "zero"),
 
-    # -----------------------------------
-    # Lollipop chart from aggregated data [xCategorical and y]
-    stat=c("mean", "sum", "sd", "deviation", "min", "median", "max"),
-    stat_x=c("count", "proportion", "\%"),
-
     # ----------------------------------
     # Integrated violin/box/scatter plot  [x only]
     vbs_plot="vbs", vbs_ratio=0.9, bw=NULL, bw_iter=10,
@@ -182,6 +177,8 @@ XY(
     # Deprecated, to be removed in future versions
     n_cat=getOption("n_cat"), value_labels=NULL,  # use R factors instead
     rows=NULL, facet1=NULL, facet2=NULL, smooth=FALSE,
+    stat=c("mean", "sum", "sd", "deviation", "min", "median", "max"),
+    stat_x=c("count", "proportion", "\%"),
 
     # ---------------------------------
     # Other
@@ -286,7 +283,7 @@ XY(
        all uppercase and lowercase letters, all digits, and most punctuation
        characters. The integers 0–25 as defined by the base R
        \code{\link{points}} function also apply. If plotting levels for
-aesthetic       different groups according to \code{by}, specify a vector of shapes
+       different groups according to \code{by}, specify a vector of shapes
        with one shape per group, or set to \code{"vary"} to have shapes
        selected automatically across \code{by} groups.}
   \item{line_width}{Width of the line segments that connect adjacent points,
@@ -449,15 +446,6 @@ aesthetic       different groups according to \code{by}, specify a vector of sha
         randomly vary about the median. Alternatively, \code{"mean"} and
         \code{"zero"} specify that the center line goes through the mean or
         zero, respectively. Currently not supported for Trellis plots.}\cr
-
-  \item{stat}{Apply a \strong{specified aggregation} such as \code{"mean"} to the
-       numerical \code{y} variable at each level of a categorical \code{x}
-       variable. The resulting dot plot (Cleveland plot) is analogous to a
-       bar chart but emphasizes position along a common scale.}
-  \item{stat_x}{If no \code{y} variable is specified, constructs a frequency
-        polygon for \code{x} with access to \code{bin_width}. Either use the
-        default \code{"count"} for each bin or \code{"proportion"}, also
-        indicated by \code{\%}.}\cr
 
 
   \item{vbs_plot}{A character string that specifies the components of the
@@ -694,7 +682,15 @@ aesthetic       different groups according to \code{by}, specify a vector of sha
   \item{facet1}{\emph{Deprecated}. Old parameter name; use \code{facet}.}
   \item{facet2}{\emph{Deprecated}. Old parameter name; use a two-element
         vector in \code{facet}.}
-  \item{smooth}{\emph{Deprecated}. Use parameter \code{type}.}\cr
+  \item{smooth}{\emph{Deprecated}. Use parameter \code{type}.}
+  \item{stat}{Apply a \strong{specified aggregation} such as \code{"mean"} to the
+       numerical \code{y} variable at each level of a categorical \code{x}
+       variable. The resulting dot plot (Cleveland plot) is analogous to a
+       bar chart but emphasizes position along a common scale.}
+  \item{stat_x}{If no \code{y} variable is specified, constructs a frequency
+        polygon for \code{x} with access to \code{bin_width}. Either use the
+        default \code{"count"} for each bin or \code{"proportion"}, also
+        indicated by \code{\%}.}\cr
 
   \item{eval_df}{Controls whether to check for an existing data frame and
         specified variables. Default is \code{TRUE}, unless the \pkg{shiny}

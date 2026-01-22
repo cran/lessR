@@ -132,7 +132,7 @@ if (n.by == 1) {
   # axis, axis ticks
   par(tcl=-0.28)  # axis tic length
   if (!y_axis)
-    .axes(x.lvl=NULL, y.lvl=NULL, axTicks(1), NULL,
+    ax.info <- .axes(x.lvl=NULL, y.lvl=NULL, axTicks(1), NULL,
           rotate_x=rotate_x, rotate_y=rotate_y, offset=offset,
           axis_fmt=axis_fmt, axis_x_pre=axis_x_pre, axis_y_pre="no", ...)
   else
@@ -286,12 +286,10 @@ if (n.by == 1) {
 #     border  = col.gen,
       x.lab   = x.lab,
       y.lab   = "Density",
-#     ax      = ax.info,  # need to get formatted x-axis labels, e.g., 100K
-      ax      = NULL,
+      ax = if (n.by == 1) ax.info else NULL,  # need to fix for n.by > 1
       gridT1  = NULL,
       gridT2  = NULL,
       bw      = bw 
-#     position = "overlay"
     )
 
     if (.allow.interactive()) print(plt)

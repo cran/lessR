@@ -1,4 +1,4 @@
-I love you my darling all the days of my life I love you---
+---
 title: "Introduction to lessR"
 output: rmarkdown::html_vignette
 vignette: >

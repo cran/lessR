@@ -194,13 +194,12 @@
       y.cl <- data.frame(y = numeric(0))
       by.cl <- data.frame(byc = NA)
       by.cl <- by.cl[-1, ]
-
       for (k in seq_len(n.by)) {
         xl <- x.call[by.call==levels(by.call)[k], , drop=FALSE]
         yl <- y.call[by.call==levels(by.call)[k], , drop=FALSE]
 
         # truncate trailing partial target periods within each group
-        es <- ts_truncate(xl, yl, tu_exist = tu_exist, ts_unit = ts_unit)
+        res <- ts_truncate(xl, yl, tu_exist = tu_exist, ts_unit = ts_unit)
         xl  <- res$x
         yl  <- res$y
         if (nrow(xl) == 0L) next
@@ -221,7 +220,6 @@
         y.cl <- rbind(y.cl, y.c)
         by.cl <- rbind(by.cl, by.c)
       }  # end by loop
-
       names(x.cl)[1] <- x.name
       x.call <- x.cl
       y.call <- y.cl

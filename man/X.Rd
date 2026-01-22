@@ -12,7 +12,7 @@
 
 \description{
 
-\code{lessR} introduces the concept of a \emph{data view} visualization function, in which the choice of visualization function directly reflects the structure of the data and the analyst's goal for understanding the data. The function \code{X()} visualizes the distribution of a continuous variable along with
+\code{lessR} introduces the concept of a \emph{data view} visualization function, in which the choice of visualization function directly reflects the structure of the data and the analyst's intent for understanding the data. The function \code{X()} visualizes the distribution of a continuous variable along with
 associated summary statistics. The specific representation is selected with the
 \code{type} argument:
 
@@ -23,7 +23,6 @@ associated summary statistics. The specific representation is selected with the
   \item Violin plot with \code{type = "violin"}
   \item Strip (one-dimensional scatter) plot with \code{type = "strip"}
   \item Integrated violin-box-strip (VBS) plot with \code{type = "vbs"}
-  \item Two-dimensional scatter plot for a \code{by} variable with \code{type = "scatter"}
 }
 
 Stratification divides the distribution into groups.
@@ -44,7 +43,7 @@ X(
 
     # ------------------------------------------
     # Type of plot for the continuous variable x
-    type = c("histogram", "freq_poly", "density", "scatter",
+    type = c("histogram", "freq_poly", "density",
              "violin", "box", "strip", "bs", "vbs"), # violin, box, strip
     stat=c("count", "proportion", "density"),
 
@@ -73,7 +72,7 @@ X(
     rug=FALSE, color_rug="black", size_rug=0.5,
 
     # -------------------------------------------------
-    # Integrated violin/box/scatter plot
+    # Integrated violin/box/strip plot
     vbs_plot="vbs", vbs_ratio=0.9, bw=NULL, bw_iter=10,
     violin_fill=getOption("violin_fill"),
     box_fill=getOption("box_fill"),
@@ -137,8 +136,7 @@ X(
         \code{"density"} (kernel density curve),
         \code{"violin"},
         \code{"strip"} (one-dimensional scatter plot),
-        \code{"scatter"} (two-dimensional scatter plot with one panel per \code{by}),
-        and \code{"vbs"} (combined violin-box-strip display).
+        and \code{"vbs"} (integrated violin-box-strip display).
         When using \code{"vbs"}, the \code{vbs_plot} parameter may specify a
         subset such as \code{"bs"} for a box-strip display.}
   \item{stat}{Specifies the vertical axis content.

@@ -14,7 +14,7 @@ dn.plotly <- function(
 
   `%||%` <- function(a, b) if (is.null(a) || length(a) == 0) b else a
 
-  # --- groups ---------------------------------------------------------------
+  # --- groups ------------------------------------------------------------
   if (is.null(by)) {
     groups <- "Series 1"; G <- 1L
   } else {
@@ -22,7 +22,7 @@ dn.plotly <- function(
     G <- length(groups)
   }
 
-  # --- shared support --------------------------------------------------------
+  # --- shared support ----------------------------------------------------
   xr <- range(x, finite = TRUE)
   if (is.null(from) || is.na(from)) from <- xr[1L]
   if (is.null(to)   || is.na(to))   to   <- xr[2L]
@@ -32,11 +32,12 @@ dn.plotly <- function(
   xgrid <- seq(from, to, length.out = n)
   dx    <- xgrid[2L] - xgrid[1L]
 
-  # --- sanity: at least 2 finite obs per group ------------------------------
+  # --- sanity: at least 2 finite obs per group ---------------------------
   if (G == 1L) {
     n_ok <- sum(is.finite(x))
     if (n_ok < 2L)
-      stop("Density requires at least 2 finite observations; found ", n_ok, ".", call. = FALSE)
+      stop("Density requires at least 2 finite observations;\n",
+           "found ", n_ok, ".", call. = FALSE)
   } else {
     for (g in seq_len(G)) {
       xg <- x[by == groups[g]]
@@ -48,7 +49,7 @@ dn.plotly <- function(
     }
   }
 
-  # --- densities per group ---------------------------------------------------
+  # --- densities per group -----------------------------------------------
   dens_list <- vector("list", G)
   ymax <- 0
   for (g in seq_len(G)) {
@@ -74,28 +75,29 @@ dn.plotly <- function(
     ymax <- max(ymax, d$y, na.rm = TRUE)
   }
 
-  # --- ticks / labels --------------------------------------------------------
+  # --- ticks / labels ----------------------------------------------------
   gridT1 <- ax$axT1 %||% gridT1 %||% pretty(c(from, to), n = 5)
   gridL1 <- ax$axL1 %||% format(gridT1, big.mark = ",", trim = TRUE)
   gridT2 <- ax$axT2 %||% gridT2 %||% pretty(c(0, ymax), n = 6)
   gridL2 <- ax$axL2 %||% format(gridT2, trim = TRUE)
 
-  # --- colors / alpha --------------------------------------------------------
+  # --- colors / alpha ----------------------------------------------------
   alpha_fill <- .auto_opacity(G, "fill")
   alpha_line <- .auto_opacity(G, "lines")
   fill_rgba  <- .maketrans_plotly(rep_len(fill, G), alpha = alpha_fill)
   line_rgba  <- .maketrans_plotly(rep_len(fill, G), alpha = alpha_line)
 
-  # --- hover builder ---------------------------------------------------------
+  # --- hover builder -----------------------------------------------------
   .hover <- function(xx, yy, cpct) {
     paste0(
       x.name, ": ", format(signif(xx, 6)),
-      "<br>density=", format(round(yy, digits_d), trim = TRUE),
+      "<br>Density=", format(round(yy, 6), trim = TRUE),
+
       "<br>Cumulative %: ", formatC(100 * cpct, format = "f", digits = 1), "%"
     )
   }
 
-  # --- widget & traces -------------------------------------------------------
+  # --- widget & traces ---------------------------------------------------
   plt <- plotly::plot_ly(
     type       = "scatter",
     mode       = "lines",
@@ -120,7 +122,7 @@ dn.plotly <- function(
     )
   }
 
-  # --- axes & grids ----------------------------------------------------------
+  # --- axes & grids ------------------------------------------------------
   border_shapes <- plot_border()
   x.shapes      <- x_grid(gridT1)
 
@@ -134,6 +136,14 @@ dn.plotly <- function(
   ax_y$gridwidth <- 1
   ax_y$griddash  <- "dot"
 
+  # nudge x-axis title up a bit (keeps font size unchanged)
+  if (is.character(ax_x$title)) {
+    ax_x$title <- list(text = ax_x$title, standoff = 10)
+  } else if (is.list(ax_x$title)) {
+    ax_x$title$standoff <- 10
+  }
+  ax_x$automargin <- TRUE
+
   plt <- plotly::layout(
     plt,
     xaxis = ax_x,
@@ -142,12 +152,14 @@ dn.plotly <- function(
     template = NULL
   )
 
-  # --- background & legend ---------------------------------------------------
+
+  # --- background & legend -----------------------------------------------
   plt$x$layout$plot_bgcolor  <- .to_hex(getOption("panel_fill",  "white"))
   plt$x$layout$paper_bgcolor <- .to_hex(getOption("window_fill", "white"))
 
   if (G > 1) {
-    leg_border <- .to_hex(getOption("legend_border", getOption("panel_border", "#808080")))
+    leg_border <- .to_hex(getOption("legend_border",
+                          getOption("panel_border", "#808080")))
     leg_bg     <- .to_hex(getOption("window_fill", "white"))
     plt <- plotly::layout(plt, legend = list(
       title = list(text = if (length(by.name)) by.name else ""),
@@ -157,7 +169,7 @@ dn.plotly <- function(
     ))
   }
 
-  # --- finalize --------------------------------------------------------------
+  # --- finalize ----------------------------------------------------------
   plt <- .finalize_plotly_widget(
     plt,
     kind = "density",

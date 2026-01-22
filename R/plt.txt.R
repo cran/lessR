@@ -291,7 +291,7 @@ function(x, y, stat, object, cat.x, cat.y, date.var,
     # ---------------------------
 
     if (!cat.x  &&  !cat.y  &&
-      object %in% c("point", "both")  && !run) {
+      object %in% c("point", "both")  && !run  && !date.var) {
 
       # suggestions
       # -----------

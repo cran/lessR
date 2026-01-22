@@ -1,7 +1,7 @@
 X <-
 function(x=NULL, by=NULL, facet=NULL, data=d, filter=NULL,
 
-    type = c("histogram", "freq_poly", "density", "scatter",
+    type = c("histogram", "freq_poly", "density", 
              "violin", "box", "strip", "bs", "vbs"), # violin, box, strip
     stat=c("count", "proportion", "density"),
 
@@ -102,7 +102,7 @@ function(x=NULL, by=NULL, facet=NULL, data=d, filter=NULL,
     se_fill <- sty$se_fill
   }
 
-  if (use_plotly && (type %in% c("histogram", "density"))) {
+  if (!quiet && use_plotly && (type %in% c("histogram", "density"))) {
     txt <- "[Interactive plot from the Plotly R package (Sievert, 2020)]"
     cat(txt, "\n\n")
   }
@@ -133,7 +133,7 @@ function(x=NULL, by=NULL, facet=NULL, data=d, filter=NULL,
       if (names(dots)[i] == "bw") bandwidth <- dots[[i]]
       if (names(dots)[i] == "density") {
         cat("\n"); stop(call.=FALSE, "\n------\n",
-          "Now enter:  type=\"density\"\n\n")
+          "Now enter:  type=\"density\" in place of density=TRUE\n\n")
       } 
       if (length(grep(".", names(dots)[i], fixed=TRUE)) > 0) {
         nm <- gsub(".", "_", names(dots)[i], fixed=TRUE)
@@ -146,15 +146,15 @@ function(x=NULL, by=NULL, facet=NULL, data=d, filter=NULL,
   # ---------------------------------------------------------
 
 
-  if (!breaks.miss && density)  {
+  if (!breaks.miss  &&  (type == "density"))  {
     cat("\n"); stop(call.=FALSE, "\n------\n",
       "When plotting density, parameter  breaks  is ignored.\n",
       "Bins must be equal width, but can use bin_start and bin_width.\n\n")
   }
 
-  if (density &&  !is.null(facet)) {
+  if (type %in% c("density", "freq_poly")  &&  !missing(facet)) {
     cat("\n"); stop(call.=FALSE, "\n------\n",
-      "Facets not yet working with density visualizations.\n\n")
+      "Facets not yet working with \"density\" or \"freq_poly\" plots.\n\n")
   }
 
   fill[which(fill == "off")] <- "transparent"
@@ -456,9 +456,6 @@ function(x=NULL, by=NULL, facet=NULL, data=d, filter=NULL,
   # -----------------------------------------------------------
   # -----------  x, y, by, and facet variables established ----
   # -----------------------------------------------------------
-
-  if (is.null(by.call) && type=="scatter")
-    type <- "strip"  # scatter and strip only different if a by var
 
   Trellis <- ifelse(!facet.miss, TRUE, FALSE)
 
@@ -810,10 +807,11 @@ function(x=NULL, by=NULL, facet=NULL, data=d, filter=NULL,
         return(invisible(output))
       }  # end n.by is 1
 
-    }  # end density
+#   }  # end density
 
 
-    if (type %in% c("histogram", "density")  &&  n.by > 1) { 
+#   if (type %in% c("histogram", "density")  &&  n.by > 1) { 
+#   if (type == "density"  &&  n.by > 1) { 
 
       if (n.by == 2) {
         if (.allow.interactive())
@@ -885,51 +883,8 @@ function(x=NULL, by=NULL, facet=NULL, data=d, filter=NULL,
       }
 
       return(invisible(NULL))
-    }  # end histogram or density and n.by > 1
+    }  # end density
 
-    ## --------------------------------------------------
-    ## X(..., by= , type="scatter") -> delegate to XY()
-    ## Numeric x, single categorical by: profile / dotplot
-    ## --------------------------------------------------
-    else if (type == "scatter") {
-
-      # Only run this when user actually called X(), not an internal helper
-      calls <- sys.calls()
-      top   <- calls[[1L]]
-      fun   <- top[[1L]]
-      if (identical(fun, quote(X)) || identical(fun, as.name("X"))) {
-
-        # Reconstruct original user call:
-        #    X(Salary, by = Gender, type="scatter", ...)
-        fun_call <- match.call(expand.dots = TRUE)
-
-        # Original x expression is the second argument
-        x_expr <- fun_call[[2L]]
-
-        # Get the by expression: prefer named 'by'
-        # fall back to second positional arg
-        by_expr <- fun_call$by
-        if (is.null(by_expr) && length(fun_call) >= 3L) {
-          # X(Salary, Gender, type="scatter") style
-          by_expr <- fun_call[[3L]]
-        }
-
-        if (is.null(by_expr)) {
-          stop("For X(..., type=\"scatter\"),\n",
-               "Supply a grouping variable via the second argument or by=.")
-        }
-
-        # We want XY(x = by, y = x, ...):
-        #   conceptual numeric-by-category profile
-        fun_call[[1L]] <- as.name("XY")
-        fun_call$x     <- by_expr
-        fun_call$y     <- x_expr
-        fun_call$by    <- NULL  # XY() doesn't need by= here; grouping is now x=
-
-        # Let XY() do all the usual myData/data= lookup, plotting, etc.
-        return(eval.parent(fun_call))
-      }
-    }
 
 
 # VBS ---------------------------------------------------------------------
@@ -1067,7 +1022,7 @@ function(x=NULL, by=NULL, facet=NULL, data=d, filter=NULL,
                 lx, n.ux, k.iqr, box_adj, a, b,
                 x.name, facet1.name, by.name, vbs_plot,
                 n_col.miss, n_row.miss,
-                size = .9, out_size = out_size, out_size.miss = out_size.miss,
+                size = pt_size, out_size = out_size, out_size.miss = out_size.miss,
                 jitter_x=NULL, jitter_y=NULL,
                 bin = FALSE, breaks = "Sturges", bin_start = NULL,
                 bin_width = NULL, bin_end = NULL,
@@ -1227,31 +1182,39 @@ function(x=NULL, by=NULL, facet=NULL, data=d, filter=NULL,
 
 # frequency polygon -------------------------------------------------------
 
-      else if (type == "freq_poly") {
+    else if (type == "freq_poly") {
 
-        if (n.by > 1) {
-          cat("\n"); stop(call.=FALSE, "\n------\n",
-            "Frequency polygons are only available for 1 group.\n", 
-            "No  by  variable.\n\n")
-        }
-
-        send1_to_XY <- function(fun_call, target = "XY") {
-          cl <- fun_call
-          cl[[1L]] <- as.name(target)   # X(...) -> XY(...)
-          cl$type  <- NULL              # drop visualization selector
-
-          # inject stat_x = "count" if user has not already specified
-          nm <- names(cl)
-          if (is.null(nm)) nm <- character(length(cl))
-          if (!("stat_x" %in% nm)) {
-            cl[["stat_x"]] <- "count"
-          }
-          cl
-        }
-
-        cl_XY <- send1_to_XY(fun_call, target = "XY")
-        return(invisible(eval.parent(cl_XY)))  # as if user typed XY(...)
+      if (n.by > 1) {
+        cat("\n"); stop(call.=FALSE, "\n------\n",
+          "Frequency polygons are only available for 1 group.\n",
+          "No  by  or  facet  variable.\n\n")
       }
+
+      fun_call <- match.call(expand.dots = TRUE)  # input function call
+
+      cl <- fun_call
+      cl[[1L]] <- as.name("XY")   # X(...) -> XY(...)
+      cl$type  <- NULL            # drop visualization selector
+
+      nm <- names(cl)
+      if (is.null(nm)) nm <- character(length(cl))
+
+      # map X's stat -> XY's stat_x
+      if ("stat" %in% nm && !("stat_x" %in% nm)) {
+        cl[["stat_x"]] <- cl[["stat"]]
+        cl[["stat"]]   <- NULL
+        nm <- names(cl)
+        if (is.null(nm)) nm <- character(length(cl))
+      }
+
+      # default for freq poly is count if user didn't supply anything
+      if (!("stat_x" %in% nm)) {
+        cl[["stat_x"]] <- "count"
+      }
+
+      return(eval.parent(cl))
+    }  # end freq_poly
+
 
     } # end ncol(data) ---------
 

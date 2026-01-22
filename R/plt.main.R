@@ -4,7 +4,7 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
          object="point", stat="data",
 
          fill=getOption("pt_fill"),
-         area_fill="transparent",
+         ts_area_fill="transparent",
          color=getOption("pt_color"),
 
          pt.trans=0, col.segment=getOption("segment_color"),
@@ -16,6 +16,7 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
 
          size=NULL, ln.width=1, shape=21, means=TRUE,
          segments=FALSE, segments_y=FALSE, segments_x=FALSE,
+         segments_diff=FALSE,
 
          type="scatter", smooth_points=100, smooth_size=1,
          smooth_power=0.25, smooth_bins=128,
@@ -43,8 +44,8 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
 
          freq.poly=FALSE, jitter_x=NULL, jitter_y=NULL,
 
-         xlab.adj=0, ylab.adj=0, bm.adj=0, lm.adj=0,
-         tm.adj=0, rm.adj=0,
+         xlab.adj=0, ylab.adj=0,
+         bm.adj=0, lm.adj=0, tm.adj=0, rm.adj=0,
          scale_x=NULL, scale_y=NULL, pad_x=c(0,0), pad_y=c(0,0),
          axis_fmt="K", axis_x_pre="", axis_y_pre="",
          legend_title=NULL, use_plotly=TRUE,
@@ -53,7 +54,9 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
          add_cex=NULL, add_lwd=1, add_lty="solid",
          add_color=NULL, add_fill=NULL, add_trans=NULL,
 
-         quiet=FALSE, ...)  {
+         quiet=FALSE, digits_d=NULL, ...)  {
+
+
 
 # preliminaries -----------------------------------------------------------
 
@@ -61,6 +64,7 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
   date.var <- ifelse (.is.date(x[,1]), TRUE, FALSE)
   if (is.null(size)) size <- 1
   size.pt <- size  # size is set in Plot.R, reduce a bit for here
+  area_fill <- ts_area_fill
   theme <- getOption("theme")
 
   want.labels <- TRUE
@@ -193,7 +197,7 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
   }
 
   # y decimal digits
-  digits_d <- .max.dd(y[,1]) + 1
+  if (is.null(digits_d)) digits_d <- .max.dd(y[,1]) + 1
   options(digits_d=digits_d)
 
   if (n.col > 1) center_line <- "off"   # no center_line for multiple plots
@@ -201,7 +205,6 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
   cleveland <- FALSE
   if (!cat.x && cat.y && unique.y  ||  !cat.y && cat.x && unique.x)
     cleveland <- TRUE
-
 
 # get minimum and maximum values of x and y -------------------------------
 
@@ -303,6 +306,8 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
     mm <- mm + 0.25  # reduce size of plot in the left to make room for label
     ylab.adj <- ylab.adj + 0.2  # move label right when calling .axlabs()
   }
+
+  if (type == "contour") ylab.adj <- ylab.adj - 0.6
 
   if (n.ycol > 1) {
     rm <- rm + 0.80  # add right margin for legend
@@ -481,7 +486,9 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
   }  # end numerical
 
   # set axT2: y-axis tics and values
-  if (cat.y)
+    if (segments_diff)
+      axT2 <- 1:nrow(x)
+  else if (cat.y)
     axT2 <- seq_along(y.lvl)
   else {
     if (is.null(scale_y))
@@ -510,11 +517,15 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
       adj <- .RSadj(axis_cex=ax$axis_x_cex); axis_x_cex <- adj$axis_cex
 
       if (!date.var) {  # call axis() for both axes
+        if (segments_diff) {  # Cleveland dot plot
+          if (n.xcol > 1) y.lvl <- rev(rownames(x))
+          if (n.ycol > 1) x.lvl <- rev(rownames(x))
+        }
         ax.info <- .axes(x.lvl, y.lvl, axT1, axT2,
               rotate_x=rotate_x, rotate_y=rotate_y, offset=offset, 
               axis_fmt=axis_fmt, axis_x_pre=axis_x_pre, axis_y_pre=axis_y_pre,
               ...)
-      }
+      }  # end !date.var
     }  # end not contour
 
     if (date.var) {  # date.var, y-axis
@@ -591,11 +602,12 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
   }  # end date.var
 
   # axes labels
-  if (type != "contour")
+  if (type != "contour") {
     .axlabs(x.lab, y.lab, main.lab, sub.lab,
            x.val, xy_tics, offset=offset,
            lab_x_cex=lab_x_cex, lab_y_cex=lab_y_cex, main_cex,
            n.lab_x.ln, n.lab_y.ln, xlab.adj, ylab.adj, ...)
+  }
 
 
 # set-up plot background --------------------------------------------------
@@ -804,7 +816,7 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
 
 # plot points, segments, means with no by --------------------------------- 
 
-      else if (size.pt[1] > 0) {
+      else if (size.pt[1] > 0  &&  !segments_diff) {
         # plot points
         if (n.xcol == 1  &&  n.ycol == 1) {  # one x and one y variable
           if (length(out_ind) == 0)  # no outliers
@@ -821,9 +833,9 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
         }
 
         else if (n.ycol == 1) {  # one y
-          for (i in 1:n.xcol) {  # one to many x's
-              points(x[,i], y[,1], pch=shape, col=color[i], bg=fill[i],
-                     cex=size.pt, ...)
+          for (i in 1:n.xcol) {  # one to many x's, Cleveland dots here
+            points(x[,i], y[,1], pch=shape, col=color[i], bg=fill[i],
+                   cex=size.pt, ...)
           }
         }
 
@@ -834,12 +846,11 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
           }
         }
 
-        # plot segments to axis
         if (segments_y) {
           if (n.xcol == 1) # line segments from points to axis
             segments(x0=0, y0=y, x1=x, y1=y,
                      lty=1, lwd=.75, col=col.segment)
-          else if (n.xcol == 2)  # line segments between points
+          else if (n.xcol == 2)  # Cleveland paired points
             segments(x0=x[,1], y0=y[,1], x1=x[,2], y1=y[,1],
                      lty=1, lwd=.75, col=col.segment)
         }
@@ -902,8 +913,25 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
           }
         }  # end means
 
-      }  # end not smooth, plot points with no by
-      # -----------------------------------------
+      }  # end size.pt[1] > 0  &&  !segments_diff
+
+      else if (size.pt[1] > 0  &&  segments_diff) {  # paired dot plot
+
+        paired_dot_plot <- function(x) {
+          y.labels <- nrow(x):1
+          segments(x0=x[, 1], y0=y.labels,
+                   x1=x[, 2], y1=y.labels,
+                   lty=1, lwd=0.75, col="black")
+
+          points(x[, 1], y.labels, pch=shape,
+                 col=color[1], bg=fill[1], cex=size.pt)
+          points(x[, 2], y.labels, pch=shape,
+                 col=color[2], bg=fill[2], cex=size.pt)
+        }  # end paired_dot_plot()
+
+        if (n.xcol > 1) paired_dot_plot(x)
+        if (n.ycol > 1) paired_dot_plot(y)
+      }  
 
 
 # plot center line --------------------------------------------------------
@@ -1401,8 +1429,9 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
 
 # interactive to plt.plotly() ----------------------------------------------
 
-  if (type != "contour"  &&  length(shape) == 1) { # only consider eligible
-    digits_d <- .max.dd(y[,1])
+  # only consider eligible
+  if (type != "contour" && length(shape) == 1 && n.xcol == 1 && n.ycol == 1) {
+    if (is.null(digits_d)) digits_d <- .max.dd(y[,1])
 
     if (use_plotly  &&  type=="scatter") {
 
@@ -1419,23 +1448,19 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
       if (date.var) {  # time series
         connect <- TRUE
         ax.info$axT1 <- as.numeric(x.dates[indices])
+        ax.info$axL1 <- .format_date_labels(x.dates[indices], ts_unit)
 
-        .format_date_labels <- function(dates, ts_unit) {
-          # ts_unit is unknown if x is a time series to begin with
-          ts_unit <- match.arg(ts_unit, c("years","quarters","months","weeks", 
-                                          "days","days7", "unknown"))
-          switch(ts_unit,
-            years    = format(dates, "%Y"),
-            quarters = paste0(format(dates, "%Y"), " ", quarters(dates)),
-            months   = format(dates, "%b %Y"),
-            weeks    = format(dates, "%d %b %Y"),
-            days     = format(dates, "%d %b %Y"),
-            days7    = format(dates, "%d %b %Y")
+        if (!is.null(ts_ahead) && ts_ahead > 0) {
+          message(
+            "\n",
+            "Note: Forecasts (ts_ahead > 0) are displayed only in the\n",
+            " static plot, Plots window, including any forecast error bands.\n",
+            " For now, the interactive Plotly time series in the\n",
+            " Viewer window only shows the observed data.\n\n"
           )
         }
-
-        ax.info$axL1 <- .format_date_labels(x.dates[indices], ts_unit)
       }
+
       else  # not time series
         connect <- FALSE
 
@@ -1453,19 +1478,19 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
         fill=fill, border=color, shape=shape, pt.size=size.pt,
         x.lab=x.lab, y.lab=y.lab,
         ax=ax.info, gridT1=gridT1, gridT2=gridT2,
-        digits_d=digits_d,
+        digits_d=digits_d, date.var=date.var,
         fit_color=fit_color, fit_lwd=fit_lwd, ln.type=1,
-        connect=connect,
+        connect=connect, ts_unit=ts_unit,
         power=power, radius.in=0.12, size.name=getOption("sizename"),
-        ellipse_region = ellipse_region, ellipse_fill = ellipse_fill,
-        ellipse_color = if (n.by <= 1L) ellipse_color else NULL,
-        ellipse_lwd = ellipse_lwd,
-        se.poly = se.poly, se_fill = se_fill,
-        pt_opacity = 1 - pt.trans
+        ellipse_region=ellipse_region, ellipse_fill=ellipse_fill,
+        ellipse_color=if (n.by <= 1L) ellipse_color else NULL,
+        ellipse_lwd=ellipse_lwd,
+        se.poly=se.poly, se_fill=se_fill, 
+        pt_opacity=1 - pt.trans
       )
 
     if (.allow.interactive())
-      .viewer_notice_once(plot_name = "scatter", window_target = "Both")
+      .viewer_notice_once(plot_name="scatter", window_target="Both")
 
       if (.allow.interactive()) print(plt)  # show in Viewer
     }  # end use_plotly

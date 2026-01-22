@@ -1,3 +1,18 @@
+
+.format_date_labels <- function(dates, ts_unit) {
+  # ts_unit is unknown if x is a time series to begin with
+  ts_unit <- match.arg(ts_unit, c("years","quarters","months","weeks", 
+                                  "days","days7", "unknown"))
+  switch(ts_unit,
+    years    = format(dates, "%Y"),
+    quarters = paste0(format(dates, "%Y"), " ", quarters(dates)),
+    months   = format(dates, "%b %Y"),
+    weeks    = format(dates, "%d %b %Y"),
+    days     = format(dates, "%d %b %Y"),
+    days7    = format(dates, "%d %b %Y")
+  )
+}
+
 .check.packages <- function() {
   required_pkgs <- c("tsibble", "fable", "fabletools")
   not_installed <- required_pkgs[!sapply(required_pkgs, requireNamespace,

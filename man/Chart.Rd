@@ -8,11 +8,12 @@
 
 \description{
 
-\code{lessR} introduces the concept of a \emph{data view} visualization function, in which the choice of visualization function directly reflects the structure of the data and the analyst's goal for understanding the data. The function \code{Chart()} visualizes the distribution of a categorical variable along with related statistics from aggregated data of a numerical variable, either counts or a statistic such as the mean of another numerical variable. Choose the type of visualization according to the value of the parameter \code{type}. 
+\code{lessR} introduces the concept of a \emph{data view} visualization function, in which the choice of visualization function directly reflects the structure of the data and the analyst's intent for understanding the data. The function \code{Chart()} visualizes the distribution of a categorical variable along with related statistics from aggregated data of a numerical variable, either counts or a statistic such as the mean of another numerical variable. Choose the type of visualization according to the value of the parameter \code{type}. 
 \itemize{
 \item Bar chart with \code{type = "bar"}, the default value
 \item Radar chart with \code{type = "radar"}
 \item Bubble chart with \code{type = "bubble"}
+\item Dot chart with \code{type = "dot"}
 \item Pie chart with \code{type = "pie"}
 \item Starburst chart with \code{type = "pie"} and another categorical variable(s) with \code{by}
 \item Treemap chart with \code{type = "treemap"}
@@ -41,7 +42,7 @@ Chart(
 
         # -----------------------------------
         # Chart type, defaults to a bar chart
-        type=c("bar", "radar", "bubble", "pie", "icicle", "treemap"),
+        type=c("bar", "radar", "bubble", "dot", "pie", "icicle", "treemap"),
         hole=0.65,  # pie chart
         radius=0.35, power=0.5,  # bubble chart
 
@@ -51,7 +52,7 @@ Chart(
         stat_x=c("count", "proportion"),
 
         # --------------------------------------------------------------
-        # Bar chart parameters: Facet plot, stratify on different panels
+        # Facet plot, stratify on different panels
         facet=NULL, n_row=NULL, n_col=NULL, aspect="fill",
         
         # -----------------------------------------------------

@@ -3,15 +3,15 @@ plt.plotly <- function(
   by.name, n.by,
   fill, border, shape, pt.size,
   x.lab, y.lab, ax, gridT1, gridT2,
-  digits_d = 2,
-  fit_color = border, fit_lwd = NULL, ln.type = NULL,
-  connect = FALSE,                 # for time series
-  power = 0.5, radius.in = 0.12,   # area = size^power (for bubble mode)
-  size.name = "Size",
-  ellipse_region = NULL, ellipse_fill = NULL,
-  ellipse_color = NULL, ellipse_lwd = NULL,
-  se.poly = NULL, se_fill = NULL,
-  pt_opacity = 0.95               # <-- NEW: user-controlled fill alpha [0,1]
+  digits_d=2, date.var,
+  fit_color=border, fit_lwd=NULL, ln.type=NULL,
+  connect=FALSE, ts_unit=NULL,                 # for time series
+  power=0.5, radius.in=0.12,   # area=size^power (for bubble mode)
+  size.name="Size",
+  ellipse_region=NULL, ellipse_fill=NULL,
+  ellipse_color=NULL, ellipse_lwd=NULL,
+  se.poly=NULL, se_fill=NULL,
+  pt_opacity=0.95
 ) {
 
   # null-coalesce helper
@@ -23,6 +23,7 @@ plt.plotly <- function(
   pt_opacity <- max(0, min(1, pt_opacity))
 
   # ---- bubbles (global scale) ----
+  # should also apply to discrete bubble plots, e.g., XY(Dept, Gender)
   dpi <- getOption("plotly_dpi", 96)
   pt_rows  <- rep(TRUE, nrow(g))
   size_vec <- as.numeric(g$size)
@@ -41,36 +42,54 @@ plt.plotly <- function(
     bubble.diam <- NULL
   }
 
-  # ---- grouping ----
+
+# groups set up -----------------------------------------------------------
+
   ind_chr   <- trimws(as.character(g$ind))
   valid     <- !is.na(ind_chr)
-  idx_list  <- split(seq_len(nrow(g))[valid], ind_chr[valid], drop = TRUE)
+  idx_list  <- split(seq_len(nrow(g))[valid], ind_chr[valid], drop=TRUE)
   grp_names <- names(idx_list)
   has_groups <- length(grp_names) > 1L
 
-  # ---- init ----
+
+# initialization ----------------------------------------------------------
   plt <- plotly::plot_ly()
+  border_hex <- .to_hex(border)  # fully opaque borders
 
-  # convenience: fully opaque borders; fill alpha set by pt_opacity
-  border_hex <- .to_hex(border)
 
-  # ---- no groups ----
+# no groups ---------------------------------------------------------------
+
   if (!has_groups) {
-    xv <- as.numeric(g$x); yv <- as.numeric(g$y)
-    hover_tmpl <- .hover.fmt(xv, yv, x.lab, y.lab, FALSE, digits_d)
+
+    if (!is.null(ts_unit)) {
+      xv <- as.Date(g$x, origin="1970-01-01")
+      xv <- .format_date_labels(xv, ts_unit)
+      xlab_h <- "Date"          # <--- add this
+    } else {
+      xv <- as.numeric(g$x)
+      xlab_h <- x.lab
+    }
+    yv <- as.numeric(g$y)
+
+    y.lab.h <- trimws(y.lab)
+    hover_tmpl <- .hover.fmt(xv, yv, xlab_h, y.lab.h, FALSE, digits_d, ts_unit)
+
+    xv <- as.numeric(g$x)        # keep numeric for plotly axis
 
     # size/marker setup
     if (use_bubbles) {
       diam_px <- bubble.diam(size_vec)
       hover_tmpl <- sub(
         "<extra></extra>$",
-        paste0("<br>", size.name, ": %{customdata:.", digits_d, "f}<extra></extra>"),
+        paste0("<br>", size.name, ": %{customdata:.",
+               digits_d, "f}<extra></extra>"),
         hover_tmpl
       )
       customdata <- size_vec
-    } else {
+    }
+    else {
       px <- as.numeric(pt.size) * 7.25
-      if (!is.finite(px) || px <= 0) px <- 5
+      if (!is.finite(px)) px <- 5
       diam_px   <- rep(px, length(xv))
       customdata <- NULL
     }
@@ -80,7 +99,7 @@ plt.plotly <- function(
       "24"="triangle-up","25"="triangle-down","circle"
     )
 
-    # IMPORTANT: set alpha via rgba colors, and leave marker.opacity at 1
+    # set alpha via rgba colors, and leave marker.opacity at 1
     marker_color <- .maketrans_plotly(fill, alpha = pt_opacity)
 
     plt <- plotly::add_trace(
@@ -102,8 +121,12 @@ plt.plotly <- function(
       showlegend    = FALSE
     )
 
-  } else {
-    # ---- groups ----
+  }
+
+
+# groups ------------------------------------------------------------------
+
+  else {  # ---- groups ----
     symbol <- switch(as.character(shape),
       "21"="circle","22"="square","23"="diamond",
       "24"="triangle-up","25"="triangle-down","circle"
@@ -114,24 +137,45 @@ plt.plotly <- function(
       idx <- idx_list[[nm]]
       if (!length(idx)) next
 
-      xv <- as.numeric(g$x[idx]); yv <- as.numeric(g$y[idx])
+# --- x for hover (formatted as Date if time series) ---
+      if (!is.null(ts_unit)) {
+        xv_h <- as.Date(g$x[idx], origin = "1970-01-01")
+        xv_h <- .format_date_labels(xv_h, ts_unit)
+        xlab_h <- "Date"   # generic label for time series hover
+      } else {
+        xv_h   <- as.numeric(g$x[idx])
+        xlab_h <- x.lab
+      }
+
+      yv <- as.numeric(g$y[idx])
+
+      y.lab.h <- trimws(y.lab)
       hover.i <- sub(
         "<extra></extra>$",
         paste0("<br>", by.name, ": %{text}<extra></extra>"),
-        .hover.fmt(xv, yv, x.lab, y.lab, FALSE, digits_d)
+        .hover.fmt(xv_h, yv, xlab_h, y.lab.h, FALSE, digits_d, ts_unit)
       )
+
+# --- x for plotly axis positioning (keep numeric day index) ---
+      xv <- as.numeric(g$x[idx])
 
       if (use_bubbles) {
         diam_px  <- bubble.diam(size_vec[idx])
         hover.i  <- sub(
           "<extra></extra>$",
-          paste0("<br>", size.name, ": %{customdata:.", digits_d, "f}<extra></extra>"),
-          hover.i
+          paste0("<br>", size.name,
+                 ": %{customdata:.", digits_d, "f}<extra></extra>"), hover.i
         )
         custom.i <- size_vec[idx]
-      } else {
+
+      }
+      else {
+        # Point sizing for standard scatter / time-series.
+        # - If user sets pt.size = 0, we suppress markers entirely (lines only).
+        # - Otherwise, scale to plotly pixels.
         px <- as.numeric(pt.size) * 6.5
-        if (!is.finite(px) || px <= 0) px <- 5
+        if (!is.finite(px)) px <- 5
+        if (px < 0) px <- 5
         diam_px  <- rep(px, length(idx))
         custom.i <- NULL
       }
@@ -139,25 +183,52 @@ plt.plotly <- function(
       # per-group fill with desired alpha
       fill_i <- .maketrans_plotly(fill[i], alpha = pt_opacity)
 
+      # ---- Main data trace ----
+      # For connected series, keep markers on the plot, remove from the legend
+      # by adding a separate legend-only line trace (below).
+      mode_data <- if (connect) {
+        if (use_bubbles) "lines+markers"
+        else if (diam_px[1] <= 0) "lines" else "lines+markers"
+      } else {
+        "markers"
+      }
+
       plt <- plotly::add_trace(
         plt,
         type = "scatter",
-        mode = if (connect) "lines+markers" else "markers",
+        mode = mode_data,
         name = nm, legendgroup = nm, text = nm,
         x = xv, y = yv,
-        marker = list(
+        marker = if (grepl("markers", mode_data, fixed = TRUE)) list(
           symbol   = symbol,
           size     = diam_px,
           sizemode = "diameter",
           color    = fill_i,
           opacity  = 1,
           line     = list(color = border[i], width = 1)
-        ),
+        ) else NULL,
         line  = if (connect) list(color = border[i], width = 1.5) else NULL,
         hovertemplate = hover.i,
         customdata    = custom.i,
-        showlegend    = TRUE
+        showlegend    = if (connect) FALSE else TRUE
       )
+
+      # ---- Legend-only line sample (no dot) ----
+      if (connect) {
+        # Use a tiny segment so legend shows a line only.
+        if (length(xv) >= 2L) {
+          plt <- plotly::add_trace(
+            plt,
+            type = "scatter",
+            mode = "lines",
+            name = nm, legendgroup = nm,
+            x = xv[1:2], y = yv[1:2],
+            line = list(color = border[i], width = 1.5),
+            hoverinfo = "skip",
+            showlegend = TRUE
+          )
+        }
+      }
     }
   }
 
@@ -172,10 +243,14 @@ plt.plotly <- function(
     target_len <- if (has_groups) length(grp_names) else 1L
     if (n_ell != target_len) ell_list <- rep(ell_list, length.out = target_len)
 
-    edge_vec  <- if (length(ellipse_color)) .to_hex(rep_len(ellipse_color, target_len))
-                 else .to_hex(rep_len(border,       target_len))
-    lw_vec    <- as.numeric(if (length(ellipse_lwd)) rep_len(ellipse_lwd, target_len) else rep(1, target_len))
-    fill_vec  <- if (length(ellipse_fill)) rep_len(ellipse_fill, target_len) else rep("transparent", target_len)
+    edge_vec <- if (length(ellipse_color))
+                    .to_hex(rep_len(ellipse_color, target_len))
+                 else .to_hex(rep_len(border, target_len))
+    lw_vec   <- as.numeric(if (length(ellipse_lwd))
+                       rep_len(ellipse_lwd, target_len) else rep(1, target_len))
+    fill_vec <- if (length(ellipse_fill))
+                       rep_len(ellipse_fill, target_len)
+                 else rep("transparent", target_len)
 
     for (k in seq_len(target_len)) {
       el <- as.data.frame(ell_list[[k]])
@@ -246,7 +321,8 @@ plt.plotly <- function(
           legendgroup   = "fit"
         )
       }
-    } else {
+    }
+    else {
       gnames <- names(idx.fit)
       for (i in seq_along(gnames)) {
         nm   <- gnames[i]
@@ -258,7 +334,8 @@ plt.plotly <- function(
         fmtx <- .get.tick.fmt(xl, digits_d); fmty <- .get.tick.fmt(yl, digits_d)
         hover <- paste0(
           x.lab, ": %{x", if (nzchar(fmtx)) paste0(":", fmtx) else "", "}",
-          "<br>Fit (", nm, "): %{y", if (nzchar(fmty)) paste0(":", fmty) else "", "}",
+          "<br>Fit (", nm, "): %{y", if (nzchar(fmty))
+                                     paste0(":", fmty) else "", "}",
           "<extra></extra>"
         )
 
@@ -308,9 +385,17 @@ plt.plotly <- function(
   plt$x$layout$plot_bgcolor  <- .to_hex(getOption("panel_fill",  "white"))
   plt$x$layout$paper_bgcolor <- .to_hex(getOption("window_fill", "white"))
 
-  # ---- margin bottom fix ----
   if (is.null(plt$x$layout$margin)) plt$x$layout$margin <- list()
-  plt$x$layout$margin$b <- max(plt$x$layout$margin$b %||% 40, 60)
+
+  # default bottom margin you want for most plots
+   b_default <- plt$x$layout$margin$b %||% 40
+
+  if (!nzchar(x.lab)) {
+    plt$x$layout$margin$b <- min(b_default, 0)
+  } else {
+    # keep your original intent for non-time-series / labeled axes
+    plt$x$layout$margin$b <- max(b_default, 60)
+  }
 
   plt <- .finalize_plotly_widget(
     plt,

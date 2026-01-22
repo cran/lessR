@@ -285,7 +285,7 @@ function(
   # reset all parameters to start-up condition for new theme
   if (reset) {
     if (!miss_theme) {
-      suppressPackageStartupMessages(.onAttach())
+      suppressPackageStartupMessages(.onLoad())
       bar_fill <- getOption("bar_fill")
       miss_theme <- FALSE
       theme <- match.arg(theme)

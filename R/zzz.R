@@ -10,31 +10,32 @@ if (getRversion() >= "3.6.0")
 .onAttach <- function(libname, pkgname) {
   packageStartupMessage(
     "\n",
-    "lessR 4.5                            feedback: gerbing@pdx.edu \n",
+    "lessR 4.5.1                          feedback: gerbing@pdx.edu \n",
     "--------------------------------------------------------------\n",
     "> d <- Read(\"\")  Read data file, many formats available, e.g., Excel\n",
     "  d is the default data frame, data= in analysis routines optional\n",
     "\n",
-    "Many examples of reading, writing, and manipulating data, graphics,\n",
+    "Find examples of reading, writing, and manipulating data, graphics,\n",
     "testing means and proportions, regression, factor analysis,\n",
     "customization, forecasting, and aggregation to pivot tables.\n",
-    "  Enter: browseVignettes(\"lessR\")\n\n",
-    "View lessR updates, now including modern time series forecasting\n",
-    "  and many, new Plotly interactive visualizations output. Most\n",
-    "  visualization functions are now reorganized to three functions:\n",
+    "  Enter: browseVignettes(\"lessR\")\n",
+    "\n",
+    "Although most previous function calls still work, most\n",
+    "visualization functions are now reorganized to three functions:\n",
     paste0(
-      "     Chart(): type=\"bar\", \"pie\", \"radar\", \"bubble\", ",
-      "\"treemap\", \"icicle\"\n"
+      "   Chart(): type = \"bar\", \"pie\", \"radar\", \"bubble\", \"dot\",\n",
+      "                   \"sunburst\", \"treemap\", \"icicle\"\n"
     ),
-    "     X(): type=\"histogram\", \"density\", \"vbs\" and more\n",
+    "   X(): type=\"histogram\", \"density\", \"vbs\", and more\n",
     paste0(
-      "     XY(): type=\"scatter\" for a scatterplot, or ",
+      "   XY(): type=\"scatter\" for a scatterplot, or ",
       "\"contour\", \"smooth\"\n"
     ),
-    "   Most previous function calls still work, such as:\n",
-    "     BarChart(), Histogram, and Plot().\n",
+    "There is also Flows() for Sankey flow diagrams.\n",
+    "\n",
+    "View lessR updates, now including modern time series forecasting.\n",
     "  Enter: news(package=\"lessR\"), or ?Chart, ?X, or ?XY\n",
-    "There is also Flows() for Sankey flow diagrams, see ?Flows\n\n",
+    "\n",
     "Interactive data analysis for constructing visualizations.\n",
     "  Enter: interact()\n"
   )
@@ -52,7 +53,7 @@ if (getRversion() >= "3.6.0")
 
   # helper: set an option only if not already set
   .set_opt_default <- function(name, value) {
-    if (is.null(getOption(name, NULL)))
+#   if (is.null(getOption(name, NULL)))
       options(structure(list(value), names = name))
   }
 
@@ -1299,12 +1300,18 @@ function(lab, labcex, cut, nm, var.nm, units) {
 .axis.format <- function(axT, axis_fmt, axis_x_pre, axis_y_pre) {
   lbls <- na.omit(axT)  # Remove NA values
 
-  if ("K" %in% axis_fmt) {
-    if (all(axT %% 100 == 0) && all(abs(axT)[abs(axT) > 0] > 1000))
-#     lbls <- trimws(paste0(lbls %/% 1000, "K"))  # int division
-      lbls <- trimws(paste0(lbls / 1000, "K"))
-    else
-      lbls <- trimws(format(lbls, nsmall=0, big.mark=",", decimal.mark="."))
+  if ("K" %in% axis_fmt) { # if values >= 1 billion, use scientific notation
+    if (any(abs(axT) >= 1e9))
+      lbls <- trimws(format(lbls, scientific = TRUE))
+    else { # Safe "multiple of 100" check without %% (tolerance-based)
+      is_mult_100 <- all(abs(axT / 100 - round(axT / 100)) < 1e-10)
+      if (is_mult_100 && all(abs(axT)[abs(axT) > 0] > 1000))
+        lbls <- trimws(paste0(lbls / 1000, "K"))
+      else
+        if (any(axT > 9999))  # do not want , if numbers < 10000, e.g. years
+          lbls <- trimws(format(lbls, nsmall = 0, big.mark = ",",
+                         decimal.mark = "."))
+    }
   }
 
   if ("," %in% axis_fmt)
@@ -1323,11 +1330,6 @@ function(lab, labcex, cut, nm, var.nm, units) {
       lbls=paste(axis_y_pre, lbls, sep="")
   }
 
-#if (!(any(c("K", "$") %in% axis_fmt)))  {
-#   dec.d <- .getdigits(round(axT,6),1) - 1
-#   lbls <- .fmt(axT, dec.d)
-    # nsmall=0: no additional added decimal places if not already present
-#}
   return(lbls)
 }
 
@@ -1350,10 +1352,10 @@ function(lab, labcex, cut, nm, var.nm, units) {
   usr <- par("usr")
   ax <- .axes_dim()  # get axis values parameters: color, lwd, lty, cex
 
-  # x-ax\is
-  # -------
+  # x-axis
+  # ------
 
-  # numeric, uses axT1
+  # numeric, uses axT1, axLn is the labels
   if (is.null(x.lvl)  &&  !is.null(axT1)) {
     if (!y.only) {  # do x axis in calling routine for time series
       axT1 <- axT1[which(axT1 >= usr[1]  &  axT1 <= usr[2])]

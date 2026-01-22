@@ -1,3 +1,56 @@
+# lessR version 4.5.1, January 22, 2026
+
+## Updates
+
+* `Chart()`, `X()`, `XY()`: If all numerical axis values are less than 10,000, then by default do not insert a comma, such as years as integers instead of dates, display 2025 instead of 2,025. If any axis value is larger than 1 billion, use scientific notation.
+
+* `Chart()`: For computing a statistic of a numerical variable from which to construct a hierarchical chart -- pie and sunburst, treemap, and icicle -- now the statistic weighted by sample size is displayed, such as the weighted mean according to the sample size of each group, instead of just the unweighted average of the available group means.
+
+* `Chart()`: For a hierarchical chart -- pie and sunburst, treemap, and icicle -- now the hover over each cell or slice indicates the corresponding sample size for any statistic other than the count.
+
+* `Chart()`: For a Cleveland dot plot, set `type="dot"` and specify the categorical $x$-variable with unique values and specify a continuous variable for $y$. The reserved keyword `row_names` is available for the argument to $x$. 
+
+
+## Bug Fixes
+
+`Chart()`, `X()`, and `XY()`: If `quiet` is `TRUE`, the citation to Plotly is not displayed.
+
+`Chart()`: For data aggregated by the function, the hover title does not list the statistic type twice, and the hover value is reported to two more decimal digits than the data to account for the computation of the mean, etc.
+
+`style()`: Works more consistently.
+
+`X()`: For `type="vbs", point size now responds to parameter `pt_size`.  
+
+`X()`: For `type="freq_poly"`, parameter `stat` now works.  
+
+`XY()`: Parameter `ts_area_fill` is now working.
+
+`XY()`: When there is missing data for a time series, now properly plotted as missing, that is, blank space, with the corresponding dates showing.
+
+`XY()`: For an interactive plotly time series:
+  + `size=0` for the point size now works.
+  + Hover now has an x-value variable name and shows the corresponding numeric value as a number instead a formatted as a date.
+  + digits_d now works
+
+`XY()`: For a time series plot, misleading suggestions removed. 
+
+`XY()`: For a time series plot from an R time series object, the $y$-axis label is now correct. 
+
+`XY()`: For the interactive time series plot, the `size` variable for the size of points beyond the default of zero now active. 
+
+`XY()`: For the paired dot plot (not yet moved to `Chart()` where it belongs under the recent reorganization), the unique character values such as row names are now properly aligned with the plotted points, and sorted properly.
+
+
+## Future
+
+`XY()`: Allow for a bubble chart when $x$ and $y$ are both categorical.
+
+`XY()`: Allow for forecasts in the interactive plotly display (RStudio `Viewer`), not only to the static (RStudio `Plots`) display.
+
+`Chart()`, `X()`, and `XY()`: For the plotly charts, allow for specifying the font sizes of different displays.
+
+ 
+
 # lessR version 4.5, December 10, 2025
 
 ## Major Updates
@@ -6,9 +59,9 @@
 
 * `Chart()`: Parameter `type` determines the visualization form. Values include `"bar"`, `"pie"`, `"radar"`, `"treemap"`, and `"icicle"`. `"sunburst"` is also available, but pie charts with a `by` variable automatically operate as sunburst charts.
 
-* `X()`: New general function for visualizing the distribution of a continuous variable, optionally grouped by a categorical variable. Implements the standard histogram plus additional distribution displays according to the type parameter.
+* `X()`: New general function for visualizing the distribution of a continuous variable, optionally grouped by a categorical variable. Implements the standard histogram plus additional distribution displays according to the new `type` parameter.
 
-* `XY()`: New general function for visualizing the joint distribution of two continuous variables or one continuous and one categorical variable, with optional subgrouping. Incorporates the standard scatterplot as the default plus additional visualizations selected via the `type` parameter.
+* `XY()`: New general function for visualizing the joint distribution of two continuous variables or one continuous and one categorical variable, with optional subgrouping. Incorporates the standard scatterplot as the default plus additional visualizations selected via the new `type` parameter.
 
 * `BarChart()` and `PieChart()`: These established `lessR` functions now serve as aliases to the unified `Chart()` function, preserving existing user scripts while providing access to the expanded visualization framework.
 

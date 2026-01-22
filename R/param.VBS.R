@@ -115,7 +115,7 @@ if (getOption("suggest") && !quiet) {
       cmts[1], cmts[2], cmts[3], sep="")
 
   if (!grepl("box_adj", fncl)) {
-    txt <- ", box_adj=TRUE, type=\"vbs\")  # Adjust boxplot whiskers for asymmetry"
+    txt <- ", box_adj=TRUE, type=\"vbs\")  # Adjust whiskers for asymmetry"
     txsug <- paste(txsug, "\n", fc, txt, sep="")
   }
 

@@ -1,7 +1,7 @@
 Chart <-
 function(x=NULL, by=NULL, y=NULL, data=d, filter=NULL,
 
-        type=c("bar", "radar", "bubble", "pie", "icicle", "treemap"),
+        type=c("bar", "radar", "bubble", "dot", "pie", "icicle", "treemap"),
         hole=0.65,  # pie chart
         radius=0.35, power=0.5,  # bubble chart
 
@@ -97,9 +97,11 @@ function(x=NULL, by=NULL, y=NULL, data=d, filter=NULL,
         "The  facet  option is not available for bubble plots.\n\n")
   }
   facet.miss <- ifelse (missing(facet), TRUE, FALSE)
-  if (use_plotly && !(type == "bar" && !facet.miss)) {
-    txt <- "[Interactive chart from the Plotly R package (Sievert, 2020)]"
-    cat(txt, "\n\n")
+  if (type != "dot") {  # for now, goes to XY(), where this is also listed
+    if (!quiet && use_plotly && !(type == "bar" && !facet.miss)) {
+      txt <- "[Interactive chart from the Plotly R package (Sievert, 2020)]"
+      cat(txt, "\n\n")
+    }
   }
 
 # old stuff ---------------------------------------------------------------
@@ -376,6 +378,8 @@ function(x=NULL, by=NULL, y=NULL, data=d, filter=NULL,
       if (nchar(x.call[1]) > 5) x.call <- trimws(x.call, which="left")
   }  # !missing x
 
+  if (type %in% c("pie", "icicle", "treemap")) x.raw <- x.call  # save data
+
 
   # -------------------------------------------------
   # -------------------------------------------------
@@ -451,12 +455,22 @@ function(x=NULL, by=NULL, y=NULL, data=d, filter=NULL,
       by.name <- NULL
     }
 
+    if (type %in% c("pie", "icicle", "treemap")) by.raw <- by.call  # save data
+
 
 # --- resolve y ------------------------------------------------------
 
     y.name <- deparse(substitute(y), width.cutoff = 120L)  # can be NULL
     options(yname = y.name)
 
+  # process row.names if specified, applicable to type="dot"
+  if (y.name %in% c("row_names", "row.names")) {
+    # retain order of row names, otherwise will be alphabetical
+    y.call <- data.frame(factor(row.names(data), levels=row.names(data)))
+    if (is.null(ylab)) ylab <- ""  # unless specified, drop the axis label
+  }
+
+  else {
     if (!is.null(y.name))
       y.in.global <- .in.global(y.name, quiet)  # in global?, also vars list
     else
@@ -485,11 +499,15 @@ function(x=NULL, by=NULL, y=NULL, data=d, filter=NULL,
       }
       if (is.null(digits_d)) digits_d <- .max.dd(y.call)
     }  # end !missing(y)
+
     else {
       y.name <- "Count"
       y.call <- NULL
       if (is.null(digits_d)) digits_d <- 0  # y will be counts
     }
+  }  # end !row_name
+
+  if (type %in% c("pie", "icicle", "treemap")) y.raw <- y.call  # save data
 
 
 # --- resolve facet --------------------------------------------------
@@ -518,6 +536,8 @@ function(x=NULL, by=NULL, y=NULL, data=d, filter=NULL,
     options(facet1name = facet.name)
   }
  
+  if (type %in% c("pie", "icicle", "treemap")) facet.raw <- facet.call
+
 
 # ------------------------------------------------------------
 # -----------  x, y, by, and facet variables established -----
@@ -672,7 +692,7 @@ function(x=NULL, by=NULL, y=NULL, data=d, filter=NULL,
         }
       }  # is a summary table
       else {
-        if (!is.agg && stat.miss) {
+        if (!is.agg && stat.miss && type != "dot") {
           cat("\n"); stop(call.=FALSE, "\n------\n",
             "The data are not a summary (pivot) table, and you have a ",
             "numerical variable,\n",
@@ -791,7 +811,7 @@ function(x=NULL, by=NULL, y=NULL, data=d, filter=NULL,
       ## ----- aggregate --------------------------------------------------
       is.agg <- TRUE
       stat_out <- .stats(x.call, y.call, by.call, facet.call, stat, y.name)
-      out <- stat_out$out
+      out <- stat_out$out  # aggregated data
 
       if (is.null(ylab)) {
         ylab   <- stat_out$ylab
@@ -823,7 +843,7 @@ function(x=NULL, by=NULL, y=NULL, data=d, filter=NULL,
         x.tbl    = x.tbl,
         x.name   = x.name,
         x.lbl    = x.lbl,
-        by.name  = by.name,  # label string, not the columns
+        by.name  = by.name,  # l Beachabel string, not the columns
         y.name   = y.name,
         stat     = stat,
         digits_d = digits_d
@@ -831,6 +851,12 @@ function(x=NULL, by=NULL, y=NULL, data=d, filter=NULL,
 
       ## ----- Update x.call / by.call / facet.call / y.call ----------------
       ## After aggregation, downstream plotting should see the *reduced* data.
+
+      # save original data for .hier.plotly() hover before aggregation
+      x.raw <- x.call
+      y.raw <- y.call
+      by.raw <- by.call
+      facet.raw <- facet.call
 
       x.call <- out[["x"]]
       y.call <- out[["y"]]
@@ -945,12 +971,13 @@ function(x=NULL, by=NULL, y=NULL, data=d, filter=NULL,
 
   else if (type %in% c("sunburst", "treemap", "icicle") ||
           (type == "pie" && !is.null(by.call))) {
+    if (type == "pie") type <- "sunburst"
 
     plt <- .hier.plotly(
-      x.call = x.call,
-      by.call = by.call,
-      facet.call = facet.call,
-      y.call = if (exists("y.call")) y.call else NULL,
+      x.call = x.raw,
+      by.call = by.raw,
+      facet.call = facet.raw,
+      y.call = y.raw,
       x.name = x.name, by.name = by.name, facet.name = facet.name, y.name = y.name,
       type  = type,
       stat  = stat,
@@ -1009,6 +1036,49 @@ function(x=NULL, by=NULL, y=NULL, data=d, filter=NULL,
 
     else if (type == "radar") {
 
+      n.x <- length(unique(x.call))
+      if (n.x < 3) {  # Axes must define a polygon
+        stop("\n\n",
+          "radar(): The first categorical variable (x) must have at least ",
+          "3 levels to form a polygon. ",
+          "Found ", n.x, " levels for ", x.name, "."
+        )
+      }
+      n.by <- length(unique(by.call))
+
+      if (n.by == 1) {  # Must have at least two groups to compare
+        stop("\n\n",
+          "radar(): The second categorical variable (y) must have at least ",
+          "2 levels to define multiple polygons. ",
+          "Found ", n.by,  " levels for ", by.name, "."
+        )
+      }
+
+      # stop when any cell is empty:\
+      # not working now because NA's cause by.call and x.call different lengths
+      if (!is.null(by.call)) {
+
+        # ensure x is a vector
+        xv <- if (is.data.frame(x.call)) x.call[[1L]] else x.call
+        ok <- complete.cases(by.call, xv)
+
+        tbl <- table(by.call[ok], xv[ok], useNA = "no")
+
+        if (any(tbl == 0L)) {
+          zeros <- which(tbl == 0L, arr.ind = TRUE)
+          max_show <- 8L  # show up to a few examples
+          show_idx <- seq_len(min(nrow(zeros), max_show))
+          print(tbl)
+
+          stop("\n\n",
+               "radar(): One or more cells are missing, with 0 entries.\n",
+               "Radar polygons assume each group has a value at every axis.\n",
+               "Here, ", nrow(zeros), "  cells were found with count=0.\n\n",
+               "Use a larger sample, reduce the number of levels,\n",
+               " or choose a different chart.\n")
+        }
+      }
+
       if (transparency.miss && !is.null(by.call))
         trans <- 0.4
 
@@ -1037,6 +1107,49 @@ function(x=NULL, by=NULL, y=NULL, data=d, filter=NULL,
       if (.allow.interactive()) print(plt)
       return(invisible(plt))
     }
+
+
+# Chart(x=, y=, ...,  type="dot") -> delegate to XY() for now -------------
+
+    else if (type == "dot") {
+
+      calls <- sys.calls()  # the function call
+      top   <- calls[[1L]]
+      fun   <- top[[1L]]  # function name: Chart
+      if (identical(fun, quote(Chart)) || identical(fun, as.name("Chart"))) {
+
+        # Reconstruct original user call
+        #   Chart(Gender, y=row_names, type="dot", ...)
+        fun_call <- match.call(expand.dots = TRUE)
+
+        # Original x expression is the second argument
+        x_expr <- fun_call[[2L]]
+
+        # Get the by expression: prefer named 'by'
+        # fall back to second positional arg
+        y_expr <- fun_call$y
+        if (is.null(y_expr) && length(fun_call) >= 3L) {
+          # X(Salary, Gender, type="scatter") style
+          y_expr <- fun_call[[3L]]
+        }
+
+        if (is.null(y_expr)) {
+          stop("For Chart(..., type=\"scatter\"),\n",
+               "Supply a grouping variable via the second argument or by=.")
+        }
+
+        # transform to XY(x = y, y = x, ...)
+        fun_call[[1L]] <- as.name("XY")
+        fun_call$x     <- y_expr
+        fun_call$y     <- x_expr
+        fun_call$type  <- "scatter"
+        fun_call$ylab  <- ""
+
+        # XY() creates the dot plot
+        return(eval.parent(fun_call))
+      }
+    }
+
   }  # end x is a single var
   # ------------------------
   # ------------------------

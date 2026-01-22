@@ -36,9 +36,6 @@ function(x, y=NULL, data=d, filter=NULL,  # keep y=NULL for if x is a ts
     show_runs=FALSE,
     center_line=c("off", "mean", "median", "zero"),
 
-    stat=c("mean", "sum", "sd", "deviation", "min", "median", "max"),
-    stat_x=c("count", "proportion", "%"),
-
     vbs_plot="vbs", vbs_ratio=0.9, bw=NULL, bw_iter=10,
     violin_fill=getOption("violin_fill"),
     box_fill=getOption("box_fill"),
@@ -77,6 +74,8 @@ function(x, y=NULL, data=d, filter=NULL,  # keep y=NULL for if x is a ts
 
     n_cat=getOption("n_cat"), value_labels=NULL,
     rows=NULL, facet1=NULL, facet2=NULL, smooth=FALSE,
+    stat=c("mean", "sum", "sd", "deviation", "min", "median", "max"),
+    stat_x=c("count", "proportion", "%"),
 
     eval_df=NULL, fun_call=NULL, ...) {
 
@@ -101,7 +100,7 @@ function(x, y=NULL, data=d, filter=NULL,  # keep y=NULL for if x is a ts
   out_fitted <- NULL
   out_y.frcst <- NULL
 
-  if (use_plotly) {
+  if (!quiet && use_plotly) {
     txt <- "[Interactive chart from the Plotly R package (Sievert, 2020)]"
     cat(txt, "\n")
   }
@@ -156,9 +155,19 @@ function(x, y=NULL, data=d, filter=NULL,  # keep y=NULL for if x is a ts
       "Parameter  ts_unit  does not yet apply to facet plots.\n\n")
   }
 
-  if (type == "contour"  &&  !is.null(add)) {
+  if (type %in% c("contour", "smooth")  &&  !is.null(substitute(by))) {
     cat("\n"); stop(call.=FALSE, "\n------\n",
-      "Parameter  add  not active for contour plots.\n\n")
+      "Parameter  by  not active for \"contour\" or \"smooth\" plots.\n\n")
+  }
+
+  if (type %in% c("contour", "smooth")  &&  !is.null(substitute(facet))) {
+    cat("\n"); stop(call.=FALSE, "\n------\n",
+      "Parameter  facet  not active for \"contour\" or \"smooth\" plots.\n\n")
+  }
+
+  if (type %in% c("contour", "smooth")  &&  !is.null(add)) {
+    cat("\n"); stop(call.=FALSE, "\n------\n",
+      "Parameter  add  not active for  \"contour\" or \"smooth\" plots.\n\n")
   }
 
   if (is.logical(fit[1])) {
@@ -567,7 +576,7 @@ function(x, y=NULL, data=d, filter=NULL,  # keep y=NULL for if x is a ts
 
 # process x variable ------------------------------------------------------
 
-  # process row.names if specified
+  # process row.names if specified, is now LEGACY
   if (x.name %in% c("row_names", "row.names")) {
     # retain order of row names, otherwise will be alphabetical
     x.call <- data.frame(factor(row.names(data), levels=row.names(data)))
@@ -617,7 +626,8 @@ function(x, y=NULL, data=d, filter=NULL,  # keep y=NULL for if x is a ts
   # time series in global env
   # deconstruct to a data frame of dates for x var and then a df for y
   else if (is.ts(x)) {
-    y.name <- deparse(substitute(y))  # get the name of the time series
+    y.name <- deparse(substitute(x))  # get the name of the time series
+    ylab <- y.name
     options(yname = y.name)
     date.var <- TRUE
     if (is.null(xlab)) xlab <- ""  # unless specified, drop the axis label
@@ -644,9 +654,10 @@ function(x, y=NULL, data=d, filter=NULL,  # keep y=NULL for if x is a ts
   BPFM <- FALSE
   spmat <- FALSE
 
-  # just one x variable for now, a vector of cat or num values
-  # see if convert to variable of -- type Date --
-  if (n.xvar == 1) {
+
+# see if convert to variable of type Date ---------------------------------
+
+  if (n.xvar == 1) { # one x variable, a vector of cat or num values
 
     if (grepl("POSIX",  class(x.call[,1]), fixed=TRUE)[1])
       x.call[,1] <- as.Date(x.call[,1])
@@ -1151,29 +1162,31 @@ function(x, y=NULL, data=d, filter=NULL,  # keep y=NULL for if x is a ts
 
 # drop rows with missing data across x, y, by, facet, and size ------------
 
-  if (!spmat) {  # not a scatterplot matrix
-    # 1) Build a temporary data frame that contains all relevant columns
-    df <- data.frame(x.call)
-    if (!is.null(y.call)) df <- cbind(df, y.call)
-    if (!is.null(by.call)) df$..by <- by.call
-    if (!is.null(facet1.call)) df$..facet1 <- facet1.call
-    if (!is.null(facet2.call)) df$..facet2 <- facet2.call
-    if (!is.null(size) && length(size) > 1) df$..size <- size
+  if (!date.var) {  # except for time series
+    if (!spmat) {  # not a scatterplot matrix
+      # 1) Build a temporary data frame that contains all relevant columns
+      df <- data.frame(x.call)
+      if (!is.null(y.call)) df <- cbind(df, y.call)
+      if (!is.null(by.call)) df$..by <- by.call
+      if (!is.null(facet1.call)) df$..facet1 <- facet1.call
+      if (!is.null(facet2.call)) df$..facet2 <- facet2.call
+      if (!is.null(size) && length(size) > 1) df$..size <- size
 
-    # 2) Compute complete cases
-    cc <- stats::complete.cases(df)
+      # 2) Compute complete cases
+      cc <- stats::complete.cases(df)
 
-    # 3) Delete rows with missing data
-    if (!all(cc)) {
-      x.call <- x.call[cc, , drop = FALSE]
-      if (!is.null(y.call)) y.call <- y.call[cc, , drop = FALSE]
-      if (!is.null(by.call)) by.call <- by.call[cc]
-      if (!is.null(facet1.call)) facet1.call <- facet1.call[cc]
-      if (!is.null(facet2.call)) facet2.call <- facet2.call[cc]
-      if (!is.null(size) && length(size) > 1) size <- size[cc]
+      # 3) Delete rows with missing data
+      if (!all(cc)) {
+        x.call <- x.call[cc, , drop = FALSE]
+        if (!is.null(y.call)) y.call <- y.call[cc, , drop = FALSE]
+        if (!is.null(by.call)) by.call <- by.call[cc]
+        if (!is.null(facet1.call)) facet1.call <- facet1.call[cc]
+        if (!is.null(facet2.call)) facet2.call <- facet2.call[cc]
+        if (!is.null(size) && length(size) > 1) size <- size[cc]
+      }
+
+      rm(df)
     }
-
-    rm(df)
   }
 
 
@@ -1829,15 +1842,15 @@ function(x, y=NULL, data=d, filter=NULL,  # keep y=NULL for if x is a ts
       if (object == "point"  &&  data.do) {
         if (!cat.x && cat.y && y.unique) {
           if (seg.y.miss) if (y.unique && cat.y) segments_y <- TRUE
-          origin_x <- 0
+          if (is.null(origin_x)) origin_x <- 0
         }
         if (cat.x && !cat.y && x.unique) {
           if (seg.x.miss) if (x.unique && cat.x) segments_x <- TRUE
-          origin_y <- 0
+          if (is.null(origin_y)) origin_y <- 0
         }
       }
 
-      # sort y by x option (intended for Cleveland dot plot)
+      # sort y by x option for 1 var Cleveland dot plot
       srt.dwn <- ifelse (sort == "-", FALSE, TRUE)
       if (sort != "0") {
         if (n.xvar == 1) {  # one x-variable
@@ -1858,43 +1871,56 @@ function(x, y=NULL, data=d, filter=NULL,  # keep y=NULL for if x is a ts
             x.call[,1] <- x.vals[ord]
           }
         }
-        else if (n.xvar == 2) {  # two x-vars, sort on diffs
-          if (!cat.x && cat.y) {
-            x.call <- x.call[order(x.call[,2]-x.call[,1], decreasing = TRUE), ]
-          }
-          if (cat.x && !cat.y) {
-            y.call <- y.call[order(y.call[,2]-y.call[,1], decreasing = TRUE), ]
-          }
-        }
-      }  # end sort
+      }  # end 1 x var sort
 
-      # for Cleveland dot plot of two vars, print difference by level
+      # for Cleveland paired-dot plot, two x-vars
+      # sort by diffs AND print differences, y must be cat
+      segments_diff <- ifelse (n.xvar == 2 && ncol(x.call) == 2 && cat.y &&
+                               y.unique, TRUE, FALSE)
+
       txdif <- NULL
-      if (n.xvar==2  &&  ncol(x.call)==2  &&  !quiet) {
-        tx <- character(length=0)
-        difs <- x.call[,2] - x.call[,1]
-        ord <- order(difs, decreasing=srt.dwn)
-        dd <- .max.dd(c(x.call[1], x.call[2])) + 1
+      if (segments_diff && !quiet) {
+
+        # compute diffs and a single ordering
+        difs <- x.call[, 2] - x.call[, 1]
+        ord  <- order(difs, decreasing = srt.dwn)
+
+        x.call <- x.call[ord, , drop = FALSE]
+        y.call <- y.call[ord, , drop = FALSE]
+        difs   <- difs[ord]
+
+        # printed output table now in the same order as the plot
+        tx <- character(0)
+
+        dd <- .max.dd(c(x.call[, 1], x.call[, 2])) + 1L
         if (dd > getOption("digits")) dd <- getOption("digits")
-        ny <- nrow(y.call)
+
+        ny   <- nrow(y.call)
         mx.i <- nchar(as.character(ny))
         mx.d <- max(nchar(.fmt(difs, dd)))
-        mx.f <- ifelse (is.factor(y.call[,1]),
-           max(nchar(as.character(levels(y.call[,1])))), 5)  #  5 is dummy
-        tx[length(tx)+1] <- paste(.fmtc("n",mx.i), " ",
-            .fmtc(" diff", mx.d), "  Row", sep="")
-        tx[length(tx)+1] <- .dash2(mx.i + mx.d + mx.f + 2, "-")
-        if (ny <= 20)
+        y_labels <- as.character(y.call[, 1])
+        mx.f <- max(5L, nchar(y_labels), na.rm = TRUE)
+
+        tx[length(tx) + 1L] <- paste(.fmtc("n", mx.i), " ",
+                                     .fmtc(" diff", mx.d), "  Row", sep = "")
+        tx[length(tx) + 1L] <- .dash2(mx.i + mx.d + mx.f + 2L, "-")
+
+        if (ny <= 20L)
           rng <- 1:ny
         else
-          rng <- c(1:10, (ny-10):ny)
+          rng <- c(1:10, (ny - 9L):ny)
+
+        # for the printed list to match the visual "top of plot first",
+        # print from last row to first row
         for (i in 1:ny) {
-          k <- nrow(y.call) - (i - 1)  # reverse order, + diffs first
-          if (i %in% rng)
-            tx[length(tx)+1] <- paste(.fmti(i, mx.i),
-              .fmt(difs[ord[k]], dd, mx.d), levels(y.call[,1])[k])
+          k <- ny - (i - 1L)
+          if (i %in% rng) {
+            txt <- paste(.fmti(i, mx.i), .fmt(difs[k], dd, mx.d), y_labels[k])
+            tx[length(tx) + 1L] <- txt
+          }
         }
-        txdif <- tx  # a little hack, only display in .plt.txt
+
+        txdif <- tx  # displayed later in .plt.txt
       }  # end two var Cleveland dot plot
 
       # bigger point for scatterplot of stats (instead of data)
@@ -1944,7 +1970,9 @@ function(x, y=NULL, data=d, filter=NULL,  # keep y=NULL for if x is a ts
       else
         min.y <- NULL
 
-      # if x is a Date variable
+
+# if x is a Date variable -------------------------------------------------
+
       #   if not specified, get the existing ts_unit
       #   if specified, aggregate the values of y.call over x.call
       if (date.var) {
@@ -2058,33 +2086,92 @@ function(x, y=NULL, data=d, filter=NULL,  # keep y=NULL for if x is a ts
       # m out, mostly the visualization, sometimes some stats
 
       if (do_plot)  {
-        m.out <- .plt.main(x.call, y.call, by.call,
-          cat.x, cat.y, object, stat,
-          pt.fill, ts_area_fill, pt.color, pt.trans, segment_color,
-          xy_ticks, xlab, ylab, main, main_cex, sub,
-          rotate_x, rotate_y, offset, proportion, origin_x, origin_y,
-          pt.size, line_width, shape, means,
-          segments, segments_y, segments_x,
-          type, smooth_points, smooth_size, smooth_power, smooth_bins,
-          contour_n, contour_nbins, contour_points,
-          radius, power, size_cut, bbl.txt.col,
-          col.low=low_fill, col.hi=hi_fill,
-          ID.call, ID_color, ID_size, outlpts,
-          out_fill, out_color, out_shape, out_shape.miss,
-          fit.ln, fit_power, fit_color, fit_lwd, fit_new,
-          fit_se, se_fill, plot_errors,
-          ellipse, ellipse_color, ellipse_fill, ellipse_lwd,
-          run, center_line, ts_stack,
-          ts_unit, ts_agg, do.agg, ts_ahead, ts_fitted, ts_n_x_tics,
-          y.fit, y.hat, x.fit, x.hat, y.upr, y.lwr,
-          mx.x, mn.y, mx.y,
-          freq.poly, jitter_x, jitter_y,
-          xlab.adj, ylab.adj, bm.adj, lm.adj, tm.adj, rm.adj,
-          scale_x, scale_y, pad_x, pad_y,
-          axis_fmt, axis_x_prefix, axis_y_prefix,
-          legend_title, use_plotly,
-          add, x1, x2, y1, y2, add_cex, add_lwd, add_lty,
-          add_color, add_fill, add_trans, quiet, ...)
+
+        m.out <- .plt.main(
+          x=x.call, y=y.call, by=by.call,
+          cat.x=cat.x, cat.y=cat.y,
+          object=object, stat=stat,
+
+          fill=pt.fill,
+          ts_area_fill=ts_area_fill,
+          color=pt.color,
+          pt.trans=pt.trans,
+          col.segment=segment_color,
+
+          xy_tics=xy_ticks,
+          xlab=xlab, ylab=ylab, main=main, main_cex=main_cex, sub=sub,
+          rotate_x=rotate_x, rotate_y=rotate_y,
+
+          offset=offset, prop=proportion,
+          origin_x=origin_x, origin_y=origin_y,
+
+          size=pt.size, ln.width=line_width, shape=shape, means=means,
+
+          segments=segments, segments_y=segments_y, segments_x=segments_x,
+          segments_diff=segments_diff,
+
+          type=type,
+          smooth_points=smooth_points, smooth_size=smooth_size,
+          smooth_power=smooth_power, smooth_bins=smooth_bins,
+
+          contour_n=contour_n,
+          contour_nbins=contour_nbins, contour_points=contour_points,
+
+          radius=radius, power=power, size_cut=size_cut,
+          bbl.txt.col=bbl.txt.col,
+
+          col.low=low_fill, col.hi =hi_fill,
+
+          ID=ID.call, ID_color=ID_color, ID_size=ID_size, out_ind=outlpts,
+
+          out_fill=out_fill, out_color=out_color,
+          out_shape=out_shape, out_shape.miss=out_shape.miss,
+
+          fit.line=fit.ln, fit_power=fit_power, fit_color=fit_color,
+          fit_lwd=fit_lwd, fit_new=fit_new,
+
+          fit_se=fit_se, se_fill=se_fill,
+          plot_errors=plot_errors,
+
+          ellipse=ellipse,
+          ellipse_color=ellipse_color,
+          ellipse_fill=ellipse_fill,
+          ellipse_lwd=ellipse_lwd,
+
+          run=run, center_line=center_line, stack=ts_stack,
+
+          ts_unit=ts_unit, ts_agg=ts_agg, do.agg=do.agg,
+          ts_ahead=ts_ahead, ts_fit=ts_fitted,
+          n_date_tics=ts_n_x_tics,
+
+          y.fit=y.fit, y.hat=y.hat,
+          x.fit=x.fit, x.hat=x.hat,
+          y.upr=y.upr, y.lwr=y.lwr,
+
+          mxf.x=mx.x, mnf.y=mn.y, mxf.y=mx.y,
+
+          freq.poly=freq.poly,
+          jitter_x=jitter_x, jitter_y=jitter_y,
+
+          xlab.adj=xlab.adj, ylab.adj=ylab.adj,
+          bm.adj=bm.adj, lm.adj=lm.adj, tm.adj=tm.adj, rm.adj=rm.adj,
+
+          scale_x=scale_x, scale_y=scale_y,
+          pad_x=pad_x, pad_y=pad_y,
+
+          axis_fmt=axis_fmt,
+          axis_x_pre=axis_x_prefix, axis_y_pre=axis_y_prefix,
+
+          legend_title=legend_title,
+          use_plotly=use_plotly,
+
+          add=add,
+          x1=x1, x2=x2, y1=y1, y2=y2,
+          add_cex=add_cex, add_lwd=add_lwd, add_lty=add_lty,
+          add_color=add_color, add_fill=add_fill, add_trans=add_trans,
+
+          quiet=quiet, digits_d=digits_d, ...
+        )
 
         if (fit.ln != "off") {
           b0 <- m.out$b0;  b1 <- m.out$b1

@@ -1,5 +1,5 @@
 .radar.plotly <- function(
-  x.call, by.call = NULL, facet.call = NULL, y.call = NULL,
+  x.call, by.call=NULL, facet.call=NULL, y.call=NULL,
   x.name, by.name, facet.name, y.name,
   stat,
   fill, border, opacity,
@@ -15,8 +15,10 @@
   if (!length(n)) stop("radar(): x.call has length 0.")
 
   x_fac      <- factor(x.call)
-  by_fac_in  <- if (is.null(by.call))   factor(rep("(All)", n), levels = "(All)") else factor(by.call)
-  fac_fac_in <- if (is.null(facet.call))factor(rep("(All)", n), levels = "(All)") else factor(facet.call)
+  by_fac_in  <- if (is.null(by.call)) factor(rep("(All)", n), levels="(All)")
+                else factor(by.call)
+  fac_fac_in <- if (is.null(facet.call))factor(rep("(All)", n), levels="(All)")
+                else factor(facet.call)
 
   # keys for detecting pre-aggregated data
   key_df  <- data.frame(
@@ -33,7 +35,8 @@
     STAT     <- "sum"
     fun      <- function(z) sum(z, na.rm = TRUE)
     y_label  <- "Count"
-  } else {
+  }
+  else {
     # y provided
     if (is.null(stat) || !nzchar(stat)) {
       ## No stat provided: allow *pre-aggregated* input
@@ -54,7 +57,8 @@
 
       y_label <- y.name
 
-    } else {
+    }
+    else {
       ## Stat explicitly provided: aggregate as before
       STAT <- tolower(stat)
       fun <- switch(
@@ -88,10 +92,10 @@
   )
 
   # ---- 3) Aggregate to 3-way array ----
-  agg <- stats::aggregate(val ~ facet + by + x, data = df, FUN = fun, drop = FALSE)
+  agg <- stats::aggregate(val ~ facet + by + x, data=df, FUN=fun, drop=FALSE)
   names(agg)[names(agg) == "val"] <- "value"
 
-  r_tab <- xtabs(value ~ facet + by + x, data = agg, drop.unused.levels = FALSE)
+  r_tab <- xtabs(value ~ facet + by + x, data = agg, drop.unused.levels=FALSE)
 
   facet_fac <- factor(dimnames(r_tab)[[1]])
   by_fac    <- factor(dimnames(r_tab)[[2]])
