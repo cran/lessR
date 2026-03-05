@@ -366,19 +366,12 @@ XY(
         For Trellis graphics, only the maximum level is used, with one ellipse
         per panel. Modify fill and border colors with the \code{\link{style}}
         parameters \code{ellipse_fill} and \code{ellipse_color}.}\cr
-
-  \item{ts_unit}{Time unit for plotting \strong{time series data}
-        when \code{x} is of type \code{Date}.
-        Default is the time unit that describes the regular time intervals
-        as they occur in the data. Aggregate to a coarser time unit
-        as specified, such as a daily series aggregated to \code{"months"}.
-        Dates are stored as variables of type \code{Date}, which represent
-        calendar dates without times-of-day.
-        Valid values include \code{"days"}, \code{"weeks"},
-        \code{"months"}, \code{"quarters"}, and \code{"years"}, as well as 
-        \code{"days7"} to model weekly seasonality for daily data.
-        Otherwise the time unit for detecting seasonality is typically
-        \code{"months"} or \code{"quarters"}.}
+\item{ts_unit}{Time unit for plotting \strong{time series data} when \code{x}
+  is of type \code{Date}. Default is to infer the unit from the observed date
+  spacing. Specify \code{ts_unit} to override the inferred unit and, when
+  requested, aggregate to a coarser unit. Valid values are \code{"days"},
+  \code{"weeks"}, \code{"months"}, \code{"quarters"}, \code{"years"}, and
+  \code{"days7"} (daily data with a 7-day seasonal cycle).}
   \item{ts_ahead}{Number of \code{ts_unit} steps ahead of the last time period
         to forecast.}
   \item{ts_method}{Forecasting method. Default is \code{"es"} for exponential
@@ -750,13 +743,8 @@ when \code{pdf_file} is specified).\cr
 
 CATEGORICAL VARIABLES
 
-Conceptually, lessR distinguishes continuous and categorical variables.
-Categorical variables have relatively few unique values and are often coded as
-factors. However, categorical variables may also be coded numerically, such as
-Likert responses from 1 to 5. The structuring arguments \code{by} and
-\code{facet} apply when at least one of \code{x} or \code{y} is numeric, but
-that numeric variable may represent either a truly continuous scale or a
-discrete Likert-type scale.
+Categorical variables have relatively few unique values and are recommended
+to be often coded as factors. However, categorical variables may also be coded numerically, such as Likert responses from 1 to 5. The structuring arguments \code{by} and \code{facet} apply when at least one of \code{x} or \code{y} is numeric, but that numeric variable may represent either a truly continuous scale or a discrete Likert-type scale.
 
 Scatterplots of Likert-type data can be challenging because the number of
 possible joint values is small. For two five-point scales there are only 25
@@ -876,23 +864,31 @@ TIME CHARTS
 See \url{https://web.pdx.edu/~gerbing/lessR/examples/Time.html} for additional
 examples and explanation.
 
+
+\subsection{Run Chart}{
+
 When \code{x} is the special variable \code{.Index}, XY() produces a run chart
 of \code{y}. The \code{y}-values are plotted against their index positions
 (1, 2, …), and run-chart diagnostics such as center lines and runs analysis can
 be displayed via the corresponding arguments.
+}
+
+\subsection{Time Series Defined with Dates}{
 
 If \code{x} is of type \code{Date} or an R time-series object, XY() produces a
 time series plot for each specified variable. Time-series data can be supplied
-in “long” format (a single column of values plus a date column) or in “wide”
-format (multiple time-series columns sharing a date index). XY() will attempt
-to convert character string date values (e.g., \code{"08/18/1952"}) to
-\code{Date} via \code{as.Date()}, using default date formats when possible.
+in \dQuote{long} format (a single column of values plus a date column) or in
+\dQuote{wide} format (multiple time-series columns sharing a date index). XY()
+will attempt to convert character string date values (e.g.,
+\code{"08/18/1952"}) to \code{Date} via \code{as.Date()}, using default date
+formats when possible.
 
 XY() makes a reasonable attempt to decode common date formats, but some formats
 (e.g., those with month names rather than numbers) may require an explicit
 format string via \code{ts_format}. If the default conversion fails or is
 ambiguous, specify the correct format using examples such as those in the
-table below.\cr
+table below. Note that \code{ts_format} can always be provided for explicit
+specification of the date format.\cr
 
 \tabular{ll}{
 Example Date \tab Format\cr
@@ -910,15 +906,103 @@ Example Date \tab Format\cr
 
 XY() also converts character-string dates such as \code{"2024 Aug"} and
 \code{"2024 Q1"}, interpreting three-letter month abbreviations and quarter
-codes \code{Q1}–\code{Q4}.
+codes \code{Q1}--\code{Q4}.
 
-The \code{ts_unit} argument optionally aggregates the date variable to a higher
-time unit using \code{endpoints()} and \code{period.apply()} from the
-\code{xts} package. For example, daily data can be aggregated and plotted as
-monthly or quarterly series.
+\strong{Time unit and aggregation.}
+The \code{ts_unit} argument controls the time unit used for plotting and, when
+specified, can also be used to aggregate the series to a coarser time unit. By
+default, XY() attempts to infer a regular time unit from the observed spacing
+of the dates (see \sQuote{Detecting the Regularity of Dates}). You may specify
+\code{ts_unit} to override the inferred unit, including treating irregular
+dates as a regular unit for aggregation (for example, \code{ts_unit="weeks"}).
+The special value \code{"days7"} retains daily observations but evaluates
+seasonality on a 7-day cycle.
 
-The aggregation function is specified with \code{ts_agg}, default \code{"sum"},
+When aggregation is requested, the date index is aggregated with
+\code{endpoints()} and \code{period.apply()} from the \code{xts} package. The
+aggregation function is specified with \code{ts_agg}, default \code{"sum"},
 with \code{"mean"} as a common alternative.
+}
+
+\subsection{Detecting the Regularity of Dates (ts_unit)}{
+
+For time series operations, \pkg{lessR} attempts to infer the regularity of a
+date variable from the observed sequence of dates. The inferred unit is
+returned internally as \code{tu_exist} and is one of \code{"days"},
+\code{"weeks"}, \code{"years"}, \code{"quarters"}, \code{"months"}, or
+\code{"unknown"}.
+
+The decision rules are:
+
+\enumerate{
+
+\item \strong{Pre-processing.}
+Dates are sorted and reduced to unique values. When a grouping variable is
+present, regularity is evaluated from the first level only (assuming dates are
+already time-sorted within that level). Day gaps are computed as positive
+differences between successive dates.
+
+\item \strong{Trivial / short series.}
+If there are fewer than two dates, or if no positive gaps are available, the
+unit is set to \code{"days"}.
+
+\item \strong{Fine units (gap-based).}
+Let \code{gap} be the median of the positive day gaps (median is robust to
+occasional missing dates).
+
+\itemize{
+  \item If \code{gap == 1}, then \code{tu_exist = "days"}.
+  \item If \code{gap == 7}, then the series is a \emph{candidate} weekly series.
+  The gap pattern is further examined to distinguish a regular weekly series
+  (primarily 7-day gaps, with only occasional longer gaps) from an irregular
+  reporting schedule (for example, many 14-day gaps). If judged sufficiently
+  weekly, then \code{tu_exist = "weeks"}; otherwise \code{tu_exist = "unknown"}.
+}
+
+\item \strong{Coarse units (calendar-based).}
+If the unit is still \code{"unknown"} after the fine-unit checks, the dates are
+examined for calendar structure. Let \code{year}, \code{month}, and \code{day}
+denote the corresponding calendar fields.
+
+\itemize{
+
+  \item \strong{Years.}
+  If there is at most one observation per year and all observations share the
+  same month and day-of-month (for example, January 1 each year), then
+  \code{tu_exist = "years"}. Missing years are permitted.
+
+  \item \strong{Quarters.}
+  If there is at most one observation per calendar quarter (unique
+  year--quarter combinations) \emph{and} the median day gap between
+  observations falls in the range 60--122 days, then
+  the existing time unit is deemed as "quarters"}. 
+  The reporting month and day-of-month may
+  vary across quarters, and missing quarters are permitted. The gap range
+  excludes sparse or irregular series that happen to have at most one
+  observation per quarter by chance.
+
+  \item \strong{Months.}
+If the time variable is a Date but the observations occur exactly once per calendar month with no duplicates within a month and the sequence of months is regular (missing months become explicit NAs if present), then lessR treats the series as monthly and converts the index accordingly.
+
+
+  \item \strong{Missing periods.}
+  When a regular unit is accepted (\code{"weeks"}, \code{"years"},
+  \code{"quarters"}, or \code{"months"}), a flag \code{has_missing_periods} is set
+  to \code{TRUE} if the sequence of inferred periods contains gaps (for example,
+  a 14-day gap in an otherwise weekly series, or a missing month in an otherwise
+  monthly series). If the series is classified as \code{"unknown"},
+  \code{has_missing_periods} is not used.
+  }
+}
+
+If the user explicitly specifies \code{ts_unit}, that value is used for
+aggregation and modeling, overriding the inferred unit. In particular, a
+user-specified \code{ts_unit = "months"} may treat one observation per month as
+monthly even if the reporting day varies across months, and a user-specified
+\code{ts_unit = "weeks"} may treat dates as weekly even if the inferred
+regularity is \code{"unknown"}.
+
+\subsection{Missing Data}{
 
 For missing data, if a date is present but the corresponding \code{y}-value is
 \code{NA}, the line is broken at that point (no segment is drawn). If both the
@@ -927,6 +1011,9 @@ nearest observed dates, spanning the gap in calendar time but skipping the
 missing tick label. For example, if "2021-01-07" and "2021-01-09" are present
 but "2021-01-08" is absent, the plot includes points for the 7th and 9th
 connected by a line; the 8th does not appear on the axis.
+}
+
+\subsection{Forecasting}{
 
 Forecasting is activated by setting \code{ts_ahead} to a positive integer. The
 trend, seasonal, and error components for exponential smoothing and regression
@@ -947,6 +1034,8 @@ For regression with seasonality, \code{TSLM()} and the \code{stl()}+\code{lm()}
 approach both rely on least squares but handle seasonal structure differently.
 Setting \code{ts_fitted = TRUE} provides fitted values and decomposed trend and
 seasonal components for inspection.\cr
+}
+
 
 2-D KERNEL DENSITY
 

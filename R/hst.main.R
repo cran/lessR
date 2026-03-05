@@ -259,7 +259,12 @@ function(x, by=NULL, by.name=NULL, n.by=1,
 
 # plotly ------------------------------------------------------------------
 
-  if (use_plotly) {
+  # Interactive console: option is not set → returns NULL
+  # While knitting: knitr sets it → returns TRUE
+  if (isTRUE(getOption("knitr.in.progress")))
+    use_plotly <- FALSE
+
+  if (use_plotly) {  # not in knitr
 
     axT1 <- pretty(range(x))
     axL1 <- .axis.format(axT1, axis_fmt, axis_x_pre, axis_y_pre="no")
@@ -297,13 +302,15 @@ function(x, by=NULL, by.name=NULL, n.by=1,
 
     if (.allow.interactive()) {
       .viewer_notice_once(plot_name = "histogram", window_target = "Both")
-
       print(plt)
     }
   }  # end use_plotly
 
-  return(list(txsug=txsug, ttx=tx, bin_width=bin_width, n.bins=n.bins,
+  # ALWAYS return stats list
+  return(list(
+    txsug=txsug, ttx=tx, bin_width=bin_width, n.bins=n.bins,
     breaks=h$breaks, mids=h$mids, counts=h$counts, prop=prop,
-    counts_cum=cum.c, prop_cum=cum.p))
+    counts_cum=cum.c, prop_cum=cum.p
+  ))
 
 }

@@ -4,45 +4,41 @@
   fill, border, opacity,
   hole, power, radius, ncols = NULL,
   labels, labels_position, labels_color, labels_size, labels_decimals,
-  main_cex, main, main.miss,
+  main_cex, main, main.miss,        # main_cex unused; reserved
   digits_d,
-  is.agg, quiet
+  is.agg, quiet                     # quiet unused; reserved
 ) {
-
-
-  group_label_pos <- c("below", "above")    # <-- add default
-  group_label_size <- 14                    # <-- optional for completeness
-  group_label_gap  <-0.05                   # <-- optional for completeness
-# group_label_pos <- match.arg(group_label_pos)  # <-- initialize early
-
 
 # set the labels ----------------------------------------------------------
 
   # use variable label for main if it exists and main not specified
   gl <- .getlabels(main=main, lab_cex=getOption("lab_cex"))
-  x.name <- gl$xn; x.lbl <- gl$xl
+  x.lbl <- gl$xl %||% x.name   # display label; falls back to variable name
+
   if (!is.null(main))
     main.lbl <- main
   else {
     if (main.miss)  # main was not explicitly set to NULL
-      main.lbl <- ifelse (is.null(x.lbl), x.name, x.lbl)
+      main.lbl <- x.lbl
     else
       main.lbl <- NULL
   }
 
-  # radar plot requires at least three categories to construct a polygon
-  if (.is.integer(x) || is.character(x))
-    n.x <- length(unique(x))
-  else if (is.factor(x))
-    n.x <- length(unique(levels(x)))
-  if (type == "radar" && n.x < 3) {
-    stop(call.=FALSE, "\n------\n",
-      "Radar plots require at least 3 categories to construct a polygon.\n",
-      x.name, " has only ", n.x, " categories.\n")
-  }
-
 
 # construct summary table x.tbl from x, optional by and y -----------------
+
+  # resolve stat function for aggregation
+  STAT <- tolower(stat %||% "sum")
+  stat_fun <- switch(
+    STAT,
+    mean   = function(z) mean(z,            na.rm = TRUE),
+    sum    = function(z) sum(z,             na.rm = TRUE),
+    median = function(z) stats::median(z,   na.rm = TRUE),
+    min    = function(z) min(z,             na.rm = TRUE),
+    max    = function(z) max(z,             na.rm = TRUE),
+    sd     = function(z) stats::sd(z,       na.rm = TRUE),
+    stop("Unsupported stat: '", stat, "'. Use mean, sum, median, min, max, or sd.")
+  )
 
   if (!is.agg) {
     if (is.null(y)) {  # no y var, so table contains counts
@@ -51,11 +47,15 @@
       else
         x.tbl <- xtabs(~ by + x, drop.unused.levels = FALSE)
     }
-    else {  # aggregate numeric y by categories
-      if (is.null(by))
-        x.tbl <- xtabs(y ~ x, drop.unused.levels = FALSE)
-      else
-        x.tbl <- xtabs(y ~ by + x, drop.unused.levels = FALSE)
+    else {  # aggregate numeric y by categories using stat_fun
+      if (is.null(by)) {
+        agg <- tapply(as.numeric(y), x, stat_fun)
+        x.tbl <- agg[!is.na(names(agg))]
+      } else {
+        agg <- tapply(as.numeric(y), list(by = by, x = x), stat_fun)
+        if (identical(STAT, "sum")) agg[is.na(agg)] <- 0
+        x.tbl <- agg
+      }
     }
   }
   else {  # construct x.tbl if data variables are already aggregated
@@ -90,7 +90,7 @@
     }
   }  # end already aggregated
 
-  is.count <- ifelse (.is.integer(x.tbl) && all(x.tbl >= 0), TRUE, FALSE) 
+  is.count <- is.null(y)
 
 
 # y-value formatting for Plotly charts ------------------------------------
@@ -115,63 +115,53 @@
 # construct title ---------------------------------------------------------
 
   if (is.count) y.name <- "Count"
-  y.pre <- ifelse (!is.null(stat), ylab, y.name)
-  ttl <- paste(y.pre, "for each", x.name)
-  if (!is.null(by)) ttl <- paste(ttl, "by", by.name) 
+  y.pre <- if (!is.null(stat)) ylab else y.name
+  ttl_auto <- paste(y.pre, "for each", x.name)
+  if (!is.null(by)) ttl_auto <- paste(ttl_auto, "by", by.name)
+  ttl <- main.lbl %||% ttl_auto
 
-
-# plot the plotly chart ---------------------------------------------------
+# build the plotly chart --------------------------------------------------
 
   if (type == "pie") {
     plt <- piechart.plotly(
       x = x.tbl, x.name = x.name, y.name = y.name, by.name = by.name, ttl = ttl,
       fill = fill, border = border, opacity = opacity,
-      hole     = hole,
-      ncols    = ncols,
-      labels   = labels,
+      hole = hole,
+      ncols = ncols,
+      labels = labels,
       labels_position = labels_position,
-      labels_color    = labels_color,
-      labels_size     = labels_size,
+      labels_color = labels_color,
+      labels_size = labels_size,
       labels_decimals = labels_decimals,
-      digits_d = digits_d,
+      digits_d = digits_d
     )
-  }
-
-  else if (type == "bubble") {
+  } else if (type == "bubble") {
     plt <- bubble.plotly(
-      x = x.tbl, x.name = x.name, y.name = y.name, by.name = by.name, 
+      x = x.tbl, x.name = x.name, y.name = y.name, by.name = by.name,
       x.lab = x.name, y.lab = if (is.null(by)) "" else by.name,
       ttl = ttl,
       fill = fill, clr = border, opacity = opacity,
-      power = power, radius = radius,  # pixels
+      power = power, radius = radius,
       digits_d = digits_d,
-      labels = labels, labels_size = labels_size, labels_color = labels_color
+      labels = labels, labels_position = labels_position,
+      labels_size = labels_size, labels_color = labels_color
     )
   }
 
+  # strip any title set by helpers
+  if (!is.null(plt$x) && !is.null(plt$x$layout))
+    plt$x$layout$title <- NULL
 
-# One-time destination/refresh notice for Plotly charts -------------------
-  if (.allow.interactive())
-    .viewer_notice_once(plot_name = type, window_target = "Viewer")
-
-
-# print the plotly chart --------------------------------------------------
-  if (.allow.interactive()) {
-    if (type == "bubble") {
-      txt <- "Can't display both discrete & non-discrete data on same axis"
-      withCallingHandlers(
-        print(plt),
-        warning = function(w) {
-          msg <- conditionMessage(w)
-          if (grepl(txt, msg, fixed = TRUE))
-            invokeRestart("muffleWarning")
-        }
-      )
-    }
-    else {
-      print(plt)
-    }
-  }
+  # finalize consistently for pie/bubble
+  plt <- .finalize_plotly_widget(
+    plt,
+    kind         = type,
+    x.name       = x.name,
+    by.name = if (!is.null(by)) by.name else NULL,
+    add_title    = FALSE,
+    nudge_viewer = (.allow.interactive() &&
+                    !isTRUE(getOption("knitr.in.progress")))
+  )
 
   return(invisible(plt))
 

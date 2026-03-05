@@ -1,5 +1,6 @@
 Logit <-
 function(my_formula, data=d, filter=NULL, ref_group=NULL,
+         pt_size=0.9, transparency=0.8,
          digits_d=4, text_width=120,
 
          brief=getOption("brief"),
@@ -10,6 +11,7 @@ function(my_formula, data=d, filter=NULL, ref_group=NULL,
          X1_new=NULL, X2_new=NULL, X3_new=NULL, X4_new=NULL,
          X5_new=NULL, X6_new=NULL,
 
+         xlab=NULL, ylab=NULL,
          pdf_file=NULL, width=5, height=5, ...) {
 
 
@@ -388,13 +390,14 @@ function(my_formula, data=d, filter=NULL, ref_group=NULL,
          n.vars, n.pred, n.obs, n.keep, digits_d, pre, line,
          res_sort, res_rows, cooks_cut)
 
-  if (pred)
+  if (pred)  # also do the plotting here
     .logit4Pred(lm.out, nm, df.name, my_formula, brief, res_rows,
-         n.vars, n.pred, n.obs, n.keep, digits_d, pre, line,
+         n.vars, n.pred, n.obs, n.keep, pt_size, transparency,
+         digits_d, pre, line,
          new.data, pred, pred_all, prob_cut,
          in.data.frame, X1_new,
          X2_new, X3_new, X4_new, X5_new, X6_new,
-         pdf_file, width, height)
+         xlab, ylab, pdf_file, width, height)
   # Also calls .logit5Confuse.R
 
   return(invisible(lm.out))

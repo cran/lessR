@@ -1430,7 +1430,9 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
 # interactive to plt.plotly() ----------------------------------------------
 
   # only consider eligible
-  if (type != "contour" && length(shape) == 1 && n.xcol == 1 && n.ycol == 1) {
+  if (type!="contour" && type!="smooth" && length(shape)==1 &&
+      n.xcol==1 && n.ycol==1 && ts_ahead==0 && !stack) {
+
     if (is.null(digits_d)) digits_d <- .max.dd(y[,1])
 
     if (use_plotly  &&  type=="scatter") {
@@ -1449,16 +1451,6 @@ function(x, y, by=NULL,  # x and y dfs with vars x.call and y.call
         connect <- TRUE
         ax.info$axT1 <- as.numeric(x.dates[indices])
         ax.info$axL1 <- .format_date_labels(x.dates[indices], ts_unit)
-
-        if (!is.null(ts_ahead) && ts_ahead > 0) {
-          message(
-            "\n",
-            "Note: Forecasts (ts_ahead > 0) are displayed only in the\n",
-            " static plot, Plots window, including any forecast error bands.\n",
-            " For now, the interactive Plotly time series in the\n",
-            " Viewer window only shows the observed data.\n\n"
-          )
-        }
       }
 
       else  # not time series

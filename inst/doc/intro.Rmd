@@ -62,7 +62,7 @@ l
 
 ## Bar Chart
 
-[more examples of bar charts and pie charts](https://web.pdx.edu/~gerbing/lessR/examples/BarChart.html)
+[more examples of bar charts and pie charts](https://web.pdx.edu/~gerbing/lessR/examples/Chart.html)
 
 Consider the categorical variable Dept in the Employee data table.  Use `Chart()` to tabulate and display the visualization of the number of employees in each department, here relying upon the default data frame (table) named _d_. Otherwise add the `data=` option for a data frame with another name.
 
@@ -85,7 +85,7 @@ Chart(Dept, theme="gray", labels="off", horiz=TRUE)
 
 ## Histogram
 
-[more examples of histograms](https://web.pdx.edu/~gerbing/lessR/examples/Histogram.html)
+[more examples of histograms](https://web.pdx.edu/~gerbing/lessR/examples/X.html)
 
 Consider the continuous variable _Salary_ in the Employee data table.  Use `X()` to tabulate and display the number of employees in each department, here relying upon the default data frame (table) named _d_, so the `data=` parameter is not needed.
 
@@ -105,7 +105,7 @@ X(Salary, bin_start=35000, bin_width=14000, fill="reds")
 
 ## Scatterplot
 
-[more examples of scatter plots and related](https://web.pdx.edu/~gerbing/lessR/examples/Plot.html)
+[more examples of scatter plots and related](https://web.pdx.edu/~gerbing/lessR/examples/XY.html)
 
 Specify an X and Y variable with the plot function to obtain a scatter plot. For two variables, both variables can be any combination of continuous or categorical. One variable can also be specified. A scatterplot of two categorical variables yields a bubble plot. Below is a scatterplot of two continuous variables. 
 

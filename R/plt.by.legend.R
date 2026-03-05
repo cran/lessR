@@ -28,15 +28,17 @@ function(mylevels, color, fill, shp, trans_pts, col.bg, usr,
 
   size <- (par("cxy")/par("cin"))  # 1 inch in user coordinates
 
-  epsilon <- (size[1] - ll$rect$w) / 2
-  if (epsilon < 0) epsilon <- .04  # do not have label overlap plot
-
+  # vertical adjustment
   axis_vert <- usr[4] - usr[3]
-  xleft <- usr[2] + epsilon - .01 # usr[2] user coordinate of right axis
-  if (mx.ch > 7) xleft <- xleft - .02  # shift legend left a bit
   lgnd.vhalf <- (ll$rect$h) / 2
   axis_cntr <- axis_vert / 2  + usr[3]
   ytop <- axis_cntr + lgnd.vhalf  # user coordinate of legend top
+
+  # horizontal adjustment
+  epsilon <- (size[1] - ll$rect$w) / 2
+  if (epsilon < 0) epsilon <- .04  # do not have label overlap plot
+  xleft <- usr[2] + epsilon - .01 # usr[2] user coordinate of right axis
+  if (mx.ch > 7) xleft <- xleft - .02  # shift legend left a bit
 
   if (trans_pts > 0.85) {  # points too light, reduce legend transparency
     legend_fill <- integer(length=n.levels)
@@ -69,8 +71,9 @@ function(mylevels, color, fill, shp, trans_pts, col.bg, usr,
            text.col=the.clr, y.intersp=yi, bty="n")
   else {  # for plotting data and forecast
     xleft <- usr[2] + epsilon/4
-    legend(xleft+legend_adj, ytop+14, legend=legend_labels, title=legend_title,
-           cex=legend_size, pt.cex=pt.size, pt.lwd=pt.lwd,
+    legend(xleft+legend_adj, ytop+ll$rect$h, legend=legend_labels,
+           title=legend_title, cex=legend_size,
+           pt.cex=pt.size, pt.lwd=pt.lwd,
            title.cex=legend_title_size,
            bg=col.bg, col=color, pt.bg=fill,
            text.col=the.clr, bty="n",

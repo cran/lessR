@@ -71,10 +71,10 @@
     ylab <- paste("Mean Deviation of", y.name)
     if (is.null(by.var) && is.null(facet.var)) {
       out <- tapply(y, x, mean, na.rm = TRUE)
-      out <- out - mean(out, na.rm = TRUE)
+      out <- out - mean(y, na.rm = TRUE)
     } else {
       cat("\n"); stop(call. = FALSE, "\n","------\n",
-        "deviation  value for  stat  not meaningful with a by or facet variable\n\n")
+        "deviation for stat not meaningful with a by or facet variable\n\n")
     }
   }
 

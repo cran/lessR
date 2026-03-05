@@ -18,7 +18,8 @@ Can also be called from the more general \code{\link{model}} function.
 
 \usage{
 Logit(my_formula, data=d, filter=NULL, ref_group=NULL,
-      digits_d=4, text_width=120,
+     pt_size=0.9, transparency=0.8,
+     digits_d=4, text_width=120,
 
      brief=getOption("brief"),
 
@@ -28,6 +29,7 @@ Logit(my_formula, data=d, filter=NULL, ref_group=NULL,
      X1_new=NULL, X2_new=NULL, X3_new=NULL, X4_new=NULL,
      X5_new=NULL, X6_new=NULL,
 
+     xlab=NULL, ylab=NULL,
      pdf_file=NULL, width=5, height=5, \dots)
 
 lr(\dots)
@@ -46,6 +48,10 @@ lr(\dots)
        otherwise set by default as the value that yields a \code{+} slope
        for one predictor variable or the largest alphabetical/numerical
        value if more than one predictor.}
+  \item{pt_size}{Size of the plotted points of the scatterplot for a
+       one-predictor model.}
+  \item{transparency}{Transparency level of the plotted points of the
+       scatterplot, from 0 to 1 for full transparency.}
   \item{digits_d}{For the Basic Analysis, it provides the number of decimal
        digits. For the rest of the output, it is a suggestion only.}
   \item{text_width}{Width of the text output at the console.}\cr
@@ -89,6 +95,8 @@ lr(\dots)
   \item{X6_new}{Values of the sixth listed predictor variable for which
        forecasted values and corresponding prediction intervals are calculated.}\cr
 
+  \item{xlab}{x-axis label, name of the x-variable by default.}
+  \item{ylab}{y-axis label, name of the y-variable by default.}
   \item{pdf_file}{Name of the pdf file to which graphics are redirected.}
   \item{width}{Width of the pdf file in inches.}
   \item{height}{Height of the pdf file in inches.}\cr

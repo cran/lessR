@@ -1,3 +1,36 @@
+# lessR version 4.5.2,  March 4, 2026
+
+## Updates
+
+`Chart()`: If there is a `stat` transformation of the `y` variable, then the label on each bar defaults to `"input"`, that is, as it exists in the data without further transformation. 
+
+`Logit()`: Added parameters `pt_size` and `transparency` to customize plotted points for the combined sigmoid/scatterplot, and `xlab` and `ylab` for the axes labels. 
+
+`XY()`: When forecasting from `ts_ahead` parameter, dependent packages are no longer attached, no longer cluttering the output with distracting messages.
+
+`XY()`: When forecasting from `ts_ahead` parameter, more robust inference of the time unit by which the data are organized, particularly with missing data.
+
+
+## Bug Fixes
+
+`Chart()`: Numerous low-level errors corrected.
+
+`Chart()`: If `quiet` is set to `TRUE`, suggestions are no longer displayed, and the frequency table is also not displayed.
+
+`Chart()`:  Fixed rendering issues for Plotly interactive visualizations when knitting from R Markdown and Quarto. Multiple interactive charts now render correctly in sequence. (Do need to p <- Chart(...), followed by p to print.)
+
+`Chart()`: Weighted mean now correctly computed in place of the unweighted mean when calculating deviations to plot instead of the original data.
+
+`X()`: Fixed rendering issues for the histogram when knitting from R Markdown and Quarto.
+
+`XY()`: Forecasting legend no longer sometimes is placed too high vertically, sometimes even outside the plotting region.
+ 
+`XY()`: If forecasting from a time series, the only plot is to the RStudio Plots window as the forecast does not apply yet to the interactive plot in the Viewer window.
+
+`XY()`: When a `by` variable is present for forecasting, date misalignment could occur. Now fixed.
+
+
+ 
 # lessR version 4.5.1, January 22, 2026
 
 ## Updates
@@ -49,6 +82,7 @@
 
 `Chart()`, `X()`, and `XY()`: For the plotly charts, allow for specifying the font sizes of different displays.
 
+`Logit()`: Add parameters `xlab` and `ylab`.  Add parameter `size` for the plotted points.
  
 
 # lessR version 4.5, December 10, 2025

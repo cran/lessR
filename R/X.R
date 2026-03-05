@@ -686,14 +686,20 @@ function(x=NULL, by=NULL, facet=NULL, data=d, filter=NULL,
           stuff <- c(stuff[1], stuff[12], stuff[2], stuff[11], stuff[3], stuff[4],
                      stuff[5], stuff[6], stuff[7], stuff[8], stuff[9], stuff[10])
 
-          if (.allow.interactive())
-            .viewer_notice_once(plot_name = type, window_target = "Both")
+#         if (.allow.interactive())
+#           .viewer_notice_once(plot_name = type, window_target = "Both")
 
           if (!is.null(pdf_file)) {
             dev.off()
             if (!quiet && df.name!="NULL") .showfile(pdf_file, "Histogram")
           }
-
+          # If knitting, force Plotly widget to be emitted at top-level
+          #   so knitr can render it
+          if (use_plotly && isTRUE(getOption("knitr.in.progress"))
+              && !isTRUE(quiet)) {
+            plt_last <- getOption("lessR.last_plotly", NULL)
+            if (inherits(plt_last, "htmlwidget")) print(plt_last)
+          }
           return(invisible(stuff))
         }  # end end 1 col data
 

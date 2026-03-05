@@ -1,7 +1,5 @@
 savePlotly <- function(obj = NULL, file = NULL, open = TRUE,
                        selfcontained = TRUE, libdir = NULL) {
-  `%||%` <- function(a, b) if (is.null(a) || length(a) == 0) b else a
-
   if (is.null(obj)) obj <- getOption("lessR.last_plotly", NULL)
   if (is.null(obj))
     stop("No recent Plotly chart found. Run a chart first or pass an object.")
@@ -17,7 +15,7 @@ savePlotly <- function(obj = NULL, file = NULL, open = TRUE,
   bynm  <- attr(obj, "lessR_byname"); if (is.null(bynm))  bynm  <- ""
 
   # Fallback: parse title like "X by Y"
-  if ((!nzchar(xname) || is.na(xname)) && (!nzchar(bynm) || is.na(bynm))) {
+  if (!nzchar(xname) || is.na(xname) || !nzchar(bynm) || is.na(bynm)) {
     ttl <- attr(obj, "lessR_title")
     if (is.null(ttl) && !is.null(obj$x$layout$title)) {
       raw <- obj$x$layout$title
@@ -48,7 +46,7 @@ savePlotly <- function(obj = NULL, file = NULL, open = TRUE,
   xname_s <- normalize_name(xname)
   bynm_s  <- normalize_name(bynm)
 
-  tag <- if (nzchar(bynm_s)) paste0(xname_s, bynm_s) else xname_s
+  tag <- if (nzchar(bynm_s)) paste0(xname_s, "_", bynm_s) else xname_s
 
   # Build parts while avoiding duplicate "plotly"
   parts <- c("plotly", if (nzchar(kind_s) && tolower(kind_s) != "plotly") kind_s, tag)

@@ -1,5 +1,5 @@
 Package: lessR
-Version: 4.5.1
+Version: 4.5.2
 Title: Less Code with More Comprehensive Results
 Authors@R: person(given = "David W.", family = "Gerbing", email = "gerbing@pdx.edu",
   role = c("aut", "cre"),
@@ -32,10 +32,10 @@ License: GPL (>= 2)
 Encoding: UTF-8
 LazyLoad: yes
 NeedsCompilation: no
-Packaged: 2026-01-22 09:20:33 UTC; davidgerbing
+Packaged: 2026-03-04 19:16:55 UTC; davidgerbing
 Maintainer: David W. Gerbing <gerbing@pdx.edu>
 Author: David W. Gerbing [aut, cre] (ORCID:
     <https://orcid.org/0000-0001-6998-8350>, Affiliation: School of
     Business, Portland State University)
 Repository: CRAN
-Date/Publication: 2026-01-22 12:20:11 UTC
+Date/Publication: 2026-03-05 06:10:29 UTC

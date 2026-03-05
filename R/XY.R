@@ -1401,7 +1401,7 @@ function(x, y=NULL, data=d, filter=NULL,  # keep y=NULL for if x is a ts
             "For a data frame named d, enter: \n    ",
              paste("d <- order_by(d, ", x.name, ")", sep=""), "\n",
             "Maybe you have a  by  variable with repeating Date values?\n",
-          "Enter  ?sort_by  for more information and examples.\n\n")
+          "Enter  ?order_by  for more information and examples.\n\n")
         }
         else {  # a by variable
           if (!sort_flag) {
@@ -1974,7 +1974,7 @@ function(x, y=NULL, data=d, filter=NULL,  # keep y=NULL for if x is a ts
 # if x is a Date variable -------------------------------------------------
 
       #   if not specified, get the existing ts_unit
-      #   if specified, aggregate the values of y.call over x.call
+      #   if specified, may need to aggregate the values of y.call over x.call
       if (date.var) {
         if (!quiet) {
           txt <- "Ryan, Ulrich, Bennett, and Joy's xts package]"
@@ -2019,7 +2019,7 @@ function(x, y=NULL, data=d, filter=NULL,  # keep y=NULL for if x is a ts
                "Please ensure all specified columns are in the input data.\n",
                call. = FALSE)
         }
-        # keep only exogenous predictors, excluding index and y variable
+        # keep only exogenous predictors except index and y variable
         drop.names <- c(names(d)[1], names(d)[2])
         exog.df <- d[setdiff(exog.names, drop.names)]
       }
@@ -2029,6 +2029,7 @@ function(x, y=NULL, data=d, filter=NULL,  # keep y=NULL for if x is a ts
           ts_unit, ts_ahead, ts_method, ts_fitted, ts_source, ts_n_x_tics,
           ts_trend, ts_seasons, ts_error,
           ts_alpha, ts_beta, ts_gamma, ts_PI, digits_d, quiet)
+
         y.fit <- f.out$y.fit;  y.hat <- f.out$y.hat
         x.fit <- f.out$x.fit;  x.hat <- f.out$x.hat
         y.upr <- f.out$y.upr;  y.lwr <- f.out$y.lwr

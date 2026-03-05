@@ -17,8 +17,15 @@ if (!exists(".lessR_deprec_env", inherits = FALSE)) {
 
 # One-time notice with ANSI color (auto-disables if not supported).
 # Persists per R session via options(lessR.seen_notices = list(...)).
+# One-time notice (ANSI color only when supported).
+# Persists per R session via options(lessR.seen_notices = list(...)).
 .viewer_notice_once <- function(plot_name, window_target = "Viewer") {
-  # allow global silence
+
+  # 0) Never print this during knitting / rendering (vignettes, Rmd, Quarto)
+  if (isTRUE(getOption("knitr.in.progress"))) return(invisible(NULL))
+  if (isTRUE(getOption("quarto.rendering")))  return(invisible(NULL))
+
+  # 1) allow global silence
   if (isTRUE(getOption("lessR.silence_notices", FALSE))) return(invisible(NULL))
 
   # build a stable key (e.g., "notice_viewer_radar")
@@ -32,13 +39,23 @@ if (!exists(".lessR_deprec_env", inherits = FALSE)) {
   seen <- getOption("lessR.seen_notices", default = list())
   if (isTRUE(seen[[key]])) return(invisible(NULL))
 
-  # ANSI colors (disable automatically if console doesn't support)
-  bold      <- "\033[1m"   # start bold
-  unbold    <- "\033[22m"  # end bold
-  darkred <- "\033[38;5;88m"   # Viewer
-  darkblue <- "\033[38;5;19m"  # Plots
-  purple  <- "\033[38;5;93m"   # Both
-  reset   <- "\033[0m"
+  # 2) Decide whether to use ANSI sequences (only in interactive terminals)
+  use_ansi <- isTRUE(getOption("lessR.use_ansi_notices", TRUE)) &&
+              interactive() &&
+              nzchar(Sys.getenv("TERM")) &&
+              Sys.getenv("TERM") != "dumb" &&
+              Sys.getenv("RSTUDIO") != "1"   # RStudio console does not reliably render ANSI
+
+  if (use_ansi) {
+    bold     <- "\033[1m"
+    unbold   <- "\033[22m"
+    darkred  <- "\033[38;5;88m"
+    darkblue <- "\033[38;5;19m"
+    purple   <- "\033[38;5;93m"
+    reset    <- "\033[0m"
+  } else {
+    bold <- unbold <- darkred <- darkblue <- purple <- reset <- ""
+  }
 
   msg <- switch(
     window_target,
@@ -48,17 +65,17 @@ if (!exists(".lessR_deprec_env", inherits = FALSE)) {
       "   top-right of the Viewer window, especially for legends or labels to display.\n"
     ),
     "Plots" = paste0(
-      " ", darkred, "Plots", reset, " Window --> Static visualization\n",
+      " ", darkblue, "Plots", reset, " Window --> Static visualization\n",
       "   This chart appears in the Plots pane. Use Export to save or copy.\n"
     ),
     "Both" = paste0(
       " ", purple, "Viewer + Plots", reset, " --> Interactive (Viewer) and static (Plots)\n",
       "   Tip: If alignment looks off in Viewer, click the Refresh button at the top-right.\n"
     ),
-    # default fallback
     paste0(" Output --> Visualization generated in ", window_target, ".\n")
   )
 
+  # Use message() so message=FALSE can suppress in chunks when desired
   message(msg)
 
   # mark as seen for the remainder of the session
@@ -370,7 +387,7 @@ if (!exists(".lessR_deprec_env", inherits = FALSE)) {
 
 .grid_style <- function() {
   list(
-    color = .to_hex(getOption("grid_color", "gray85")),  # convert here
+    color = .to_hex(getOption("grid_col", "gray85")),  # convert here
     width = getOption("grid_lwd", 0.5),
     dash  = getOption("grid_lty", NULL)
   )
@@ -473,7 +490,7 @@ axis_cat <- function(title_txt) {
 
 # Draw top/right frame lines inside the plotting area
 plot_border <- function(top = TRUE, right = TRUE,
-                        color =getOption("panel_color"),
+                        color = getOption("panel_border"),
                         width = getOption("panel_lwd")) {
 
   if (is.character(color) && grepl("^gray[0-9]+$", color)) 
@@ -598,90 +615,91 @@ legend_base <- function() {
 
 # nudge viewer to address RStudio bug of mis-alignment
 force_viewer_reload <- function(plt, delays = c(16, 90, 250, 600, 1200)) {
-  # Only "kick" Plotly when the element actually has a size.
-  # Also re-kick when the Viewer or its parents change size/visibility.
+
   js <- sprintf(
-    "(function(){
-      return function(el){
-        var kicks = [%s];
-        var lastW = -1, lastH = -1;
+"(function(){
+  return function(el){
+    var kicks = [%s];
+    var lastW = -1, lastH = -1;
 
-        function measurable(){
-          if (!el) return false;
-          // skip until attached to layout tree
-          if (!(el.offsetParent || el.getClientRects().length)) return false;
+    function measurable(){
+      if (!el) return false;
+      if (!(el.offsetParent || el.getClientRects().length)) return false;
+      var r = el.getBoundingClientRect();
+      return (r.width > 0 && r.height > 0);
+    }
+
+    function doKick(){
+      try {
+        if (!measurable()) return false;
+        var r = el.getBoundingClientRect();
+        if (window.Plotly && el && el.data) {
+          try { Plotly.relayout(el, {autosize: true}); } catch(e){}
+          try { Plotly.Plots.resize(el); } catch(e){}
+        } else {
+          try { window.dispatchEvent(new Event('resize')); } catch(e){}
+        }
+        lastW = r.width; lastH = r.height;
+        return true;
+      } catch(e) { return false; }
+    }
+
+    function guardedKick(deadlineMs){
+      var t0 = Date.now();
+      (function loop(){
+        if (doKick()) return;
+        if (deadlineMs && (Date.now() - t0) > deadlineMs) return;
+        setTimeout(loop, 32);
+      })();
+    }
+
+    // Early kicks
+    try { requestAnimationFrame(function(){ guardedKick(250); }); } catch(e){}
+    try { requestAnimationFrame(function(){
+      requestAnimationFrame(function(){ guardedKick(250); });
+    }); } catch(e){}
+
+    // Staggered delayed kicks (FIXED)
+    for (var i=0; i<kicks.length; i++) {
+      (function(d){
+        setTimeout(function(){ guardedKick(0); }, d);
+      })(kicks[i]);
+    }
+
+    // ResizeObserver
+    if (typeof ResizeObserver !== 'undefined') {
+      try {
+        var ro = new ResizeObserver(function(){
           var r = el.getBoundingClientRect();
-          return (r.width > 0 && r.height > 0);
-        }
-
-        function doKick(){
-          try {
-            if (!measurable()) return false;
-            var r = el.getBoundingClientRect();
-            if (window.Plotly && el && el.data) {
-              try { Plotly.relayout(el, {autosize: true}); } catch(e){}
-              try { Plotly.Plots.resize(el); } catch(e){}
-            } else {
-              try { window.dispatchEvent(new Event('resize')); } catch(e){}
-            }
-            lastW = r.width; lastH = r.height;
-            return true;
-          } catch(e) { return false; }
-        }
-
-        // A guarded kick that retries until measurable
-        function guardedKick(deadlineMs){
-          var t0 = Date.now();
-          (function loop(){
-            if (doKick()) return;
-            if (deadlineMs && (Date.now() - t0) > deadlineMs) return;
-            setTimeout(loop, 32);
-          })();
-        }
-
-        // Early kicks (animation frames) for first paint
-        try { requestAnimationFrame(function(){ guardedKick(250); }); } catch(e){}
-        try { requestAnimationFrame(function(){ requestAnimationFrame(function(){ guardedKick(250); }); }); } catch(e){}
-
-        // Staggered delayed kicks
-        for (var i=0; i<kicks.length; i++) {
-          setTimeout(function(){ guardedKick(0); }, kicks[i]);
-        }
-
-        // Re-kick when the widget or its container resizes
-        if (typeof ResizeObserver !== 'undefined') {
-          try {
-            var ro = new ResizeObserver(function(){
-              var r = el.getBoundingClientRect();
-              if (r.width !== lastW || r.height !== lastH) {
-                doKick();
-              }
-            });
-            ro.observe(el);
-            if (el.parentElement) ro.observe(el.parentElement);
-          } catch(e){}
-        }
-
-        // Also re-kick on DOM mutations that often accompany Viewer layout shifts
-        try {
-          var mo = new MutationObserver(function(){ guardedKick(0); });
-          mo.observe(document.documentElement, {attributes:true, childList:true, subtree:true});
-        } catch(e){}
-
-        // When the window/tab becomes visible/focused
-        window.addEventListener('focus', function(){ guardedKick(250); });
-        document.addEventListener('visibilitychange', function(){
-          if (!document.hidden) guardedKick(250);
+          if (r.width !== lastW || r.height !== lastH) doKick();
         });
+        ro.observe(el);
+        if (el.parentElement) ro.observe(el.parentElement);
+      } catch(e){}
+    }
 
-        // One last kick after full load
-        if (document.readyState !== 'complete') {
-          window.addEventListenee('load', function(){ guardedKick(250); }, {once:true});
-        }
-      }
-    })();",
+    // MutationObserver (can be heavy, but keeping your intent)
+    try {
+      var mo = new MutationObserver(function(){ guardedKick(0); });
+      mo.observe(document.documentElement, {attributes:true, childList:true, subtree:true});
+    } catch(e){}
+
+    window.addEventListener('focus', function(){ guardedKick(250); });
+    document.addEventListener('visibilitychange', function(){
+      if (!document.hidden) guardedKick(250);
+    });
+
+    // One last kick after full load (FIXED TYPO)
+    if (document.readyState !== 'complete') {
+      window.addEventListener('load', function(){ guardedKick(250); }, {once:true});
+    } else {
+      guardedKick(250);
+    }
+  }
+})();",
     paste(as.integer(delays), collapse = ",")
   )
+
   htmlwidgets::onRender(plt, js)
 }
 
@@ -703,8 +721,6 @@ force_viewer_reload <- function(plt, delays = c(16, 90, 250, 600, 1200)) {
   nudge_viewer = TRUE,
   unique_element = TRUE   # if TRUE, force a unique elementId to avoid stale mounts
 ) {
-
-  `%||%` <- function(a, b) if (is.null(a) || length(a) == 0) b else a
 
   # collapse name vectors (safe for scalars, NULL)
   .collapse_names <- function(nm, sep = " \u2192 ") {  # default arrow
@@ -812,8 +828,6 @@ force_viewer_reload <- function(plt, delays = c(16, 90, 250, 600, 1200)) {
 
     # (5) Register last widget for savePlotly()
     options(lessR.last_plotly = plt)
-
-    # (6) Viewer robustness: autosize + responsive + margins + fill container
     plt$x$layout <- plt$x$layout %||% list()
     plt$x$layout$autosize <- TRUE
     plt$x$layout$margin <- utils::modifyList(
@@ -834,7 +848,7 @@ force_viewer_reload <- function(plt, delays = c(16, 90, 250, 600, 1200)) {
       defaultHeight = NULL
     )
 
-    # (7) Gentle but smarter Viewer nudge
+    # (6) Viewer robustness: autosize + responsive + margins + fill container
     if (isTRUE(nudge_viewer)) {
       plt <- force_viewer_reload(plt, delays = c(16, 90, 250, 600, 1200))
     }
@@ -905,8 +919,8 @@ force_viewer_reload <- function(plt, delays = c(16, 90, 250, 600, 1200)) {
   n_col <- min(n_col_max, n_fac)
   n_row <- ceiling(n_fac / n_col)
 
-  width  <- (1 - (n_col + 1) * gap_x) / n_col
-  height <- (1 - (n_row + 1) * gap_y) / n_row
+  width  <- max(0.01, (1 - (n_col + 1) * gap_x) / n_col)
+  height <- max(0.01, (1 - (n_row + 1) * gap_y) / n_row)
 
   domains <- vector("list", n_fac)
   k <- 1L
@@ -1027,11 +1041,23 @@ force_viewer_reload <- function(plt, delays = c(16, 90, 250, 600, 1200)) {
 
 # display or summarize an already-built table, x.tbl
 # output: formatted to the R console
-`%||%` <- function(a, b) if (is.null(a) || !length(a)) b else a
 
 .build_xtab <- function(x, y = NULL, by = NULL, facet = NULL,
                         stat = NULL, is.agg = FALSE, digits_d = 2) {
   # construct summary table x.tbl from x, optional by / facet and optional y
+
+  # resolve stat function
+  STAT <- tolower(stat %||% "sum")
+  stat_fun <- switch(
+    STAT,
+    mean   = function(z) mean(z,          na.rm = TRUE),
+    sum    = function(z) sum(z,           na.rm = TRUE),
+    median = function(z) stats::median(z, na.rm = TRUE),
+    min    = function(z) min(z,           na.rm = TRUE),
+    max    = function(z) max(z,           na.rm = TRUE),
+    sd     = function(z) stats::sd(z,     na.rm = TRUE),
+    stop("Unsupported stat: '", stat, "'. Use mean, sum, median, min, max, or sd.")
+  )
 
   ## helper: coerce a generic grouping object (vector, matrix, data.frame, list)
   ## into a data.frame with at least one column, or NULL
@@ -1085,13 +1111,15 @@ force_viewer_reload <- function(plt, delays = c(16, 90, 250, 600, 1200)) {
 
     }
     else {  # numeric summary
-      if (is.null(group_df))  # numeric y summarized by x only
-        x.tbl <- xtabs(y ~ x, drop.unused.levels = FALSE)
-      else {
-        df <- data.frame(group_df, x = x, y = y)
-        # y ~ g1 + g2 + ... + x
-        form <- reformulate(c(names(group_df), "x"), response = "y")
-        x.tbl <- xtabs(form, data = df, drop.unused.levels = FALSE)
+      if (is.null(group_df)) {  # numeric y summarized by x only
+        agg <- tapply(as.numeric(y), x, stat_fun)
+        x.tbl <- agg[!is.na(names(agg))]
+      } else {
+        df   <- data.frame(group_df, x = x, y = as.numeric(y))
+        grps <- c(lapply(names(group_df), function(nm) df[[nm]]), list(x = df$x))
+        agg  <- tapply(df$y, grps, stat_fun)
+        if (identical(STAT, "sum")) agg[is.na(agg)] <- 0
+        x.tbl <- agg
       }
     }
   }  # end !is.agg
@@ -1114,7 +1142,8 @@ force_viewer_reload <- function(plt, delays = c(16, 90, 250, 600, 1200)) {
       facet_df <- to_group_df(facet, prefix = "facet")
 
       if (is.null(by_df) && is.null(facet_df)) {
-        x.tbl <- xtabs(y ~ x, drop.unused.levels = FALSE)
+        agg <- tapply(as.numeric(y), x, stat_fun)
+        x.tbl <- agg[!is.na(names(agg))]
       }
       else {
         if (is.null(by_df) && !is.null(facet_df)) {
@@ -1142,8 +1171,8 @@ force_viewer_reload <- function(plt, delays = c(16, 90, 250, 600, 1200)) {
                          by.name = NULL, y.name = NULL,
                          stat = NULL, digits_d = 2) {
 
-  # helper: is this table "count-like"?
-  is.count <- (is.integer(x.tbl) && all(x.tbl >= 0))
+  # helper: is this table "count-like"? (y was NULL, so caller passes y.name = "Count")
+  is.count <- is.null(y.name) || identical(y.name, "Count")
 
   nd <- length(dim(x.tbl))
 

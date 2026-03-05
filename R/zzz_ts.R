@@ -13,17 +13,32 @@
   )
 }
 
+
 .check.packages <- function() {
+
   required_pkgs <- c("tsibble", "fable", "fabletools")
-  not_installed <- required_pkgs[!sapply(required_pkgs, requireNamespace,
-                                         quietly=TRUE)]
-  if (length(not_installed) > 0) {
-    stop("To use ts_source = \"fable\" to forecast\nn",
-         "Please install the following packages:\n",
-         paste0("  install.packages(\"", not_installed, "\")",
-                collapse="\n"), call.=FALSE)
+
+  quiet_require <- function(pkg) {
+    suppressMessages(
+      suppressPackageStartupMessages(
+        requireNamespace(pkg, quietly = TRUE)
+      )
+    )
   }
-  lapply(required_pkgs, function(pkg) library(pkg, character.only=TRUE))
+
+  missing <- required_pkgs[!vapply(required_pkgs, quiet_require, logical(1))]
+
+  if (length(missing)) {
+    stop("To use ts_source = \"fable\" to forecast\n\n",
+         "Please install:\n",
+         paste0("  install.packages(\"", missing, "\")", collapse = "\n"),
+         call. = FALSE)
+  }
+
+  # Optional: pre-load quietly (so later :: calls don’t trigger messages)
+  invisible(lapply(required_pkgs, quiet_require))
+
+  invisible(TRUE)
 }
 
 

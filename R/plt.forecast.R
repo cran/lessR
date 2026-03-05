@@ -1,7 +1,7 @@
 .plt.forecast <-
 function(x, y, by=NULL, exog.df=NULL, ts_new_x=NULL,
          ts_unit=NULL, ts_ahead=0, ts_method=NULL,
-         ts_fitted=FALSE, ts_source="classic", n_date_tics=NULL,
+         ts_fitted=FALSE, ts_source="fable", n_date_tics=NULL,
          ts_trend=NULL, ts_seasons=NULL, ts_error=NULL,
          ts_alpha=NULL, ts_beta=NULL, ts_gamma=NULL, ts_PI=0.95,
          digits_d=getOption("digits_d"), quiet=getOption("quiet"))  {
@@ -9,22 +9,19 @@ function(x, y, by=NULL, exog.df=NULL, ts_new_x=NULL,
 
   nd <- .max.dd(y[,1])
 
-  if (is.null(digits_d)) digits_d <- 3
+  if (is.null(digits_d)) digits_d <- .max.dd(y[,1]) + 1
   n.d <- digits_d - 1
   if (n.d <= 2) n.d <- 3
 
   x.name <- getOption("xname")
   y.name <- names(y)
-  if (is.null(digits_d)) digits_d <- .max.dd(y[,1]) + 1
 
   # get x.dates, a superset of x.fit for HoltWinters()
   n.by <- ifelse (is.null(by), 0, nlevels(by))
   if (n.by == 0)
     x.dates <- x[,1]  # save actual dates as a vector
-  else {  # x-axis tics just for one level of by
-    cnt <- sum(by == levels(by)[1])  # just dates for the first level
-    x.dates <- x[1:cnt,1]  # assumes by is sorted by level
-  }
+  else  # x-axis tics just for one level of by
+    x.dates <- x[by == levels(by)[1], 1]
 
   # when computing x.hat, need the +1 and [-1] to not duplicate last x value
   hold.days7 <- ifelse (ts_unit == "days7", TRUE, FALSE)
@@ -189,28 +186,100 @@ function(x, y, by=NULL, exog.df=NULL, ts_new_x=NULL,
       }
       else 
         cat("  ", deparse(fml), "\n")
-#     if (ts_method == "es") {
-        cat("The specified model is only suggested,",
-            "and may differ from the estimated model.\n\n")
-        cat("Estimated model\n---------------\n")
-        cat(actual_model_expr, "\n")
-#     }
+      cat("The specified model is only suggested.\n",
+          "It may differ from the estimated model.\n\n", sep="")
+
+      cat("Model to be estimated\n---------------------\n")
+      cat(actual_model_expr, "\n")
       cat("\n")
     }
 
-    # summary of model type and fit
-    if (!quiet) {
-      cat("\nModel analysis\n--------------\n")
-      fabletools::report(fit)
-    }
-    if (ts_method == "es") {
+    # deconstruct fit instead of rely upon report(fit) to better
+    #   order the components 
+    if (ts_method == "lm") {
+      aug    <- as.data.frame(fabletools::augment(fit)) # decomposition
+      resids <- aug$.resid
+      MSE    <- mean(resids^2, na.rm = TRUE)
+      coefs <- as.data.frame(fabletools::tidy(fit))
+
+      if (!quiet) { 
+        cat("Estimated model\n---------------\n")
+
+        model_name <- toupper(coefs$.model[1])
+        response_name <- colnames(aug)[3]
+
+        cat(sprintf("Model: %s\n", model_name))
+        cat(sprintf("Series: %s\n", response_name))
+
+        df_resid <- sum(!is.na(aug$.resid)) - nrow(coefs)
+        t_crit <- qt(0.975, df_resid)
+        lower <- coefs$estimate - t_crit * coefs$std.error
+        upper <- coefs$estimate + t_crit * coefs$std.error
+
+        unit_label <- sub("s$", "", ts_unit)  # specify the proper unit
+        coefs_disp <- coefs  # local copy for display only
+        coefs_disp$term <- gsub("season\\(\\)year", unit_label, coefs_disp$term)
+        coef_mat <- cbind(
+          Estimate     = coefs_disp$estimate,
+          "Std. Error" = coefs_disp$std.error,
+          "t-value"    = coefs_disp$statistic,
+          "p-value"    = round(coefs_disp$p.value, 5),
+          "Lower 95%"  = lower,
+          "Upper 95%"  = upper
+        )
+        rownames(coef_mat) <- coefs_disp$term
+        cat("\n")
+  #     printCoefmat(coef_mat, P.values = FALSE, has.Pvalue = FALSE)
+
+        fmt <- data.frame(
+          Estimate     = formatC(coef_mat[,1], format="f", digits=digits_d),
+          "Std. Error" = formatC(coef_mat[,2], format="f", digits=digits_d),
+          "t-value"    = formatC(coef_mat[,3], format="f", digits=digits_d),
+          "p-value"    = formatC(coef_mat[,4], format="f", digits=4),
+          "Lower 95%"  = formatC(coef_mat[,5], format="f", digits=digits_d),
+          "Upper 95%"  = formatC(coef_mat[,6], format="f", digits=digits_d),
+          check.names = FALSE
+        )
+        rownames(fmt) <- rownames(coef_mat)
+        print(fmt, right = TRUE)
+
+        cat("\nModel fit statistics\n--------------------\n")
+        gof <- as.data.frame(fabletools::glance(fit))
+
+        cat("Residuals:\n")
+        rq <- quantile(resids, probs=c(0, 0.25, 0.5, 0.75, 1), na.rm=TRUE)
+        names(rq) <- c("Min", "1Q", "Median", "3Q", "Max")
+        print(rq, digits = 4)
+
+        n <- sum(!is.na(resids))
+        p <- nrow(coefs)
+        df_resid <- n - p
+        df_model <- p - 1
+        sigma <- gof$sigma
+        f_stat <- gof$statistic
+        f_pval <- round(gof$p_value, 5)
+
+        cat("\n")
+        cat(sprintf("Residual standard error: %.3f on %d degrees of freedom\n",
+            sigma, df_resid))
+        if (!empty_rhs) {  # no R2 for the null model
+          cat(sprintf("Multiple R-squared: %.4f,\tAdjusted R-squared: %.4f\n",
+              gof$r_squared, gof$adj_r_squared))
+          cat(sprintf("F-statistic: %.2f on %d and %d DF, p-value: %.5f\n",
+              f_stat, df_model, df_resid, f_pval))
+        }
+      } # end !quiet
+    }  # end method="lm"
+
+    else if (ts_method == "es") {
+      if (!quiet) {
+        cat("\nModel analysis\n--------------\n")
+        fabletools::report(fit)
+      }
       m <- fit$ets[[1]]
       MSE <- m$fit$fit$MSE
     }
-    else if (ts_method == "lm") {
-      res <- fabletools::augment(fit)$`.resid`
-      MSE <- mean(res^2, na.rm = TRUE)
-    }
+
     if (!quiet)
       cat("\nMean squared error of fit to data:", .fmt_pn(MSE,3), "\n\n")
 
@@ -219,7 +288,7 @@ function(x, y, by=NULL, exog.df=NULL, ts_new_x=NULL,
     index.var <- tsibble::index_var(fitted.tbl)
 
     x.fit <- as.character(fitted.tbl[[index.var]])
-    if (ts_unit == "days"){
+    if (ts_unit %in% c("days", "days7")) {
       x.fit <- zoo::as.Date(x.fit)  # if already ISO: "2024-01-01"
     }
     else if (ts_unit == "weeks") {
@@ -229,7 +298,7 @@ function(x, y, by=NULL, exog.df=NULL, ts_new_x=NULL,
       yearmon_obj <- zoo::as.yearmon(x.fit, format = "%Y %b")
       x.fit <- zoo::as.Date(yearmon_obj)
     }
-    if (ts_unit == "quarters") {
+    else if (ts_unit == "quarters") {
       yearqtr_obj <- zoo::as.yearqtr(x.fit, format = "%Y Q%q")
       x.fit <- zoo::as.Date(yearqtr_obj)
     }
@@ -242,15 +311,15 @@ function(x, y, by=NULL, exog.df=NULL, ts_new_x=NULL,
   
     # forecast
     # --------
-    if (!is.null(exog.df)) exog.df <- .to_tsbl(ts_new_x, ts_unit)
-
     if (is.null(exog.df)) {
       frcst <- fabletools::forecast(fit, h = ts_ahead)
-    }
-    else {
-      if (!(names(exog.df)[1] == names(d.data)[1]))
-        exog.df <- .generate_future_df(d.data, ts_unit, ts_ahead, exog.df)
-      frcst <- fabletools::forecast(fit, new_data = exog.df)
+    } else {
+      # convert future exog predictors to tsibble for forecast()
+      future.tsbl <- .to_tsbl(ts_new_x, ts_unit)
+      if (!(names(future.tsbl)[1] == names(d.data)[1]))
+        future.tsbl <- .generate_future_df(d.data, ts_unit, ts_ahead,
+                                           future.tsbl)
+      frcst <- fabletools::forecast(fit, new_data = future.tsbl)
     }
 
     # prediction interval at level ts_PI
@@ -322,13 +391,14 @@ function(x, y, by=NULL, exog.df=NULL, ts_new_x=NULL,
         else if (ts_seasons == "M") {
           seasonal <- "multiplicative"
           if (!is.null(ts_gamma)) gam <- ts_gamma
-        }  # "N"
-        else
-          gam <- FALSE 
+        }
+      } else {
+        gam <- FALSE  # suppress seasonality estimation
       }
 
       # fit the data
-      fit <- HoltWinters(y.ts, alpha=NULL, beta=bet, gamma=gam,
+      alp <- if (!is.null(ts_alpha)) ts_alpha else NULL
+      fit <- HoltWinters(y.ts, alpha=alp, beta=bet, gamma=gam,
                          seasonal=seasonal)
       colnames(fit$fitted)[1] <- "fitted"
       yf <- .tsExtract(fit$fitted[,1], x.name)
@@ -352,7 +422,6 @@ function(x, y, by=NULL, exog.df=NULL, ts_new_x=NULL,
       y.ahead <- .tsExtract(y.pred[,1], x.name)
       y.hat <- y.ahead$y
       xhw.hat <- y.ahead$x.dates
-      diffx.dates <- diff(x.dates)
       x.pred1 <- x.dates[length(x.dates)]
       if (ts_unit=="weeks")
         x.hat <- seq.Date(from=x.pred1+7, by="week", length.out=nrow(xhw.hat))
@@ -385,7 +454,7 @@ function(x, y, by=NULL, exog.df=NULL, ts_new_x=NULL,
 
     # Linear Regression with Seasonality
     # ----------------------------------
-    if (ts_method == "lm") {
+    else if (ts_method == "lm") {
 
      if (!is.null(ts_trend)) {
        if (!ts_trend %in% c("A", "N")) {
@@ -432,7 +501,6 @@ function(x, y, by=NULL, exog.df=NULL, ts_new_x=NULL,
       x.seq <- 1:length(y.trend)
       fit <- lm(y.trend ~ x.seq)
       y.fit.trend <- fit$fitted.values  # reg fitted y.trend values
-      varcov <- vcov(fit)  # variance-covariance matrix of coefficients
       coefs <- fit$coefficients
       names(coefs) <- c("b0", "b1")
 
@@ -462,10 +530,11 @@ function(x, y, by=NULL, exog.df=NULL, ts_new_x=NULL,
         y.seas.eff <- double(length=length(y[,1]))
       }
 
-      y.fit <- y.fit.trend + y.seas.eff[1:length(y.fit.trend)]  # trend + seasonal
+      y.fit <- y.fit.trend + y.seas.eff[1:length(y.fit.trend)]  # trend+seasonal
       y.fit <- data.frame(y.fit)
       SSE <- sum((y[,1] - y.fit[,1])^2)
-      MSE <- SSE / (nrow(y)-2)
+      n.param.lm <- 2 + ifelse(do.seasons, freq, 0)  # freq seasonal effects
+      MSE <- SSE / (nrow(y) - n.param.lm)
 
       # y.hat from trend and (usually) seasonality plus prediction intervals
       new.x.seq <- seq(max(x.seq)+1, by=1, length.out=ts_ahead)  # future times
@@ -477,24 +546,10 @@ function(x, y, by=NULL, exog.df=NULL, ts_new_x=NULL,
       se_forecast <- sqrt(MSE * (1 + 1/nrow(y) + (new.x.seq-x_mean)^2 / Sxx))
 
       # get prediction intervals
-      t.crit <- qt((1 + ts_PI)/2, df=fit$df.residual)  # critical t-value
+      t.crit <- qt((1 + ts_PI)/2, df = nrow(y) - n.param.lm)
       half.width <- t.crit * se_forecast
       y.lwr <- as.vector(y.hat) - half.width
       y.upr <- as.vector(y.hat) + half.width
-
-      # output data frame of fitted values
-      if (ts_fitted) {
-        xc.fit <- .toFmtDate(x.dates, ts_unit)  # e.g., 2020-01-01 to 2020 Q1
-        out_fitted <- data.frame(
-          date=xc.fit,
-          y=y[,1],
-          fitted=y.fit[,1],
-          error=y[,1]-fit$fitted
-        )
-        names(out_fitted)[1:2] <- c(x.name, y.name)
-      }
-      else
-        out_fitted <- NULL
 
       out_report <- NULL
       txparam <- NULL
@@ -576,7 +631,7 @@ function(x, y, by=NULL, exog.df=NULL, ts_new_x=NULL,
           date=x.fit,  # x.fit already in correct date format
           y=y[,1],
           fitted=y.fit[,1],
-          error=y[,1]-fit$fitted
+          error=y[,1]-y.fit[,1]
         )
         names(out_fitted)[1:2] <- c(x.name, y.name)
       }  # end lm
@@ -586,7 +641,6 @@ function(x, y, by=NULL, exog.df=NULL, ts_new_x=NULL,
 
       if (ts_method == "es") {
         cmp <- fabletools::components(fit)
-        fitted_tbl <- fabletools::augment(fit)
         out <- capture.output(print(cmp, n = 1))
         formula_line <- grep("^#\\s*:", out, value = TRUE)
         if (length(formula_line) > 0)
@@ -594,16 +648,15 @@ function(x, y, by=NULL, exog.df=NULL, ts_new_x=NULL,
         else
           frm <- NA_character_
         decomp.frm <- paste("\nDecomposition formula:\n", frm, "\n\n")
-        n.pad <- nrow(cmp) - nrow(fitted_tbl)
+        n.pad <- nrow(cmp) - nrow(fitted.tbl)
         xc <- c(rep(NA, n.pad), xc)
         y.fit.pad <- c(rep(NA, n.pad), y.fit)
         y <- data.frame(y.name = c(rep(NA, n.pad), y[,1]))
       } 
 
       else if (ts_method == "lm") {
-        fitted_tbl <- fabletools::augment(fit)
-        cmp <- data.frame(fitted = fitted_tbl$.fitted,
-                      resid = fitted_tbl$.resid)
+        cmp <- data.frame(fitted = fitted.tbl$.fitted,
+                      resid = fitted.tbl$.resid)
         decomp.frm <- "TSLM only provides fitted and residuals.\n\n"
       }
 
@@ -613,23 +666,23 @@ function(x, y, by=NULL, exog.df=NULL, ts_new_x=NULL,
         if (ts_method == "es") {
           out_fitted <- cbind(out_fitted, fitted=y.fit.pad)
           out_fitted <- cbind(out_fitted, level=cmp$level)
-        if (!is.null(ts_trend)) {
-          if (ts_trend != "N")
-            out_fitted <- cbind(out_fitted, trend=cmp$slope)
-        }
-        if (!is.null(ts_seasons)) {
-          if (ts_seasons != "N")
-            out_fitted <- cbind(out_fitted, season=cmp$season)
+          if (!is.null(ts_trend)) {
+            if (ts_trend != "N")
+              out_fitted <- cbind(out_fitted, trend=cmp$slope)
+          }
+          if (!is.null(ts_seasons)) {
+            if (ts_seasons != "N")
+              out_fitted <- cbind(out_fitted, season=cmp$season)
+          }
           out_fitted <- cbind(out_fitted, error=cmp$remainder)
-        }
 
-        # Replace NAs with blanks across all columns of out_fitted
-        out_fitted[] <- lapply(out_fitted, function(col) {
-          if (is.numeric(col)) 
-            ifelse(is.na(col), "", as.character(.fmt(col, nd)))
-          else
-            ifelse(is.na(col), "", col)
-        })
+          # Replace NAs with blanks across all columns of out_fitted
+          out_fitted[] <- lapply(out_fitted, function(col) {
+            if (is.numeric(col)) 
+              ifelse(is.na(col), "", as.character(.fmt(col, nd)))
+            else
+              ifelse(is.na(col), "", col)
+          })
         }  # end es fit
       else if (ts_method == "lm")
         out_fitted <- cbind(out_fitted, cmp)
@@ -653,7 +706,7 @@ function(x, y, by=NULL, exog.df=NULL, ts_new_x=NULL,
     upper=y.upr,
     width=y.upr-y.lwr
   )
-  names(y.frcst) <- c(x.name, "predicted", "upper", "lower", "width")
+  names(y.frcst) <- c(x.name, "predicted", "lower", "upper", "width")
 
   x.fit <- data.frame(x.fit)
   y.fit <- data.frame(y.fit)

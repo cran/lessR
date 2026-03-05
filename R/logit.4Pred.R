@@ -1,10 +1,11 @@
 .logit4Pred <-
 function(lm.out, nm, d, my_formula, brief, res_rows,
-         n.vars, n.pred, n.obs, n.keep, digits_d, pre, line,
+         n.vars, n.pred, n.obs, n.keep, pt_size, transparency,
+         digits_d, pre, line,
          new.data, pred, pred_all, prob_cut, 
          in.data.frame, X1_new, 
          X2_new, X3_new, X4_new, X5_new, X6_new,
-         pdf_file, width, height, ...) {
+         xlab, ylab, pdf_file, width, height, ...) {
 
 
   pred_sort <- TRUE  # data must be sorted to find cases close to fitted=0.5
@@ -144,16 +145,24 @@ function(lm.out, nm, d, my_formula, brief, res_rows,
 
     y.values <- as.numeric(lm.out$model[,nm[1]])
     min.y <- min(y.values, na.rm=TRUE)
-    y.label <- paste("Probability ", nm[1], " = ", 
-      levels(lm.out$model[,nm[1]])[2], sep="")
+    if (is.null(xlab))
+       x.lab <- nm[2]
+    else
+       x.lab <- xlab
+    
+    if (is.null(ylab))
+       y.lab <- paste("Probability ", nm[1], " = ",
+                      levels(lm.out$model[,nm[1]])[2], sep="")
+    else
+       y.lab <- ylab
     for (i in 1:length(y.values))
       y.values[i] <- ifelse (y.values[i]==min.y, 0, 1) 
  
     # set margins
     max.width <- strwidth(as.character(max(pretty(y.values))), units="inches")
     
-    margs <- .plt.marg(max.width, y.lab=nm[1], x.lab=nm[2], main=NULL, sub=NULL)
-    lm <- margs$lm + 0.2;  tm <- margs$tm;  rm <- margs$rm;  bm <- margs$bm
+    margs <- .plt.marg(max.width, y.lab=nm[1], x.lab=x.lab, main=NULL, sub=NULL)
+    lm <- margs$lm+0.2;  tm <- margs$tm;  rm <- margs$rm;  bm <- margs$bm+0.1
 
     nc <- max(nchar(levels(lm.out$model[,nm[1]])))
     rm <- rm + .076*nc + 0.18
@@ -180,27 +189,25 @@ function(lm.out, nm, d, my_formula, brief, res_rows,
     text(x=usr[2]+0.07, y=c(0,1), labels=levels(lm.out$model[,nm[1]]),
          pos=4, xpd=TRUE, cex=ax$axis_y_cex, col=ax$axis_y_text_color)
 
-    .axlabs(nm[2], y.label, labels=FALSE, main.lab=NULL, sub.lab=NULL, 
+    .axlabs(x.lab, y.lab, labels=FALSE, main.lab=NULL, sub.lab=NULL, 
             cex.lab=getOption("lab_cex"), cex.main=1.0, ...) 
 
     fill <- getOption("pt_fill")
-    trans <- .7
-    fill <- .maketrans(fill, (1-trans)*256)
+    fill <- .maketrans(fill, (1-transparency)*256)
     color <- getOption("pt_color")
     if (n.vars == 2  &&  length(prob_cut) == 1) {
       pc <- prob_cut[1]
       segments(usr[1], pc, usr[2], pc, col="gray35", lty="dashed", lwd=0.5)  
       segments(x.cut, usr[3], x.cut, usr[4], col="gray35", lty="dashed", lwd=0.5)  
-#     polygon(c(x.cut, usr[2], usr[2], x.cut), c(1,1,0,0), col="gray98")
     }
-    points(x.values, y.values, pch=21, col=color, bg=fill, cex=0.8)
+    points(x.values, y.values, pch=21, col=color, bg=fill, cex=pt_size)
     lines(x.values, p.int$fit, col=color, lwd=2)
 
     if (!is.null(pdf_file)) {
       dev.off()
       .showfile(pdf_file, "fitted values and scatter plot")
     }
-  }
+  }  # end sigmoid plot
 
   else {  # scatterplot matrix for multiple regression
     if (in.data.frame) {
@@ -231,6 +238,6 @@ function(lm.out, nm, d, my_formula, brief, res_rows,
       cat("\n\n>>> No scatterplot matrix reported because not all variables are ")
       if (!in.data.frame) cat("in the data frame.\n")
     }
-  }
+  }  # end scatterplot matrix
 
 }

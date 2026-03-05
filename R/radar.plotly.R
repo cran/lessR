@@ -8,17 +8,15 @@
   facet_title_y_base, facet_title_row_shift
 ) {
 
-  `%||%` <- function(a, b) if (is.null(a) || length(a) == 0L) b else a
-
   # ---- 1) Build data.frame ----
   n <- length(x.call)
-  if (!length(n)) stop("radar(): x.call has length 0.")
+  if (n == 0L) stop("radar(): x.call has length 0.")
 
-  x_fac      <- factor(x.call)
+  x_fac      <- factor(x.call, levels = unique(x.call))
   by_fac_in  <- if (is.null(by.call)) factor(rep("(All)", n), levels="(All)")
-                else factor(by.call)
-  fac_fac_in <- if (is.null(facet.call))factor(rep("(All)", n), levels="(All)")
-                else factor(facet.call)
+                else factor(by.call, levels = unique(by.call))
+  fac_fac_in <- if (is.null(facet.call)) factor(rep("(All)", n), levels="(All)")
+                else factor(facet.call, levels = unique(facet.call))
 
   # keys for detecting pre-aggregated data
   key_df  <- data.frame(
@@ -97,33 +95,24 @@
 
   r_tab <- xtabs(value ~ facet + by + x, data = agg, drop.unused.levels=FALSE)
 
-  facet_fac <- factor(dimnames(r_tab)[[1]])
-  by_fac    <- factor(dimnames(r_tab)[[2]])
-  x_fac_out <- factor(dimnames(r_tab)[[3]])
+  facet_fac <- factor(dimnames(r_tab)[[1]], levels = dimnames(r_tab)[[1]])
+  by_fac    <- factor(dimnames(r_tab)[[2]], levels = dimnames(r_tab)[[2]])
+  x_fac_out <- factor(dimnames(r_tab)[[3]], levels = dimnames(r_tab)[[3]])
 
   if (!length(x_fac_out)) stop("radar(): x has no levels to plot.")
   if (!length(by_fac))   stop("radar(): by has no levels to plot.")
   if (!length(facet_fac))stop("radar(): facet has no levels to plot.")
 
   rmax  <- max(r_tab, na.rm = TRUE)
+  if (!is.finite(rmax)) stop("radar(): all aggregated values are NA; nothing to plot.")
   n_fac <- length(facet_fac)
   n_by  <- length(by_fac)
 
   # ---- 4) Facet gaps from facet_size ----
   base_gap_x <- 0.04
   base_gap_y <- 0.11
-  if (n_fac > 1L) {
-    if (is.null(facet_gap_x) && is.null(facet_gap_y)) {
-      facet_gap_x <- base_gap_x / (facet_size %||% 1)
-      facet_gap_y <- base_gap_y / (facet_size %||% 1)
-    } else {
-      facet_gap_x <- facet_gap_x %||% base_gap_x
-      facet_gap_y <- facet_gap_y %||% base_gap_y
-    }
-  } else {
-    facet_gap_x <- facet_gap_x %||% base_gap_x
-    facet_gap_y <- facet_gap_y %||% base_gap_y
-  }
+  facet_gap_x <- facet_gap_x %||% (base_gap_x / (facet_size %||% 1))
+  facet_gap_y <- facet_gap_y %||% (base_gap_y / (facet_size %||% 1))
 
   # ---- 5) Facet domains ----
   grid <- .plotly_make_domains_grid(
@@ -158,7 +147,7 @@
 
   # ---- 8) Build traces ----
   p <- plotly::plot_ly()
-  val_spec <- paste0(":.", max(0L, as.integer(digits_d)), "f")
+  val_spec <- paste0(":.", if (is.null(digits_d)) 0L else max(0L, as.integer(digits_d)), "f")
 
   for (i in seq_along(facet_fac)) {
     fac <- facet_fac[i]
@@ -184,8 +173,8 @@
         text  = text_labels,
         hovertemplate = paste0(
           x.name, ": %{text}<br>",
-          by.name, ": ", by_fac[j], "<br>",
-          facet.name, ": ", fac, "<br>",
+          if (n_by  > 1) paste0(by.name,    ": ", by_fac[j], "<br>") else "",
+          if (n_fac > 1) paste0(facet.name, ": ", fac,       "<br>") else "",
           y_label, ": %{r", val_spec, "}<extra></extra>"
         ),
         subplot = subplot_name,
@@ -222,24 +211,35 @@
   )
 
   # ---- 11) Final layout (legend shifted left a bit) ----
-  p <- plotly::layout(
+p <- plotly::layout(
+  p,
+  title = list(
+    text = ttl_text,
+    x = 0.5, xanchor = "center",
+    y = 0.97, yanchor = "top"
+  ),
+  margin = list(t = 60, b = 10, l = 25, r = 25),
+  annotations = ann,
+  legend = list(
+    x = 1.0,
+    xanchor = "right",
+    y = 1.0,
+    yanchor = "top",
+    bordercolor = .to_hex(getOption("panel_border", "gray70")),
+    borderwidth = 1
+  )
+)
+
+  # Finalize to ensure htmlwidget form + sizingPolicy + unique id
+  p <- .finalize_plotly_widget(
     p,
-    title = list(
-      text = ttl_text,
-      x = 0.5, xanchor = "center",
-      y = 0.985, yanchor = "top"
-    ),
-    margin = list(t = 90, b = 0, l = 25, r = 25),
-    annotations = ann,
-    legend = list(
-      x = 1.0,
-      xanchor = "right",
-      y = 1.0,
-      yanchor = "top",
-      bordercolor = .to_hex(getOption("panel_color", "gray70")),
-      borderwidth = 1
-    )
+    kind         = "radar",
+    x.name       = x.name,
+    by.name      = by.name,
+    add_title    = FALSE,
+    nudge_viewer = (.allow.interactive() && !isTRUE(getOption("knitr.in.progress"))),
+    unique_element = TRUE
   )
 
-  p
+  return(invisible(p))
 }

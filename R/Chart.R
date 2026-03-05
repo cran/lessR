@@ -1,5 +1,4 @@
-Chart <-
-function(x=NULL, by=NULL, y=NULL, data=d, filter=NULL,
+Chart <- function(x=NULL, by=NULL, y=NULL, data=d, filter=NULL,
 
         type=c("bar", "radar", "bubble", "dot", "pie", "icicle", "treemap"),
         hole=0.65,  # pie chart
@@ -23,7 +22,7 @@ function(x=NULL, by=NULL, y=NULL, data=d, filter=NULL,
         labels=c("%", "input", "prop", "off"),
         labels_position=c("in","out"),
         labels_color="white",
-        labels_size=0.75,
+        labels_size=1.00,
         labels_decimals=NULL,
         labels_cut=NULL,
 
@@ -103,6 +102,10 @@ function(x=NULL, by=NULL, y=NULL, data=d, filter=NULL,
       cat(txt, "\n\n")
     }
   }
+
+  labels_size.miss <- ifelse (missing(labels_size), TRUE, FALSE)
+  if (!facet.miss && labels_size.miss) labels_size <- .85
+
 
 # old stuff ---------------------------------------------------------------
 
@@ -546,7 +549,7 @@ function(x=NULL, by=NULL, y=NULL, data=d, filter=NULL,
 # suggestions -------------------------------------------------------------
 
     txsug <- ""
-    if (getOption("suggest")) {
+    if (getOption("suggest") && !quiet) {
       # function call, with last ) removed for suggestions
       fncl <- .fun_call.deparse(fun_call)  # class call to class character
       fncl <- gsub(")$", "", fncl)  # get function call less closing )
@@ -812,6 +815,7 @@ function(x=NULL, by=NULL, y=NULL, data=d, filter=NULL,
       is.agg <- TRUE
       stat_out <- .stats(x.call, y.call, by.call, facet.call, stat, y.name)
       out <- stat_out$out  # aggregated data
+      if (!labels.miss) labels <- "input"
 
       if (is.null(ylab)) {
         ylab   <- stat_out$ylab
@@ -843,7 +847,7 @@ function(x=NULL, by=NULL, y=NULL, data=d, filter=NULL,
         x.tbl    = x.tbl,
         x.name   = x.name,
         x.lbl    = x.lbl,
-        by.name  = by.name,  # l Beachabel string, not the columns
+        by.name  = by.name,  # label string, not the columns
         y.name   = y.name,
         stat     = stat,
         digits_d = digits_d
@@ -911,33 +915,36 @@ function(x=NULL, by=NULL, y=NULL, data=d, filter=NULL,
     gl <- .getlabels(main=main, lab_cex=getOption("lab_cex"))
     x.name <- gl$xn; x.lbl <- gl$xl
 
-    # build the 1-D / 2-D table strictly for console output & hover
-    x.tbl <- .build_xtab(
-      x        = x.call,
-      y        = if (exists("y.call")) y.call else NULL,
-      by       = by.call,
-      facet    = facet.call,
-      stat     = stat,
-      is.agg   = is.agg,
-      digits_d = digits_d
-    )
-
-    if (length(dim(x.tbl)) < 3) { # by not a vector 
-      .print_table(  # print 1-D or 2-D, in zzz_plotly
-        x.tbl   = x.tbl,
-        x.name  = x.name,
-        x.lbl   = x.lbl,
-        by.name = if (is.null(by.call)) NULL else by.name,
-        y.name  = if (!is.null(stat) && !is.null(y.call)) y.name else "Count",
-        stat    = stat,
+    if (!quiet) {
+      # build the 1-D / 2-D table strictly for console output & hover
+      x.tbl <- .build_xtab(
+        x        = x.call,
+        y        = if (exists("y.call")) y.call else NULL,
+        by       = by.call,
+        facet    = facet.call,
+        stat     = stat,
+        is.agg   = is.agg,
         digits_d = digits_d
       )
-    }
+
+      if (length(dim(x.tbl)) < 3) { # by not a vector 
+        .print_table(  # print 1-D or 2-D, in zzz_plotly
+          x.tbl   = x.tbl,
+          x.name  = x.name,
+          x.lbl   = x.lbl,
+          by.name = if (is.null(by.call)) NULL else by.name,
+          y.name  = if (!is.null(stat) && !is.null(y.call)) y.name else "Count",
+          stat    = stat,
+          digits_d = digits_d
+        )
+      }
+    }  # end !quiet
   }
 }  # end need to aggregate
 
 
 # begin processing designated chart type ----------------------------------
+
 
   if (type == "bar") {
     bc <- .bc.main(x.call, y.call, by.call, stack100,
@@ -972,30 +979,22 @@ function(x=NULL, by=NULL, y=NULL, data=d, filter=NULL,
   else if (type %in% c("sunburst", "treemap", "icicle") ||
           (type == "pie" && !is.null(by.call))) {
     if (type == "pie") type <- "sunburst"
-
     plt <- .hier.plotly(
-      x.call = x.raw,
-      by.call = by.raw,
-      facet.call = facet.raw,
-      y.call = y.raw,
-      x.name = x.name, by.name = by.name, facet.name = facet.name, y.name = y.name,
-      type  = type,
-      stat  = stat,
-      fill=fill,
-      border=color,
-      digits_d = digits_d,
-      facet_gap_x = 0.04,
-      facet_gap_y = 0.11,
-      facet_size  = 1.00,
-      facet_title_y_base    = -0.018,  # down a bit into panel
-      facet_title_row_shift = -0.003,  # additional downshift per lower row
-      main = if (!missing(main)) main else NULL
+      x.call=x.raw, by.call=by.raw, facet.call=facet.raw, y.call=y.raw,
+      x.name=x.name, by.name=by.name, facet.name=facet.name, y.name=y.name,
+      type=type, stat=stat, fill=fill, border=color, digits_d=digits_d,
+      facet_gap_x=0.04, facet_gap_y=0.11, facet_size=1.00,
+      facet_title_y_base =-0.018, facet_title_row_shift=-0.003,
+      main=if (!missing(main)) main else NULL,
+      labels=labels, labels_position=labels_position,
+      labels_color=labels_color, labels_size=labels_size
     )
 
-    if (.allow.interactive()) print(plt)
-    return(invisible(plt))
+    if (.allow.interactive() && !isTRUE(getOption("knitr.in.progress")))
+      print(plt)
 
-  } 
+    return(invisible(plt))
+  }
 
   else if (type == "pie") {  # plain pie, no by, maybe facet
 
@@ -1013,6 +1012,9 @@ function(x=NULL, by=NULL, y=NULL, data=d, filter=NULL,
                labels_decimals, main_cex=1, main, main.miss, digits_d,
                is.agg, quiet)
 
+    if (.allow.interactive() && !isTRUE(getOption("knitr.in.progress")))
+      print(plt)
+
     return(invisible(plt))
   }
 
@@ -1027,6 +1029,9 @@ function(x=NULL, by=NULL, y=NULL, data=d, filter=NULL,
                labels, labels_position, labels_color, labels_size,
                labels_decimals, main_cex=1, main, main.miss, digits_d,
                is.agg, quiet)
+
+    if (.allow.interactive() && !isTRUE(getOption("knitr.in.progress")))
+      print(plt)
 
     return(invisible(plt))
   }
@@ -1104,14 +1109,40 @@ function(x=NULL, by=NULL, y=NULL, data=d, filter=NULL,
         facet_title_row_shift = -0.003  # additional downshift per lower row
       )
 
-      if (.allow.interactive()) print(plt)
-      return(invisible(plt))
+    if (.allow.interactive() && !isTRUE(getOption("knitr.in.progress")))
+      print(plt)
+
+    return(invisible(plt))
     }
 
 
 # Chart(x=, y=, ...,  type="dot") -> delegate to XY() for now -------------
 
     else if (type == "dot") {
+
+      # future: aggregate here instead of quit, but now go to XY()
+      if (is.character(x.call)) {
+        if (length(x.call) > length(unique(x.call))) {
+          msg <- paste0(
+            "\n------\n",
+            "Dot charts require unique values for ", x.name, ".\n\n",
+            "Aggregation can be used to obtain unique values, but\n",
+            "currently the data must be pre-aggregated.\n\n",
+            "Example:\n",
+            "  a <- pivot(", df.name, ", table, by = ", x.name, ")\n",
+            "  Chart(", x.name, ", by = n, type = \"dot\", data=a)\n\n"
+          )
+              stop(msg, call. = FALSE)
+        }
+      }
+
+      if (is.null(y.call)) {
+          msg <- paste0(
+            "\n------\n",
+            "Need to specify a numerical variable for y, y=NAME\n",
+            "\n")
+          stop(msg, call. = FALSE)
+      }
 
       calls <- sys.calls()  # the function call
       top   <- calls[[1L]]

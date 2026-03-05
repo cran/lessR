@@ -19,17 +19,18 @@
 ) {
 
 
-  `%||%` <- function(a, b) if (is.null(a) || length(a) == 0L) b else a
-
-
 # add trace function ------------------------------------------------------
 
   make_trace <- function(p, nd, domain_xy) {
-#   digits  <- max(0L, as.integer(digits_d))
-    if (!is.null(stat) && digits_d==0) digits_d <- digits_d + 2  # mean, etc.
-    txtinfo <- if (isTRUE(show_labels)) "label" else "none"
+    if (!is.null(stat) && isTRUE(digits_d == 0)) digits_d <- digits_d + 2  # mean, etc.
+    txtinfo <- if (!show_text) "none" else switch(labels,
+      "input" = "label+value",
+      "%"     = "label+percent root",
+      "prop"  = "label+percent root",
+      "label"
+    )
 
-    digits <- max(0L, as.integer(digits_d))
+    digits <- if (is.null(digits_d)) 0L else max(0L, as.integer(digits_d))
 
     stat_line <- paste0(
       stat_label, ": %{customdata.stat:,.", digits, "f}"
@@ -51,8 +52,8 @@
 
     # map top-level category -> color, then inherit down the tree
     col_map   <- setNames(as.character(fill_vec), top_levels)
-    node_cols <- col_map[as.character(nd$root)]
-    node_cols[is.na(node_cols)] <- col_map[1L]  # fallback if any NA
+    node_cols <- unname(col_map[as.character(nd$root)])
+    node_cols[is.na(node_cols)] <- unname(col_map[1L])  # fallback if any NA
 
     marker <- list(
       colors = node_cols,
@@ -68,8 +69,9 @@
       values       = nd$values,
       customdata   = nd$customdata,
       domain       = list(x = domain_xy$x, y = domain_xy$y),
-      branchvalues = "total",
+      branchvalues = "remainder",
       textinfo     = txtinfo,
+      textfont     = list(size = label_fsize, color = labels_color),
       hovertemplate = hover,
       marker       = marker
     )
@@ -85,7 +87,7 @@
         labels  = character(),
         parents = character(),
         values  = numeric(),
-        custom  = list(),
+        customdata = I(list()),
         root    = character()
       ))
     }
@@ -193,7 +195,10 @@
       out_ids     <- c(out_ids, ids)
       out_labels  <- c(out_labels, cur_labels)
       out_parents <- c(out_parents, parents)
-      out_values  <- c(out_values, agg_size$size)
+      # branchvalues="remainder": only leaves carry values; parent value = 0
+      # so Plotly sums children automatically — no parent/child mismatch possible
+      out_values  <- c(out_values,
+                       if (lvl == n_levels) agg_size$size else rep(0, nrow(agg_size)))
       out_custom  <- c(out_custom, custom)
       out_root    <- c(out_root, root_vals)
     }  # end: for (lvl in seq_len(n_levels))
@@ -225,7 +230,7 @@
 
 # build path table ------------------------------------------------------------ 
 
-  mk_char <- function(v) as.character(if (is.factor(v)) v else v)
+  mk_char <- function(v) as.character(v)
 
   if (is.null(by.call)) {
     path_df   <- data.frame(x = mk_char(x.call), check.names=FALSE)
@@ -248,12 +253,12 @@
   # ---- base numeric vector from y (or 1s for counts) -------------------
   base_vals <- if (is.null(y.call)) rep(1, nrow(path_df)) else {
     z <- suppressWarnings(as.numeric(y.call))
-    z[!is.finite(z)] <- NA_real_
+    z[!is.finite(z)] <- 0  # treat non-finite as 0 for sizing; ring must close
     z
   }
 
   # ---- set the stat function & label ------------------------------------
-  STAT <- tolower(stat %||% if (is.null(y.call)) "sum" else "sum")
+  STAT <- tolower(stat %||% "sum")
   stat_fun <- switch(
     STAT,
     mean   = function(z) mean(z, na.rm=TRUE),
@@ -267,17 +272,18 @@
 
   non_additive <- !identical(STAT, "sum")
 
-  # For sizing always apply an additive aggregator
-  size_fun <- function(z) sum(z, na.rm=TRUE)
+  # For sizing always apply an additive aggregator; replace NA with 0 so
+  # all leaf values sum exactly to the root and the outer ring closes.
+  size_fun <- function(z) sum(ifelse(is.na(z), 0, z))
 
-  stat_label <- y.name
+  stat_label <- if (is.null(y.call)) "Count" else y.name
 
 
 # assign colors, setup based on top-level categories ----------------------
 
   # top-level categories are in the first path column
   top_raw <- mk_char(path_df[[1L]])
-  top_levels <- if (!is.null(levels(path_df[[1L]]))) levels(path_df[[1L]])
+  top_levels <- if (is.factor(x.call)) levels(x.call)
                 else unique(top_raw)
 
   if (is.null(fill)) {  # fill palette for top-level categories
@@ -310,11 +316,23 @@
       stat   = if (is.null(y.call)) NULL else STAT
     )
 
-    return(plotly::layout(
+    p <- plotly::layout(
       p,
       margin = list(t = 50, b = 8, l = 20, r = 20),
       title  = list(text = ttl_text, font = list(size = 16))
-    ))
+    )
+
+    # Ensure unique htmlwidget id (REQUIRED for knitting)
+    if (is.null(p$elementId)) {
+      p$elementId <- paste0(
+        "lessr-hier-",
+        format(Sys.time(), "%Y%m%d%H%M%OS3"),
+        "-",
+        sample.int(1e5, 1)
+      )
+    }
+
+    return(p)
   }
 
 
@@ -383,10 +401,6 @@
       new_y1 <- min(1, y1 - shift)
       new_y0 <- max(0, new_y1 - span)
 
-      if ((new_y1 - new_y0) < span) {
-        new_y0 <- max(0, new_y1 - span)
-      }
-
       list(x = d$x, y = c(new_y0, new_y1))
     })
   }
@@ -419,12 +433,7 @@
     y_row_shift  = facet_title_row_shift
   )
 
-  if (type == "sunburst") {
-    for (i in seq_along(ann)) {
-      top_y <- domains[[i]]$y[2]
-      ann[[i]]$y <- min(top_y + 0.03, 0.98)
-    }
-  } else if (type == "treemap") {
+  if (type %in% c("sunburst", "treemap")) {
     for (i in seq_along(ann)) {
       top_y <- domains[[i]]$y[2]
       ann[[i]]$y <- min(top_y + 0.03, 0.98)
@@ -440,13 +449,21 @@
   }
 
 
-# Plot --------------------------------------------------------------------
+  # Plot --------------------------------------------------------------------
 
-  plotly::layout(
+  p <- plotly::layout(
     p,
     annotations = ann,
-    margin=list(t=50, b=8, l=20, r=20),
+    margin = list(t=50, b=8, l=20, r=20),
     title  = list(text = ttl_text, font = list(size=16))
   )
 
+  p$elementId <- paste0(
+    "lessr-hier-",
+    format(Sys.time(), "%Y%m%d%H%M%OS3"),
+    "-",
+    sample.int(1e5, 1)
+  )
+
+  p   # last expression returned
 }

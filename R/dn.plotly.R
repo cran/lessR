@@ -12,13 +12,11 @@ dn.plotly <- function(
 ) {
 
 
-  `%||%` <- function(a, b) if (is.null(a) || length(a) == 0) b else a
-
   # --- groups ------------------------------------------------------------
   if (is.null(by)) {
     groups <- "Series 1"; G <- 1L
   } else {
-    if (is.factor(by)) groups <- levels(by) else groups <- unique(by)
+    if (is.factor(by)) groups <- levels(by) else groups <- unique(by[!is.na(by)])
     G <- length(groups)
   }
 
@@ -26,7 +24,7 @@ dn.plotly <- function(
   xr <- range(x, finite = TRUE)
   if (is.null(from) || is.na(from)) from <- xr[1L]
   if (is.null(to)   || is.na(to))   to   <- xr[2L]
-  if (to <= from) to <- from + .Machine$double.eps
+  if (to <= from) to <- from + max(abs(from) * 1e-4, 1e-6)
   if (n < 2) n <- 2
 
   xgrid <- seq(from, to, length.out = n)
@@ -58,7 +56,7 @@ dn.plotly <- function(
 
     d  <- stats::density(
       xg, bw = bw, adjust = adjust, kernel = kernel,
-      n = n, from = from, to = to, na.rm = TRUE
+      n = n, from = from, to = to
     )
 
     # align to shared grid
@@ -101,7 +99,6 @@ dn.plotly <- function(
   plt <- plotly::plot_ly(
     type       = "scatter",
     mode       = "lines",
-    hoverinfo  = "text",
     showlegend = G > 1
     # elementId removed — belongs on the widget, not on the trace
   )
@@ -115,6 +112,7 @@ dn.plotly <- function(
       line      = list(color = line_rgba[g], width = 1.4),
       fill      = "tozeroy",
       fillcolor = fill_rgba[g],
+      hoverinfo = "text",
       hovertext = if (!is.null(nm) && length(by.name))
         paste0(by.name, ": ", groups[g], "<br>", .hover(d$x, d$y, d$cum))
       else
@@ -176,7 +174,7 @@ dn.plotly <- function(
     x.name = x.name,
     by.name = if (G > 1) by.name else NULL,
     add_title = FALSE,
-    nudge_viewer = TRUE
+    nudge_viewer = (.allow.interactive() && !isTRUE(getOption("knitr.in.progress")))
   )
 
   invisible(plt)

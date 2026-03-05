@@ -10,7 +10,7 @@ if (getRversion() >= "3.6.0")
 .onAttach <- function(libname, pkgname) {
   packageStartupMessage(
     "\n",
-    "lessR 4.5.1                          feedback: gerbing@pdx.edu \n",
+    "lessR 4.5.2                          feedback: gerbing@pdx.edu \n",
     "--------------------------------------------------------------\n",
     "> d <- Read(\"\")  Read data file, many formats available, e.g., Excel\n",
     "  d is the default data frame, data= in analysis routines optional\n",

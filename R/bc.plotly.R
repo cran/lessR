@@ -13,6 +13,12 @@ function(x, x.name, y.name, by.name, x.lab, y.lab,
   labels <- match.arg(labels)
   alpha_fill <- if (is.null(opacity)) 0.92 else as.numeric(opacity)
 
+  # Show % lines in hover only when data are counts (i.e., user did NOT
+  # explicitly pass labels="input", which signals means / deviations).
+  # missing_labels=TRUE covers the 1-D default path that overrides to "input"
+  # for tabulated counts — percentages are still meaningful there.
+  show_pct_hover <- missing_labels || labels != "input"
+
   .row_customdata <- function(a, b = NULL) {
     a <- as.numeric(a)
     if (is.null(b)) unname(lapply(a, function(z) c(z)))
@@ -54,14 +60,16 @@ function(x, x.name, y.name, by.name, x.lab, y.lab,
 
     tick.fmt <- .get.tick.fmt(df[[y.name]], digits_d)
 
+    pct_line <- if (show_pct_hover) "<br>% of total: %{customdata:.1%}" else ""
+
     hover <- if (!horiz)
       paste0(x.name, ": %{x}<br>",
              y.name, ": %{y:", tick.fmt, "}",
-             "<br>% of total: %{customdata:.1%}<extra></extra>")
+             pct_line, "<extra></extra>")
     else
       paste0(x.name, ": %{y}<br>",
              y.name, ": %{x:", tick.fmt, "}",
-             "<br>% of total: %{customdata:.1%}<extra></extra>")
+             pct_line, "<extra></extra>")
 
     fill_vec   <- .to_hex(rep_len(fill, nrow(df)))
     border_hex <- .to_hex(rep_len(clr,  nrow(df)))
@@ -116,35 +124,42 @@ function(x, x.name, y.name, by.name, x.lab, y.lab,
     df[[by.name]] <- factor(df[[by.name]], levels = rownames(x))
     df[[x.name]]  <- factor(df[[x.name]],  levels = colnames(x))
 
-    cat_vals <- as.character(df[[x.name]])
+    cat_vals <- levels(df[[x.name]])
+
+    # mirror 1-D behaviour: default to showing input values, not percentages,
+    # when the caller did not explicitly specify labels= (e.g. means/deviations)
+    if (missing_labels) labels <- "input"
 
     total_n <- sum(df[[y.name]], na.rm = TRUE)
-    df$share_total <- df[[y.name]] / total_n
+    df$share_total <- if (total_n > 0) df[[y.name]] / total_n else rep(NA_real_, nrow(df))
 
     x_totals <- tapply(df[[y.name]], df[[x.name]], sum, na.rm = TRUE)
-    df$share_within_x <- df[[y.name]] /
-      as.numeric(x_totals[as.character(df[[x.name]])])
+    x_denom  <- as.numeric(x_totals[as.character(df[[x.name]])])
+    df$share_within_x <- ifelse(x_denom != 0, df[[y.name]] / x_denom, NA_real_)
 
     grp    <- df[[by.name]]
     groups <- levels(grp)
 
     tick.fmt <- .get.tick.fmt(df[[y.name]], digits_d)
 
+    pct_lines_2d <- if (show_pct_hover)
+      paste0("<br>% of ", x.name, ": %{customdata[1]:.1%}",
+             "<br>% of total: %{customdata[0]:.1%}")
+    else ""
+
     hover <- if (!horiz)
       paste0(
         x.name, ": %{x}<br>",
         by.name, ": %{fullData.name}<br>",
         y.name, ": %{y:", tick.fmt, "}",
-        "<br>% of ", x.name, ": %{customdata[1]:.1%}",
-        "<br>% of total: %{customdata[0]:.1%}<extra></extra>"
+        pct_lines_2d, "<extra></extra>"
       )
     else
       paste0(
         x.name, ": %{y}<br>",
         by.name, ": %{fullData.name}<br>",
         y.name, ": %{x:", tick.fmt, "}",
-        "<br>% of ", x.name, ": %{customdata[1]:.1%}",
-        "<br>% of total: %{customdata[0]:.1%}<extra></extra>"
+        pct_lines_2d, "<extra></extra>"
       )
 
     plt <- plotly::plot_ly()
@@ -165,7 +180,7 @@ function(x, x.name, y.name, by.name, x.lab, y.lab,
       if (labels == "off") {
         txt <- rep("", length(rows))
       } else if (labels == "input") {
-        txt <- .fmt_val(yv, digits_d)
+        txt <- .fmt_val(df[[y.name]][rows], digits_d)
       } else if (labels == "%") {
         txt <- sprintf("%.0f%%", 100 * df$share_total[rows])
       } else {  # "prop"
@@ -251,8 +266,11 @@ function(x, x.name, y.name, by.name, x.lab, y.lab,
     )
   }
 
-  plt$x$layout$plot_bgcolor  <- .to_hex(getOption("panel_fill",  "white"))
-  plt$x$layout$paper_bgcolor <- .to_hex(getOption("window_fill", "white"))
+  plt <- plotly::layout(
+    plt,
+    plot_bgcolor  = .to_hex(getOption("panel_fill",  "white")),
+    paper_bgcolor = .to_hex(getOption("window_fill", "white"))
+  )
 
   if (!is.null(by.name) && nzchar(by.name)) {
     plt <- plotly::layout(

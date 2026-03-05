@@ -18,7 +18,7 @@ hs.plotly <- function(
   right  <- breaks[-1L]
   mids   <- (left + right) / 2
   widths <- right - left
-  right_closed <- isTRUE(attr(breaks, "right"))
+  right_closed <- isTRUE(attr(breaks, "right") %||% TRUE)
   n_bins <- length(mids)
 
   # --- groups ---
@@ -26,7 +26,7 @@ hs.plotly <- function(
     groups <- "Series 1"
     G <- 1L
   } else {
-    if (is.factor(by)) groups <- levels(by) else groups <- unique(by)
+    if (is.factor(by)) groups <- levels(by) else groups <- unique(by[!is.na(by)])
     G <- length(groups)
   }
 
@@ -50,8 +50,9 @@ hs.plotly <- function(
   }
 
   rng_txt <- paste0(
-    "[", format(signif(left, 6)), ", ", format(signif(right, 6)),
-    if (right_closed) ")" else "]"
+    if (right_closed) "(" else "[",
+    format(signif(left, 6)), ", ", format(signif(right, 6)),
+    if (right_closed) "]" else ")"
   )
 
   .hover_group <- function(yv) {
@@ -104,7 +105,6 @@ hs.plotly <- function(
   # --- base widget (NO elementId here) ---
   plt <- plotly::plot_ly(
     type       = "bar",
-    hoverinfo  = "text",
     showlegend = G > 1
   )
 
@@ -134,6 +134,7 @@ hs.plotly <- function(
           line  = list(color = border_hex_grp[g], width = 1)
         )
       },
+      hoverinfo = "text",
       hovertext = if (!is.null(nm) && length(by.name))
         paste0(by.name, ": ", groups[g], "<br>", hover) else hover
     )
@@ -179,7 +180,6 @@ hs.plotly <- function(
     )
   }
 
-  plt <- plotly::layout(plt, title = NULL)
   plt$x$layout$title <- NULL
 
   plt <- .finalize_plotly_widget(
@@ -188,7 +188,7 @@ hs.plotly <- function(
     x.name      = x.name,
     by.name     = if (G > 1) by.name else NULL,
     add_title   = FALSE,
-    nudge_viewer = TRUE
+    nudge_viewer = (.allow.interactive() && !isTRUE(getOption("knitr.in.progress")))
   )
 
   invisible(plt)

@@ -72,7 +72,7 @@ Chart(
         labels=c("\%", "input", "prop", "off"),
         labels_position=c("in", "out"),
         labels_color="white",
-        labels_size=0.75,
+        labels_size=1.00,
         labels_decimals=NULL,
         labels_cut=NULL,
 
